@@ -175,11 +175,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Framework.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Framework.hpp" />
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="stdafx.hpp" />
   </ItemGroup>
