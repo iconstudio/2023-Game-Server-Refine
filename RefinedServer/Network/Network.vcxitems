@@ -3,8 +3,8 @@
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{74c59b3a-a02f-4e4e-9e1e-afce7a7cb14b}</ItemsProjectGuid>
-    <ItemsRootNamespace>core</ItemsRootNamespace>
+    <ItemsProjectGuid>{36e8bd54-1dbb-4fd1-a304-8d22721b85a6}</ItemsProjectGuid>
+    <ItemsRootNamespace>net</ItemsRootNamespace>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -13,5 +13,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
   </ItemGroup>
 </Project>

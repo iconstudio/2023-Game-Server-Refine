@@ -3,8 +3,8 @@
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{74c59b3a-a02f-4e4e-9e1e-afce7a7cb14b}</ItemsProjectGuid>
-    <ItemsRootNamespace>core</ItemsRootNamespace>
+    <ItemsProjectGuid>{2b6d212a-90b7-4295-ac9d-7adb96c265d1}</ItemsProjectGuid>
+    <ItemsRootNamespace>util</ItemsRootNamespace>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -13,5 +13,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Utility.ixx" />
   </ItemGroup>
 </Project>

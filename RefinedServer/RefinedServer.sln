@@ -7,6 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RefinedServer", "RefinedSer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxitems", "{74C59B3A-A02F-4E4E-9E1E-AFCE7A7CB14B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utility", "Utility\Utility.vcxitems", "{2B6D212A-90B7-4295-AC9D-7ADB96C265D1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Network", "Network\Network.vcxitems", "{36E8BD54-1DBB-4FD1-A304-8D22721B85A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,7 +33,11 @@ Global
 		SolutionGuid = {CE01ECCD-634D-4CDB-A95B-598155485A55}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Utility\Utility.vcxitems*{2b6d212a-90b7-4295-ac9d-7adb96c265d1}*SharedItemsImports = 9
+		Network\Network.vcxitems*{36e8bd54-1dbb-4fd1-a304-8d22721b85a6}*SharedItemsImports = 9
 		Core\Core.vcxitems*{74c59b3a-a02f-4e4e-9e1e-afce7a7cb14b}*SharedItemsImports = 9
 		Core\Core.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
+		Network\Network.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
+		Utility\Utility.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal
