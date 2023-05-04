@@ -15,6 +15,7 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Monad.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Utility.ixx" />
   </ItemGroup>
 </Project>

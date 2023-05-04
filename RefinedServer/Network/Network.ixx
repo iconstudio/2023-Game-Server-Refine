@@ -1,3 +1,6 @@
 export module Network;
 
-export void MyFunc();
+export namespace net
+{
+
+}

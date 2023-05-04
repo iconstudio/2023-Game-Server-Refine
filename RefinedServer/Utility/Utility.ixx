@@ -1,3 +1,8 @@
 export module Utility;
 
-export void MyFunc();
+export using ASDF = int;
+
+export namespace util
+{
+
+}
