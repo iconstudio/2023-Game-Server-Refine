@@ -13,5 +13,6 @@
 #define UNUSED [[maybe_unused]]
 #define DEPRECATED [[deprecated]]
 #define DEPRECATE(msg) [[deprecated(msg)]]
+#define NOADDRESS [[msvc::no_unique_address]]
 
 #endif // __PCH__

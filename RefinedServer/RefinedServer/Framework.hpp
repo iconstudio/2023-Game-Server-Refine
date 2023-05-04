@@ -14,7 +14,7 @@ namespace net
 	namespace abi
 	{}
 
-	class NODISCARD [[msvc::no_unique_address]] Functions final
+	class NODISCARD Functions final
 	{};
 
 	namespace service
