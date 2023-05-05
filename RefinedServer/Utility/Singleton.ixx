@@ -10,7 +10,7 @@ export namespace util
 			Instance = instance;
 		}
 
-		constexpr ~Singleton(T* instance) noexcept = default;
+		constexpr ~Singleton() noexcept = default;
 
 		Singleton(const Singleton& other) noexcept = delete;
 		Singleton& operator=(const Singleton& other) noexcept = delete;
