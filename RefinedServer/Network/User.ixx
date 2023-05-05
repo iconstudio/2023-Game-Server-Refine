@@ -1,7 +1,8 @@
 export module Net.User;
 import Net.Session;
+import Net.Socket;
 
-export namespace net::session
+export namespace net
 {
 	export enum class UserStates : unsigned char
 	{

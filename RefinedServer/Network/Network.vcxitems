@@ -16,9 +16,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Context.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Operations.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Socket.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
   </ItemGroup>
 </Project>
