@@ -82,26 +82,8 @@ export namespace util
 	concept similar = !std::same_as<clean_t<Ty1>, clean_t<Ty2>>&& std::common_with<clean_t<Ty1>, clean_t<Ty2>>;
 
 	template <typename T>
-	inline constexpr bool is_actual_integral_v = std::_Is_any_of_v<std::remove_cvref_t<T>, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long>;
-
-	template <typename T>
 	concept actual_integral = is_actual_integral_v<T>;
 
-	template <typename Special, template <typename...> typename Template>
-	struct is_specialization : std::false_type {};
-
-	template<template<typename...> typename Template, typename... Args>
-	struct is_specialization<Template<Args...>, typename Template> : std::true_type {};
-
-	template<typename Special, template<typename...> typename Template>
-	inline constexpr bool is_specialization_v = is_specialization<Special, Template>::value;
-
-	//template <typename T, template <typename...> typename>
-	//inline constexpr bool is_specialization_v = false;
-
-	//template <template <typename...> typename T, typename... Args>
-	//inline constexpr bool is_specialization_v<T<Args...>, T> = true;
-
 	template<typename... Ts>
-	concept specializations = is_specialization_v<Ts...>;
+	concept specializations = is_specialization_v<clean_t<Ts>...>;
 }
