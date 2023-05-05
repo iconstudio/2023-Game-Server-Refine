@@ -669,61 +669,20 @@ export namespace util
 	class [[nodiscard]] Monad<void>
 	{
 	public:
-		constexpr Monad(nullopt_t) noexcept {}
+		using value_type = void;
 
-		template<copyable Uty>
-		constexpr Monad(Monad<Uty>& other) noexcept
-			: hasValue(other.hasValue)
+		constexpr Monad() noexcept
+			: hasValue(true)
 		{}
 
-		template<copyable Uty>
-		constexpr Monad(const Monad<Uty>& other) noexcept
-			: hasValue(other.hasValue)
+		constexpr Monad(nullopt_t) noexcept
+			: hasValue(false)
 		{}
-
-		template<copyable Uty>
-		constexpr Monad(Monad<Uty>&& other) noexcept
-			: hasValue(move(other.hasValue))
-		{}
-
-		template<copyable Uty>
-		constexpr Monad(const Monad<Uty>&& other) noexcept
-			: hasValue(move(other.hasValue))
-		{}
-
-		template<copyable Uty>
-		constexpr Monad& operator=(Monad<Uty>& other) noexcept
-		{
-			hasValue = other.hasValue;
-			return *this;
-		}
-
-		template<copyable Uty>
-		constexpr Monad& operator=(const Monad<Uty>& other) noexcept
-		{
-			hasValue = other.hasValue;
-			return *this;
-		}
-
-		template<copyable Uty>
-		constexpr Monad& operator=(Monad<Uty>&& other) noexcept
-		{
-			hasValue = move(other.hasValue);
-			return *this;
-		}
-
-		template<copyable Uty>
-		constexpr Monad& operator=(const Monad<Uty>&& other) noexcept
-		{
-			hasValue = move(other.hasValue);
-			return *this;
-		}
-
-		constexpr Monad& operator=(Monad&&) noexcept = default;
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr Monad&
+		inline constexpr
+			Monad&
 			if_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
@@ -737,7 +696,8 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr const Monad&
+		inline constexpr
+			const Monad&
 			if_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
@@ -751,7 +711,8 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr Monad&&
+		inline constexpr
+			Monad&&
 			if_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
@@ -760,12 +721,13 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return move(*this);
+			return std::move(*this);
 		}
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr const Monad&&
+		inline constexpr
+			const Monad&&
 			if_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
@@ -774,20 +736,21 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return move(*this);
+			return std::move(*this);
 		}
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
 		inline constexpr
-			monad_result_t<Fn, Args...>
+			auto
 			and_then(Fn&& action, Args&&... args)
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			using fwd_result_t = monad_result_t<Fn, Args...>;
 
-			static_assert(!is_same_v<fwd_result_t, void>);
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
+
+			using fwd_value_t = fwd_result_t::value_type;
 
 			if (hasValue)
 			{
@@ -795,21 +758,22 @@ export namespace util
 			}
 			else
 			{
-				return fwd_result_t{ nullopt };
+				return Monad<fwd_value_t>{ nullopt };
 			}
 		}
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
 		inline constexpr
-			monad_result_t<Fn, Args...>
+			auto
 			and_then(Fn&& action, Args&&... args) const
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			using fwd_result_t = monad_result_t<Fn, Args...>;
 
-			static_assert(!is_same_v<fwd_result_t, void>);
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
+
+			using fwd_value_t = fwd_result_t::value_type;
 
 			if (hasValue)
 			{
@@ -817,42 +781,7 @@ export namespace util
 			}
 			else
 			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<invocables Lfn, invocables Rfn>
-		inline constexpr
-			monad_result_t<Lfn>
-			transform(Lfn&& safe_action, Rfn&& fail_action)
-			noexcept(noexcept(forward<Lfn>(safe_action)()) && noexcept(forward<Rfn>(fail_action)()))
-		{
-			using safe_result_t = monad_result_t<Lfn>;
-			using fail_result_t = monad_result_t<Rfn>;
-
-			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
-
-			if (hasValue)
-			{
-				if constexpr (is_same_v<safe_result_t, void>)
-				{
-					forward<Lfn>(safe_action)();
-				}
-				else
-				{
-					return forward<Lfn>(safe_action)();
-				}
-			}
-			else
-			{
-				if constexpr (is_same_v<fail_result_t, void>)
-				{
-					forward<Rfn>(fail_action)();
-				}
-				else
-				{
-					return forward<Rfn>(fail_action)();
-				}
+				return Monad<fwd_value_t>{ nullopt };
 			}
 		}
 
@@ -860,7 +789,7 @@ export namespace util
 		inline constexpr
 			monad_result_t<Lfn>
 			transform(Lfn&& safe_action, Rfn&& fail_action) const
-			noexcept(noexcept(forward<Lfn>(safe_action)()) && noexcept(forward<Rfn>(fail_action)()))
+			noexcept(noexcept(forward<Lfn>(safe_action)) && noexcept(forward<Rfn>(fail_action)))
 		{
 			using safe_result_t = monad_result_t<Lfn>;
 			using fail_result_t = monad_result_t<Rfn>;
@@ -911,30 +840,11 @@ export namespace util
 			}
 		}
 
-		template<invocables Fn, typename Uty>
-		inline constexpr
-			Uty
-			translate(Fn&& safe_action, Uty&& default_value) const
-			noexcept(noexcept(forward<Fn>(safe_action)()))
-		{
-			using fn_result_t = monad_result_t<Fn>;
-
-			static_assert(convertible_to<fn_result_t, Uty>);
-
-			if (hasValue)
-			{
-				return forward<Fn>(safe_action)();
-			}
-			else
-			{
-				return forward<Uty>(default_value);
-			}
-		}
-
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr Monad&
-			else_than(Fn&& action, Args&&... args) &
+		inline constexpr
+			Monad&
+			else_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!hasValue)
@@ -947,8 +857,9 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr const Monad&
-			else_than(Fn&& action, Args&&... args) const&
+		inline constexpr
+			const Monad&
+			else_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!hasValue)
@@ -961,8 +872,9 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr Monad&&
-			else_than(Fn&& action, Args&&... args) &&
+		inline constexpr
+			Monad&&
+			else_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!hasValue)
@@ -970,13 +882,14 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return move(*this);
+			return *this;
 		}
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
-		inline constexpr const Monad&&
-			else_than(Fn&& action, Args&&... args) const&&
+		inline constexpr
+			const Monad&&
+			else_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!hasValue)
@@ -984,35 +897,13 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return move(*this);
+			return *this;
 		}
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, Args...>
 		inline constexpr
-			monad_result_t<Fn, Args...>
-			or_else(Fn&& action, Args&&... args)
-			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
-		{
-			using fwd_result_t = monad_result_t<Fn, Args...>;
-
-			static_assert(!is_same_v<fwd_result_t, void>);
-			static_assert(is_specialization_v<fwd_result_t, Monad>);
-
-			if (!hasValue)
-			{
-				return forward<Fn>(action)(forward<Args>(args)...);
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<typename Fn, typename... Args>
-			requires invocables<Fn, Args...>
-		inline constexpr
-			monad_result_t<Fn, Args...>
+			auto
 			or_else(Fn&& action, Args&&... args) const
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
@@ -1021,22 +912,36 @@ export namespace util
 			static_assert(!is_same_v<fwd_result_t, void>);
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
 
+			using fwd_value_t = fwd_result_t::value_type;
+
 			if (!hasValue)
 			{
 				return forward<Fn>(action)(forward<Args>(args)...);
 			}
 			else
 			{
-				return fwd_result_t{ nullopt };
+				return Monad<fwd_value_t>{ nullopt };
 			}
 		}
 
-		constexpr Monad() noexcept = default;
+		constexpr bool has_value() const noexcept
+		{
+			return hasValue;
+		}
+
+		explicit constexpr operator bool() const noexcept
+		{
+			return hasValue;
+		}
+
 		constexpr Monad(const Monad&) noexcept = default;
 		constexpr Monad(Monad&&) noexcept = default;
+		constexpr Monad& operator=(const Monad&) noexcept = default;
+		constexpr Monad& operator=(Monad&&) noexcept = default;
 		constexpr ~Monad() noexcept = default;
 
-		bool hasValue = false;
+	private:
+		bool hasValue;
 	};
 
 	template<typename T>

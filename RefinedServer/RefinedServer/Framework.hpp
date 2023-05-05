@@ -1,6 +1,7 @@
 #pragma once
 import Utility;
 import Utility.Array;
+import Utility.Monad;
 
 class NODISCARD Framework
 {
@@ -13,21 +14,21 @@ public:
 	void Update() noexcept;
 	void UpdateOnce(const float& delta_time) noexcept;
 
-	Monad<int> BeginAccept();
+	util::Monad<int> BeginAccept();
 	void EndAccept() noexcept;
 	void EndFailedAccept() noexcept;
 
-	Monad<int> BeginWelcome();
+	util::Monad<int> BeginWelcome();
 	void EndWelcome() noexcept;
 	void EndFailedWelcome() noexcept;
 
-	Monad<int> BeginDispose();
+	util::Monad<int> BeginDispose();
 	void EndDispose() noexcept;
 	void EndFailedDispose() noexcept;
 
 private:
-	Monad<int> Dispose(User* const& user);
-	Monad<int> Close(Socket& socket);
+	util::Monad<int> Dispose(User* const& user);
+	util::Monad<int> Close(Socket& socket);
 
 	bool Poll() noexcept;
 	bool Post() noexcept;
