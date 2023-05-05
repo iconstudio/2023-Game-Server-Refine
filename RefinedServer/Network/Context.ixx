@@ -229,7 +229,7 @@ export namespace std
 		[[nodiscard]]
 		size_t operator()(const net::Context& ctx) const noexcept
 		{
-			return _Hash_representation(ctx.Internal + ctx.Offset + static_cast<unsigned long long>(ctx.GetOperation()));
+			return _Hash_representation(ctx.Internal + ctx.Offset + static_cast<unsigned>(ctx.GetOperation()));
 		}
 	};
 
@@ -239,7 +239,7 @@ export namespace std
 		[[nodiscard]]
 		size_t operator()(const net::Context* ctx) const noexcept
 		{
-			return _Hash_representation(ctx);
+			return _Hash_representation(static_cast<const void*>(ctx));
 		}
 	};
 }
