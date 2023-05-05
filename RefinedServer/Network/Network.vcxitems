@@ -15,6 +15,8 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
   </ItemGroup>
 </Project>

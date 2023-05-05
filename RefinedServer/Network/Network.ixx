@@ -13,7 +13,6 @@ export namespace net
 	class Address;
 	class EndPoint;
 	class Socket;
-	class IoState;
 	class Context;
 	class SendContext;
 	class BasicUser;
