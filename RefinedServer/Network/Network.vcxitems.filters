@@ -12,5 +12,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)UserIdentifier.ixx">
       <Filter>Identifiers</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
   </ItemGroup>
 </Project>

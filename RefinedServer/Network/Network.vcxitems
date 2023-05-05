@@ -17,6 +17,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Asynchron.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Context.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
