@@ -4,6 +4,7 @@ import Utility.Singleton;
 import Utility.Array;
 import Utility.Monad;
 import Net;
+import Net.EndPoint;
 
 class NODISCARD Framework : util::Singleton<Framework>
 {
@@ -28,19 +29,21 @@ public:
 	void EndDispose() noexcept;
 	void EndFailedDispose() noexcept;
 
-private:
 	util::Monad<int> Dispose(net::User* const& user);
-	util::Monad<int> Close(net::Socket& socket);
 
 	bool Poll() noexcept;
 	bool Post() noexcept;
+
+private:
+	util::Monad<int> Close(net::Socket& socket);
 
 	static inline constexpr size_t maxNPCs = 1000;
 	static inline constexpr size_t maxUsers = 1000;
 
 	net::CompletionPort ioService;
-	net::Socket ioSocket;
+	net::Socket nameSocket;
+	net::EndPoint nameEndPoint;
 
-	util::Array<net::BasicUser, maxNPCs> everySession;
-	util::Array<net::User, maxUsers> everyUser;
+	util::Array<net::BasicSession*, maxNPCs> everySession;
+	util::Array<net::User*, maxUsers> everyUser;
 };

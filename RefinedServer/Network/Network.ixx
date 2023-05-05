@@ -15,7 +15,7 @@ export namespace net
 	class Socket;
 	class Context;
 	class SendContext;
-	class BasicUser;
+	class BasicSession;
 	class User;
 	class Room;
 	template<size_t Size>
