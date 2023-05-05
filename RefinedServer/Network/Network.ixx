@@ -48,4 +48,101 @@ export namespace net
 		constexpr unsigned short version = MAKEWORD(2, 2);
 		return ::WSAStartup(version, &data);
 	}
+
+	namespace debug
+	{
+		inline constexpr
+			bool
+			CheckSocket(const unsigned long long& socket) noexcept
+		{
+			return INVALID_SOCKET != socket;
+		}
+
+		inline constexpr
+			bool
+			CheckError(const int& socket_fn_result) noexcept
+		{
+			return SOCKET_ERROR == socket_fn_result;
+		}
+
+		inline constexpr
+			bool
+			CheckError(int&& socket_fn_result) noexcept
+		{
+			return SOCKET_ERROR == static_cast<int&&>(socket_fn_result);
+		}
+
+		inline constexpr
+			bool
+			CheckError(const volatile int& socket_fn_result) noexcept
+		{
+			return SOCKET_ERROR == socket_fn_result;
+		}
+
+		inline constexpr
+			bool
+			CheckError(volatile int&& socket_fn_result) noexcept
+		{
+			return SOCKET_ERROR == static_cast<volatile int&&>(socket_fn_result);
+		}
+
+		inline constexpr
+			bool
+			CheckPending(const int& socket_error_code) noexcept
+		{
+			return ERROR_IO_PENDING == socket_error_code;
+		}
+
+		inline constexpr
+			bool
+			CheckPending(int&& socket_error_code) noexcept
+		{
+			return ERROR_IO_PENDING == static_cast<int&&>(socket_error_code);
+		}
+
+		inline constexpr
+			bool
+			CheckPending(const volatile int& socket_error_code) noexcept
+		{
+			return ERROR_IO_PENDING == socket_error_code;
+		}
+
+		inline constexpr
+			bool
+			CheckPending(volatile int&& socket_error_code) noexcept
+		{
+			return ERROR_IO_PENDING == static_cast<volatile int&&>(socket_error_code);
+		}
+
+		inline constexpr
+			bool
+			CheckIncomplete(const int& socket_error_code) noexcept
+		{
+			return ERROR_IO_INCOMPLETE == socket_error_code;
+		}
+
+		inline constexpr
+			bool
+			CheckIncomplete(int&& socket_error_code) noexcept
+		{
+			return ERROR_IO_INCOMPLETE == static_cast<int&&>(socket_error_code);
+		}
+
+		inline constexpr
+			bool
+			CheckIncomplete(const volatile int& socket_error_code) noexcept
+		{
+			return ERROR_IO_INCOMPLETE == socket_error_code;
+		}
+
+		inline constexpr
+			bool
+			CheckIncomplete(volatile int&& socket_error_code) noexcept
+		{
+			return ERROR_IO_INCOMPLETE == static_cast<volatile int&&>(socket_error_code);
+		}
+
+		using ::GetLastError;
+		using ::WSAGetLastError;
+	}
 }
