@@ -1,30 +1,6 @@
 #pragma once
-
-template<typename T, typename ID>
-class Session;
-class BasicUser;
-class User;
-class CompletionPort;
-class Socket;
-template<typename T>
-class Monad;
-
-namespace net
-{
-	namespace abi
-	{}
-
-	class NODISCARD Functions final
-	{};
-
-	namespace service
-	{
-	}
-
-	namespace settings
-	{
-	}
-}
+import Utility;
+import Utility.Array;
 
 class NODISCARD Framework
 {
@@ -62,6 +38,6 @@ private:
 	CompletionPort ioService;
 	Socket ioSocket;
 
-	std::array<BasicUser, maxNPCs> everySession;
-	std::array<User, maxUsers> everyUser;
+	util::Array<BasicUser, maxNPCs> everySession;
+	util::Array<User, maxUsers> everyUser;
 };
