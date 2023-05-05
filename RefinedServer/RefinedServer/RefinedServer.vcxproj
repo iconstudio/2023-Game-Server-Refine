@@ -193,6 +193,9 @@
     <ClInclude Include="stdafx.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Update="D:\yoyof\Documents\Git\iconstudio\2023-Game-Server-Refine\RefinedServer\Network\Intrinsics.ixx">
+      <FileType>Document</FileType>
+    </ClCompile>
     <ClCompile Update="D:\yoyof\Documents\Git\iconstudio\2023-Game-Server-Refine\RefinedServer\Network\ISession.ixx">
       <FileType>Document</FileType>
     </ClCompile>
