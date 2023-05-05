@@ -8,6 +8,7 @@ export namespace net
 	using ::WSAOVERLAPPED;
 	using ::WSABUF;
 	using ::LPWSABUF;
+	using ::SOCKET;
 
 	class CompletionPort;
 	class Address;
