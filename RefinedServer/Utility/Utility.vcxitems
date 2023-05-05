@@ -17,8 +17,10 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Atomic.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Constraints.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Locks.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Meta.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Monad.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Thread.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Traits.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Utility.ixx" />
   </ItemGroup>
