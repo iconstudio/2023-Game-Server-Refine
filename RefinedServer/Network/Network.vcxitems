@@ -16,7 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)BasicSession.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />

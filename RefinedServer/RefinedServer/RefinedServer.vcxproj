@@ -192,6 +192,11 @@
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="stdafx.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Update="D:\yoyof\Documents\Git\iconstudio\2023-Game-Server-Refine\RefinedServer\Network\ISession.ixx">
+      <FileType>Document</FileType>
+    </ClCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
