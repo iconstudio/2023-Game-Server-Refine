@@ -62,35 +62,35 @@ export namespace net
 	concept qualified_sessions = session_identifiers<ID>;
 
 	template<typename T, session_identifiers ID>
-	struct ISession
+	struct Session
 	{
 	public:
 		using base = void;
 		using crtp_type = T;
 		using id_type = ID;
 
-		ISession(ISession&& other) noexcept
-			: myID(util::move(other).MyID())
-			, isTaken(util::move(other).IsTaken())
+		Session(Session&& other) noexcept
+			: myID(static_cast<Session&&>(other).MyID())
+			, isTaken(static_cast<Session&&>(other).IsTaken())
 		{}
 
-		explicit constexpr ISession(const ID& id) noexcept
+		explicit constexpr Session(const ID& id) noexcept
 			: myID(id)
 			, isTaken(false)
 		{}
 
-		explicit constexpr ISession(ID&& id) noexcept
-			: myID(util::move(id))
+		explicit constexpr Session(ID&& id) noexcept
+			: myID(static_cast<ID&&>(id))
 			, isTaken(false)
 		{}
 
-		inline ISession& operator=(ISession&& other) noexcept
+		inline Session& operator=(Session&& other) noexcept
 		{
-			myID = util::move(other).MyID();
-			isTaken = util::move(other).IsTaken();
+			myID = static_cast<Session&&>(other).MyID();
+			isTaken = static_cast<Session&&>(other).IsTaken();
 		}
 
-		constexpr ~ISession() noexcept = default;
+		constexpr ~Session() noexcept = default;
 
 		inline bool Take() & noexcept
 		{
@@ -116,7 +116,7 @@ export namespace net
 		[[nodiscard]]
 		inline constexpr ID&& MyID() && noexcept
 		{
-			return util::move(myID);
+			return static_cast<ID&&>(myID);
 		}
 
 		[[nodiscard]]
@@ -128,18 +128,18 @@ export namespace net
 		[[nodiscard]]
 		explicit inline constexpr operator ID() && noexcept
 		{
-			return util::move(myID);
+			return static_cast<ID&&>(myID);
 		}
 
 		[[nodiscard]]
-		inline constexpr bool operator==(const ISession& other) const noexcept
+		inline constexpr bool operator==(const Session& other) const noexcept
 		{
 			return myID == other.myID;
 		}
 
 		template<typename U, session_identifiers UID>
 		[[nodiscard]]
-		inline constexpr bool operator==(const ISession<U, UID>& other) const noexcept
+		inline constexpr bool operator==(const Session<U, UID>& other) const noexcept
 		{
 			if constexpr (util::same_as<UID, ID>)
 			{
@@ -159,14 +159,14 @@ export namespace net
 		}
 
 		[[nodiscard]]
-		inline constexpr util::strong_ordering operator<=>(const ISession& other) const noexcept
+		inline constexpr util::strong_ordering operator<=>(const Session& other) const noexcept
 			requires util::integrals<ID>
 		{
 			return myID <=> other.myID;
 		}
 
 		[[nodiscard]]
-		inline constexpr util::strong_ordering operator<=>(const ISession& other) const noexcept
+		inline constexpr util::strong_ordering operator<=>(const Session& other) const noexcept
 			requires util::enumerations<ID>
 		{
 			return util::to_underlying(myID) <=> util::to_underlying(other.myID);
@@ -229,12 +229,12 @@ namespace net
 		//const auto y = detail::declitem(TestIDEN1{});
 		//const auto z = detail::declitem(TestIDEN2{});
 
-		constexpr ISession<TestCL, bool> id0{ bool{} };
-		constexpr ISession<int, int> id1{ int {} };
-		constexpr ISession<long long, long long> id2{ long long{} };
-		constexpr ISession<TestIDEN1, TestIDEN1> id3{ TestIDEN1 {} };
-		constexpr ISession<TestIDEN2, TestIDEN2> id4{ TestIDEN2 {} };
-		constexpr ISession<TestIDEN3, int> id5{ 0 };
-		//constexpr ISession<TestIDEN3, float> id6{ 20.010523029f };
+		constexpr Session<TestCL, bool> id0{ bool{} };
+		constexpr Session<int, int> id1{ int {} };
+		constexpr Session<long long, long long> id2{ long long{} };
+		constexpr Session<TestIDEN1, TestIDEN1> id3{ TestIDEN1 {} };
+		constexpr Session<TestIDEN2, TestIDEN2> id4{ TestIDEN2 {} };
+		constexpr Session<TestIDEN3, int> id5{ 0 };
+		//constexpr Session<TestIDEN3, float> id6{ 20.010523029f };
 	}
 }

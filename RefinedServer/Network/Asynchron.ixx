@@ -7,11 +7,11 @@ export namespace net
 {
 	template<typename T, session_identifiers ID>
 	class Asynchron
-		: public ISession<T, ID>
+		: public Session<T, ID>
 		, public Context
 	{
 	public:
-		using base = ISession<T, ID>;
+		using base = Session<T, ID>;
 		using crtp_type = T;
 		using id_type = ID;
 
