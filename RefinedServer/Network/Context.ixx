@@ -24,7 +24,7 @@ namespace net
 		{}
 
 		constexpr Context(Context&& other) noexcept
-			: OVERLAPPED(), myOperation(util::move(other.myOperation))
+			: OVERLAPPED(), myOperation(static_cast<Operation&&>(other.myOperation))
 		{}
 
 		explicit constexpr Context(const Operation& op) noexcept
@@ -32,40 +32,65 @@ namespace net
 		{}
 
 		explicit constexpr Context(Operation&& op) noexcept
-			: OVERLAPPED(), myOperation(util::move(op))
+			: OVERLAPPED(), myOperation(static_cast<Operation&&>(op))
 		{}
 
 		Context& operator=(Context&& other) noexcept
 		{
-			myOperation = util::move(other.myOperation);
+			myOperation = static_cast<Operation&&>(other.myOperation);
 			return *this;
 		}
 
 		constexpr ~Context() noexcept = default;
 
-		inline constexpr void Clear() & noexcept
+		inline bool SetOperation(const Operation& prev_op, const Operation& op) & noexcept
 		{
-			static_cast<OVERLAPPED&>(*this) = OVERLAPPED{};
+			return util::CompareAndSet(reinterpret_cast<util::atomic<Operation>*>(&myOperation), prev_op, op);
 		}
 
-		inline bool SetOperation(Operation prev_op, const Operation& op) & noexcept
+		inline bool SetOperation(Operation&& prev_op, const Operation& op) & noexcept
 		{
-			return util::atomic_compare_exchange_strong
-			(
-				reinterpret_cast<util::atomic<Operation>*>(&myOperation),
-				&prev_op,
-				op
-			);
+			return util::CompareAndSet(reinterpret_cast<util::atomic<Operation>*>(&myOperation), static_cast<Operation&&>(prev_op), op);
 		}
 
-		inline bool SetOperation(Operation prev_op, Operation&& op) & noexcept
+		inline bool SetOperation(const Operation& prev_op, Operation&& op) & noexcept
 		{
-			return util::atomic_compare_exchange_strong
-			(
-				reinterpret_cast<util::atomic<Operation>*>(&myOperation),
-				&prev_op,
-				util::move(op)
-			);
+			return util::CompareAndSet(reinterpret_cast<util::atomic<Operation>*>(&myOperation), prev_op, static_cast<Operation&&>(op));
+		}
+
+		inline bool SetOperation(Operation&& prev_op, Operation&& op) & noexcept
+		{
+			return util::CompareAndSet(reinterpret_cast<util::atomic<Operation>*>(&myOperation), static_cast<Operation&&>(prev_op), static_cast<Operation&&>(op));
+		}
+
+		inline void WaitNext(const Operation& prev_op, const Operation& op) & noexcept
+		{
+			while (!SetOperation(prev_op, op));
+		}
+
+		inline void WaitNext(Operation&& prev_op, const Operation& op) & noexcept
+		{
+			while (!SetOperation(static_cast<Operation&&>(prev_op), op));
+		}
+
+		inline void WaitNext(const Operation& prev_op, Operation&& op) & noexcept
+		{
+			while (!SetOperation(prev_op, static_cast<Operation&&>(op)));
+		}
+
+		inline void WaitNext(Operation&& prev_op, Operation&& op) & noexcept
+		{
+			while (!SetOperation(static_cast<Operation&&>(prev_op), static_cast<Operation&&>(op)));
+		}
+
+		inline void Wait(const Operation& op) & noexcept
+		{
+			while (!SetOperation(op, op));
+		}
+
+		inline void Wait(Operation&& op) & noexcept
+		{
+			while (!SetOperation(static_cast<Operation&&>(op), static_cast<Operation&&>(op)));
 		}
 
 		inline constexpr Context& SetOperation(const Operation& op) & noexcept
@@ -77,9 +102,14 @@ namespace net
 
 		inline constexpr Context& SetOperation(Operation&& op) & noexcept
 		{
-			myOperation = util::move(op);
+			myOperation = static_cast<Operation&&>(op);
 
 			return *this;
+		}
+
+		inline constexpr void Clear() & noexcept
+		{
+			static_cast<OVERLAPPED&>(*this) = OVERLAPPED{};
 		}
 
 		inline constexpr const Operation& GetOperation() const& noexcept
@@ -89,7 +119,7 @@ namespace net
 
 		inline constexpr Operation&& GetOperation() && noexcept
 		{
-			return util::move(myOperation);
+			return static_cast<Operation&&>(myOperation);
 		}
 
 		Context(const Context& other) noexcept = delete;
