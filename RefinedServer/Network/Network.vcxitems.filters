@@ -13,5 +13,6 @@
       <Filter>Identifiers</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IOIntrinsic.ixx" />
   </ItemGroup>
 </Project>

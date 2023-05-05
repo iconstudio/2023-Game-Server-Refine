@@ -19,6 +19,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Asynchron.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Context.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IOIntrinsic.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
