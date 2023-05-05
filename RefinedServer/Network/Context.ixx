@@ -206,38 +206,38 @@ namespace net
 export namespace std
 {
 	template<>
-	struct formatter<kj::Operation> : formatter<util::string>
+	struct formatter<net::Operation> : formatter<util::string>
 	{
-		inline auto format(const kj::Operation op, format_context& context) const noexcept
+		inline auto format(const net::Operation op, format_context& context) const noexcept
 		{
-			return format_to(context.out(), "{}", kj::ToString(op));
+			return format_to(context.out(), "{}", net::ToString(op));
 		}
 	};
 
 	template<>
-	struct formatter<kj::Context> : formatter<util::string>
+	struct formatter<net::Context> : formatter<util::string>
 	{
-		inline auto format(const kj::Context& ct, format_context& context) const noexcept
+		inline auto format(const net::Context& ct, format_context& context) const noexcept
 		{
-			return format_to(context.out(), "Context<{}>", kj::ToString(ct.GetOperation()));
+			return format_to(context.out(), "Context<{}>", net::ToString(ct.GetOperation()));
 		}
 	};
 
 	template<>
-	struct hash<kj::Context>
+	struct hash<net::Context>
 	{
 		[[nodiscard]]
-		size_t operator()(const kj::Context& ctx) const noexcept
+		size_t operator()(const net::Context& ctx) const noexcept
 		{
 			return _Hash_representation(ctx.Internal + ctx.Offset + static_cast<unsigned long long>(ctx.GetOperation()));
 		}
 	};
 
 	template<>
-	struct hash<kj::Context*>
+	struct hash<net::Context*>
 	{
 		[[nodiscard]]
-		size_t operator()(const kj::Context* ctx) const noexcept
+		size_t operator()(const net::Context* ctx) const noexcept
 		{
 			return _Hash_representation(ctx);
 		}

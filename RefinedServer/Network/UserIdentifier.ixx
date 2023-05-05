@@ -91,9 +91,9 @@ export namespace net
 
 export namespace std
 {
-	inline string to_string(const kj::userid_t& pid) noexcept
+	inline string to_string(const net::userid_t& pid) noexcept
 	{
-		if (kj::userid_t::invalid == pid)
+		if (net::userid_t::invalid == pid)
 		{
 			return "Invalid ID";
 		}
@@ -103,48 +103,22 @@ export namespace std
 		}
 	}
 
-	inline string to_string(const kj::account_t& account) noexcept
-	{
-		if (kj::account_t::invalid == account)
-		{
-			return "Invalid AC";
-		}
-		else
-		{
-			return std::to_string(std::to_underlying(account));
-		}
-	}
-
-	inline ostream& operator<<(ostream& stream, const kj::userid_t& pid) noexcept
+	inline ostream& operator<<(ostream& stream, const net::userid_t& pid) noexcept
 	{
 		return stream << to_string(pid);
 	}
 
-	inline ostream& operator<<(ostream& stream, const kj::account_t& account) noexcept
-	{
-		return stream << to_string(account);
-	}
-
-	inline istream& operator>>(istream& stream, kj::userid_t& pid) noexcept
+	inline istream& operator>>(istream& stream, net::userid_t& pid) noexcept
 	{
 		unsigned int buffer{};
 		stream >> buffer;
 
-		pid = static_cast<kj::userid_t>(buffer);
+		pid = static_cast<net::userid_t>(buffer);
 		return stream;
 	}
-
-	inline istream& operator>>(istream& stream, kj::account_t& account) noexcept
-	{
-		unsigned long long buffer{};
-		stream >> buffer;
-
-		account = static_cast<kj::account_t>(buffer);
-		return stream;
-	}
-
+	
 	template<>
-	struct formatter<kj::userid_t>
+	struct formatter<net::userid_t>
 	{
 		inline format_parse_context::iterator parse(format_parse_context& context) const noexcept
 		{
@@ -152,24 +126,9 @@ export namespace std
 		}
 
 		template<int = 0>
-		inline auto format(const kj::userid_t& id, format_context& context) const noexcept
+		inline auto format(const net::userid_t& id, format_context& context) const noexcept
 		{
 			return std::format_to(context.out(), "ID<{}>", to_string(id));
-		}
-	};
-
-	template<>
-	struct formatter<kj::account_t>
-	{
-		inline format_parse_context::iterator parse(format_parse_context& context) const noexcept
-		{
-			return context.begin();
-		}
-
-		template<int = 0>
-		inline auto format(const kj::account_t& account, format_context& context) const noexcept
-		{
-			return std::format_to(context.out(), "AC<{}>", to_string(account));
 		}
 	};
 }

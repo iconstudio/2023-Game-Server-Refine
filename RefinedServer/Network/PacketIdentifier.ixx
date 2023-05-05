@@ -100,114 +100,114 @@ export namespace net
 
 export namespace std
 {
-	inline constexpr string to_string(const kj::packetid_t& protocol) noexcept
+	inline constexpr string to_string(const net::packetid_t& protocol) noexcept
 	{
 		switch (protocol)
 		{
-			case kj::packetid_t::NONE:
+			case net::packetid_t::NONE:
 			return "NONE";
 
-			case kj::packetid_t::SC_RESPOND_VERSION:
+			case net::packetid_t::SC_RESPOND_VERSION:
 			return "RESPOND_VERSION";
 
-			case kj::packetid_t::SC_RESPOND_USERS:
+			case net::packetid_t::SC_RESPOND_USERS:
 			return "RESPOND_USERS";
 
-			case kj::packetid_t::SC_RESPOND_ROOMS:
+			case net::packetid_t::SC_RESPOND_ROOMS:
 			return "RESPOND_ROOMS";
 
-			case kj::packetid_t::SC_GAME_START:
+			case net::packetid_t::SC_GAME_START:
 			return "START";
 
-			case kj::packetid_t::SC_GAME_STATE:
+			case net::packetid_t::SC_GAME_STATE:
 			return "STATE";
 
-			case kj::packetid_t::SC_GAME_LOADING_FAILED:
+			case net::packetid_t::SC_GAME_LOADING_FAILED:
 			return "FAILED_GAME_LOAD";
 
-			case kj::packetid_t::SC_GAME_VICTORY:
+			case net::packetid_t::SC_GAME_VICTORY:
 			return "VICTORY";
 
-			case kj::packetid_t::SC_GAME_DEFEAT:
+			case net::packetid_t::SC_GAME_DEFEAT:
 			return "DEFEAT";
 
-			case kj::packetid_t::SC_CREATE_PLAYER:
+			case net::packetid_t::SC_CREATE_PLAYER:
 			return "CREATE_PLAYER";
 
-			case kj::packetid_t::SC_CREATE_ENTITY:
+			case net::packetid_t::SC_CREATE_ENTITY:
 			return "CREATE_ENTITY";
 
-			case kj::packetid_t::SC_CREATE_OBJET:
+			case net::packetid_t::SC_CREATE_OBJET:
 			return "CREATE_OBJET";
 
-			case kj::packetid_t::SC_MOVE_CHARACTER:
+			case net::packetid_t::SC_MOVE_CHARACTER:
 			return "STAMOVE_CHARACTERRT";
 
-			case kj::packetid_t::SC_MOVE_ENTITY:
+			case net::packetid_t::SC_MOVE_ENTITY:
 			return "MOVE_ENTITY";
 
-			case kj::packetid_t::SC_MOVE_OBJET:
+			case net::packetid_t::SC_MOVE_OBJET:
 			return "MOVE_OBJET";
 
-			case kj::packetid_t::SC_UPDATE_CHARACTER:
+			case net::packetid_t::SC_UPDATE_CHARACTER:
 			return "UPDATE_CHARACTER";
 
-			case kj::packetid_t::SC_PLAYER_UPDATE_TRANSFORM:
+			case net::packetid_t::SC_PLAYER_UPDATE_TRANSFORM:
 			return "UPDATE_TRANSFORM";
 
-			case kj::packetid_t::SC_ROOM_CREATED:
+			case net::packetid_t::SC_ROOM_CREATED:
 			return "CREATE_ROOM";
 
-			case kj::packetid_t::SC_ROOM_CREATE_FAILED:
+			case net::packetid_t::SC_ROOM_CREATE_FAILED:
 			return "CANNOT_CREATE_ROOM";
 
-			case kj::packetid_t::SC_ROOM_JOINED:
+			case net::packetid_t::SC_ROOM_JOINED:
 			return "JOIN_ROOM";
 
-			case kj::packetid_t::SC_ROOM_JOIN_FAILED:
+			case net::packetid_t::SC_ROOM_JOIN_FAILED:
 			return "CANNOT_JOIN_ROOM";
 
-			case kj::packetid_t::SC_ROOM_LEAVE:
+			case net::packetid_t::SC_ROOM_LEAVE:
 			return "LEAVE_ROOM";
 
-			case kj::packetid_t::CS_SIGNIN:
+			case net::packetid_t::CS_SIGNIN:
 			return "CL:SIGNIN";
 
-			case kj::packetid_t::CS_SIGNOUT:
+			case net::packetid_t::CS_SIGNOUT:
 			return "CL:SIGNOUT";
 
-			case kj::packetid_t::CS_SIGNUP:
+			case net::packetid_t::CS_SIGNUP:
 			return "CL:SIGNUP";
 
 			// 게임 준비 또는 시작
-			case kj::packetid_t::CS_GAME_START:
+			case net::packetid_t::CS_GAME_START:
 			return "CL:READY";
 
-			case kj::packetid_t::CS_PLAYER_LOADING_COMPLETE:
+			case net::packetid_t::CS_PLAYER_LOADING_COMPLETE:
 			return "CL:LOADING_IS_DONE";
 
-			case kj::packetid_t::CS_GAME_EXIT:
+			case net::packetid_t::CS_GAME_EXIT:
 			return "CL:EXIT";
 
-			case kj::packetid_t::CS_CREATE_A_ROOM:
+			case net::packetid_t::CS_CREATE_A_ROOM:
 			return "CL:ROOM_CREATE";
 
-			case kj::packetid_t::CS_JOIN_A_ROOM:
+			case net::packetid_t::CS_JOIN_A_ROOM:
 			return "CL:ROOM_JOIN";
 
-			case kj::packetid_t::CS_MATCH_A_ROOM:
+			case net::packetid_t::CS_MATCH_A_ROOM:
 			return "CL:MATCH";
 
-			case kj::packetid_t::CS_LEAVE_A_ROOM:
+			case net::packetid_t::CS_LEAVE_A_ROOM:
 			return "CL:LEAVE";
 
-			case kj::packetid_t::CS_MOVE_CHARACTER:
+			case net::packetid_t::CS_MOVE_CHARACTER:
 			return "CL:MOVE";
 
-			case kj::packetid_t::CS_PLAYER_UPDATE_TRANSFORM:
+			case net::packetid_t::CS_PLAYER_UPDATE_TRANSFORM:
 			return "CL:UPDATE_TFRM";
 
-			case kj::packetid_t::CS_PLAYER_ACTION:
+			case net::packetid_t::CS_PLAYER_ACTION:
 			return "CL:ACTION";
 
 			default:
@@ -218,40 +218,40 @@ export namespace std
 	}
 
 	template<>
-	struct hash<kj::packetid_t>
+	struct hash<net::packetid_t>
 	{
 		[[nodiscard]]
-		size_t operator()(const kj::packetid_t& protocol) const noexcept
+		size_t operator()(const net::packetid_t& protocol) const noexcept
 		{
 			return hash<unsigned char>::_Do_hash(static_cast<unsigned char>(protocol));
 		}
 	};
 
 	template<>
-	struct formatter<kj::packetid_t>
+	struct formatter<net::packetid_t>
 	{
 		inline format_parse_context::iterator parse(format_parse_context& context) const noexcept
 		{
 			return context.begin();
 		}
 
-		inline auto format(const kj::packetid_t& protocol, format_context& context) const noexcept
+		inline auto format(const net::packetid_t& protocol, format_context& context) const noexcept
 		{
 			return format_to(context.out(), "{}", to_string(protocol));
 		}
 	};
 
-	inline ostream& operator<<(ostream& stream, const kj::packetid_t& protocol)
+	inline ostream& operator<<(ostream& stream, const net::packetid_t& protocol)
 	{
 		return stream << to_string(protocol);
 	}
 
-	inline istream& operator>>(istream& stream, kj::packetid_t& protocol)
+	inline istream& operator>>(istream& stream, net::packetid_t& protocol)
 	{
 		unsigned char buffer{};
 		stream >> buffer;
 
-		protocol = static_cast<kj::packetid_t>(buffer);
+		protocol = static_cast<net::packetid_t>(buffer);
 		return stream;
 	}
 }

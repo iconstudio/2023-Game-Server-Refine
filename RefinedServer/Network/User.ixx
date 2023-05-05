@@ -2,21 +2,12 @@ export module Net.User;
 import Net.Session;
 import Net.Socket;
 import Net.Session.Asynchron;
-import Net.User.Identifier;
+export import Net.User.Identifier;
 
 export namespace net
 {
-	export enum class UserStates : unsigned char
-	{
-		NONE = 0,
-		ACCEPTED,
-	};
-
-	inline constexpr UserStates user_npos = UserStates::NONE;
-
-	export class User
-		: public ISession<BasicUser, userid_t>
-		, public IManagedStatus<BasicUser, UserStates>
+	class [[nodiscard]] User
+		: public Asynchron<User, userid_t>
 	{
 	protected:
 		static inline constexpr size_t BufferSize = 512;

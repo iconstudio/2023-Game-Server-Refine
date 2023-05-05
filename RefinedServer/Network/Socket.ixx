@@ -1,3 +1,3 @@
-export module Socket;
+export module Net.Socket;
 
 export void MyFunc();
