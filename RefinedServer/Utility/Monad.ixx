@@ -8,8 +8,18 @@ import Utility.Constraints;
 
 export namespace util
 {
+	using ::std::nullopt_t;
+	using ::std::nullopt;
+
 	template<typename Fn, typename... Args>
 	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
+
+	struct [[nodiscard]] monad_reverse_t
+	{
+		explicit constexpr monad_reverse_t() noexcept = default;
+	};
+
+	inline constexpr monad_reverse_t monad_reverse{};
 
 	template<typename T>
 	class [[nodiscard]] Monad;
@@ -20,20 +30,26 @@ export namespace util
 	public:
 		using value_type = T;
 
-		template<bool Reverse = false>
 		constexpr Monad() noexcept(nothrow_constructibles<T>)
 			: myValue()
-			, hasValue(false), isReverse(Reverse)
+			, hasValue(false), isReverse(false)
 		{}
 
-		template<bool Reverse = false>
-		constexpr Monad(nullopt_t) noexcept(nothrow_constructibles<T>)
+		constexpr Monad(monad_reverse_t, const bool& reverse)
+			noexcept(nothrow_constructibles<T>)
 			: myValue()
-			, hasValue(false), isReverse(Reverse)
+			, hasValue(false), isReverse(reverse)
+		{}
+
+		constexpr Monad(nullopt_t)
+			noexcept(nothrow_constructibles<T>)
+			: myValue()
+			, hasValue(false), isReverse(false)
 		{}
 
 		template<convertible_to<T> Uty>
-		constexpr Monad(Uty&& uty) noexcept(nothrow_constructibles<T, Uty&&>)
+		constexpr Monad(Uty&& uty)
+			noexcept(nothrow_constructibles<T, Uty&&>)
 			: myValue(static_cast<T>(uty))
 			, hasValue(true), isReverse(false)
 		{}
@@ -675,7 +691,6 @@ export namespace util
 			}
 		}
 
-		constexpr Monad() noexcept(nothrow_default_constructibles<T>) = default;
 		constexpr Monad(const Monad&) noexcept(nothrow_copy_constructibles<T>) = default;
 		constexpr Monad(Monad&&) noexcept(nothrow_move_constructibles<T>) = default;
 		constexpr Monad& operator=(const Monad&) noexcept(nothrow_copy_assignables<T>) = default;
@@ -694,14 +709,12 @@ export namespace util
 	public:
 		using value_type = void;
 
-		template<bool Reverse = false>
-		constexpr Monad() noexcept
-			: hasValue(true), isReverse(Reverse)
+		constexpr Monad(const bool& reverse = false) noexcept
+			: hasValue(true), isReverse(reverse)
 		{}
 
-		template<bool Reverse = false>
-		constexpr Monad(nullopt_t) noexcept
-			: hasValue(false), isReverse(Reverse)
+		constexpr Monad(nullopt_t, const bool& reverse = false) noexcept
+			: hasValue(false), isReverse(reverse)
 		{}
 
 		template<typename Fn, typename... Args>
@@ -990,12 +1003,8 @@ namespace util
 	inline void do_something() noexcept
 	{}
 
-	static void test_monad() noexcept
+	void test_monad() noexcept
 	{
-		Monad<int> monad1{};
-		const Monad<int> monad2{};
-		constexpr Monad<int> monad3{};
-
 		Monad<int> monad4{ 1000 };
 		const bool has4 = monad4.has_value();
 		const Monad<int> monad5{ 1000 };
@@ -1018,13 +1027,17 @@ namespace util
 
 		const auto& expr8_5 = monad8.else_then([](auto&&) { do_something(); });
 
+		Monad<int> monad1{false};
+		const Monad<int> monad2{ false };
+		constexpr Monad<int> monad3{ false };
+
 		constexpr int valor3 = monad3.value_or(3000.0);
 
 		constexpr const auto& expr9_1 = monad9.if_then([](auto&&) -> float { return 3000.0; });
 
 		constexpr Monad<float> expr9_2 = monad9.and_then(
 			[](auto&&) -> Monad<float> {
-			return { 3000.0 };
+			return 3000.0;
 		});
 
 		constexpr double expr9_3 = monad9.transform(

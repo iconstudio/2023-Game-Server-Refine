@@ -14,6 +14,7 @@ export namespace util
 	using ::std::false_type;
 	using ::std::conditional;
 	using ::std::conditional_t;
+	using ::std::void_t;
 
 	using ::std::type_identity;
 	using ::std::type_identity_t;
@@ -41,6 +42,8 @@ export namespace util
 	using ::std::underlying_type_t;
 	using ::std::to_underlying;
 
+	using ::std::piecewise_construct_t;
+	using ::std::piecewise_construct;
 	using ::std::optional;
 	using ::std::bad_optional_access;
 	using ::std::nullopt_t;
