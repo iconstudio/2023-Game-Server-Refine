@@ -1,10 +1,13 @@
 ﻿#include "pch.hpp"
 #include "Framework.hpp"
 
-import Utility;
-import Utility.Monad;
+Framework* myFramework;
 
 int main()
 {
-	std::cout << "Hello World!\n";
+	myFramework = new Framework{};
+
+	myFramework->Awake();
+	myFramework->Start();
+	myFramework->Update();
 }

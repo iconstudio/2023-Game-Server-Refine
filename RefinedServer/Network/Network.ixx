@@ -1,7 +1,7 @@
 module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
-export module Network;
+export module Net;
 
 export namespace net
 {

@@ -1,12 +1,14 @@
 #pragma once
 import Utility;
+import Utility.Singleton;
 import Utility.Array;
 import Utility.Monad;
+import Net;
 
-class NODISCARD Framework
+class NODISCARD Framework : util::Singleton<Framework>
 {
 public:
-	Framework() noexcept = default;
+	Framework() noexcept;
 	~Framework() noexcept = default;
 
 	void Awake();
@@ -27,8 +29,8 @@ public:
 	void EndFailedDispose() noexcept;
 
 private:
-	util::Monad<int> Dispose(User* const& user);
-	util::Monad<int> Close(Socket& socket);
+	util::Monad<int> Dispose(net::User* const& user);
+	util::Monad<int> Close(net::Socket& socket);
 
 	bool Poll() noexcept;
 	bool Post() noexcept;
@@ -36,9 +38,9 @@ private:
 	static inline constexpr size_t maxNPCs = 1000;
 	static inline constexpr size_t maxUsers = 1000;
 
-	CompletionPort ioService;
-	Socket ioSocket;
+	net::CompletionPort ioService;
+	net::Socket ioSocket;
 
-	util::Array<BasicUser, maxNPCs> everySession;
-	util::Array<User, maxUsers> everyUser;
+	util::Array<net::BasicUser, maxNPCs> everySession;
+	util::Array<net::User, maxUsers> everyUser;
 };

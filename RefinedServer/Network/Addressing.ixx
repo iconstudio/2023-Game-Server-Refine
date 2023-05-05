@@ -1,7 +1,7 @@
-export module Network.Addressing;
+export module Net.Addressing;
 import Utility;
-import Network;
-export import Network.EndPoint;
+import Net;
+export import Net.EndPoint;
 
 export namespace net
 {
