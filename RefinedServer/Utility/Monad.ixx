@@ -20,14 +20,22 @@ export namespace util
 	public:
 		using value_type = T;
 
+		template<bool Reverse = false>
+		constexpr Monad() noexcept(nothrow_constructibles<T>)
+			: myValue()
+			, hasValue(false), isReverse(Reverse)
+		{}
+
+		template<bool Reverse = false>
 		constexpr Monad(nullopt_t) noexcept(nothrow_constructibles<T>)
 			: myValue()
+			, hasValue(false), isReverse(Reverse)
 		{}
 
 		template<convertible_to<T> Uty>
 		constexpr Monad(Uty&& uty) noexcept(nothrow_constructibles<T, Uty&&>)
-			: myValue(static_cast<T>(forward<Uty>(uty)))
-			, hasValue(true)
+			: myValue(static_cast<T>(uty))
+			, hasValue(true), isReverse(false)
 		{}
 
 		template<typename Fn, typename... Args>
@@ -36,7 +44,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<T&>(), declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -50,7 +58,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&>(), declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -64,7 +72,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<T&&>(), declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -78,7 +86,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>(), declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -100,7 +108,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -124,7 +132,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -148,7 +156,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -172,7 +180,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -193,7 +201,7 @@ export namespace util
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
-			if (hasValue)
+			if (has_value())
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
@@ -228,7 +236,7 @@ export namespace util
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
-			if (hasValue)
+			if (has_value())
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
@@ -263,7 +271,7 @@ export namespace util
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
-			if (hasValue)
+			if (has_value())
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
@@ -298,7 +306,7 @@ export namespace util
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
-			if (hasValue)
+			if (has_value())
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
@@ -332,9 +340,9 @@ export namespace util
 
 			static_assert(convertible_to<fn_result_t, Uty>);
 
-			if (hasValue)
+			if (has_value())
 			{
-				return forward<Fn>(safe_action)(myValue);
+				return static_cast<Uty>(forward<Fn>(safe_action)(myValue));
 			}
 			else
 			{
@@ -352,9 +360,9 @@ export namespace util
 
 			static_assert(convertible_to<fn_result_t, Uty>);
 
-			if (hasValue)
+			if (has_value())
 			{
-				return forward<Fn>(safe_action)(myValue);
+				return static_cast<Uty>(forward<Fn>(safe_action)(myValue));
 			}
 			else
 			{
@@ -372,9 +380,9 @@ export namespace util
 
 			static_assert(convertible_to<fn_result_t, Uty>);
 
-			if (hasValue)
+			if (has_value())
 			{
-				return forward<Fn>(safe_action)(move(myValue));
+				return static_cast<Uty>(forward<Fn>(safe_action)(move(myValue)));
 			}
 			else
 			{
@@ -392,9 +400,9 @@ export namespace util
 
 			static_assert(convertible_to<fn_result_t, Uty>);
 
-			if (hasValue)
+			if (has_value())
 			{
-				return forward<Fn>(safe_action)(move(myValue));
+				return static_cast<Uty>(forward<Fn>(safe_action)(move(myValue)));
 			}
 			else
 			{
@@ -409,7 +417,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<T&>(), declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -424,7 +432,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&>(), declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -439,7 +447,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<T&&>(), declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -454,7 +462,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>(), declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -476,7 +484,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (!hasValue)
+			if (!has_value())
 			{
 				return forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -500,7 +508,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (!hasValue)
+			if (!has_value())
 			{
 				return forward<Fn>(action)(myValue, forward<Args>(args)...);
 			}
@@ -524,7 +532,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (!hasValue)
+			if (!has_value())
 			{
 				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -548,7 +556,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (!hasValue)
+			if (!has_value())
 			{
 				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
 			}
@@ -581,7 +589,7 @@ export namespace util
 		template<convertible_to<T> U>
 		constexpr T value_or(const U& failsafe) const& noexcept(nothrow_constructibles<T>)
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				return myValue;
 			}
@@ -593,7 +601,7 @@ export namespace util
 
 		constexpr T value_or(T&& failsafe) const& noexcept(nothrow_move_constructibles<T>)
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				return myValue;
 			}
@@ -606,7 +614,7 @@ export namespace util
 		template<convertible_to<T> U>
 		constexpr T value_or(const U& failsafe) && noexcept(nothrow_constructibles<T>)
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				return move(myValue);
 			}
@@ -618,7 +626,7 @@ export namespace util
 
 		constexpr T&& value_or(T&& failsafe) && noexcept(nothrow_move_constructibles<T>)
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				return move(myValue);
 			}
@@ -640,7 +648,14 @@ export namespace util
 
 		constexpr bool has_value() const noexcept
 		{
-			return hasValue;
+			if (isReverse)
+			{
+				return !hasValue;
+			}
+			else
+			{
+				return hasValue;
+			}
 		}
 
 		explicit constexpr operator T () const noexcept(nothrow_copy_constructibles<T>)
@@ -650,7 +665,14 @@ export namespace util
 
 		explicit constexpr operator bool() const noexcept
 		{
-			return hasValue;
+			if (isReverse)
+			{
+				return !hasValue;
+			}
+			else
+			{
+				return hasValue;
+			}
 		}
 
 		constexpr Monad() noexcept(nothrow_default_constructibles<T>) = default;
@@ -662,7 +684,8 @@ export namespace util
 
 	private:
 		T myValue = {};
-		bool hasValue = false;
+		bool hasValue;
+		bool isReverse;
 	};
 
 	template<>
@@ -671,12 +694,14 @@ export namespace util
 	public:
 		using value_type = void;
 
+		template<bool Reverse = false>
 		constexpr Monad() noexcept
-			: hasValue(true)
+			: hasValue(true), isReverse(Reverse)
 		{}
 
+		template<bool Reverse = false>
 		constexpr Monad(nullopt_t) noexcept
-			: hasValue(false)
+			: hasValue(false), isReverse(Reverse)
 		{}
 
 		template<typename Fn, typename... Args>
@@ -686,7 +711,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -701,7 +726,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -716,7 +741,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -731,7 +756,7 @@ export namespace util
 			if_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (hasValue)
+			if (has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -752,7 +777,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -775,7 +800,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -796,7 +821,7 @@ export namespace util
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
-			if (hasValue)
+			if (has_value())
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
@@ -830,7 +855,7 @@ export namespace util
 
 			static_assert(convertible_to<fn_result_t, Uty>);
 
-			if (hasValue)
+			if (has_value())
 			{
 				return forward<Fn>(safe_action)();
 			}
@@ -847,7 +872,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -862,7 +887,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -877,7 +902,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -892,7 +917,7 @@ export namespace util
 			else_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
-			if (!hasValue)
+			if (!has_value())
 			{
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -914,7 +939,7 @@ export namespace util
 
 			using fwd_value_t = fwd_result_t::value_type;
 
-			if (!hasValue)
+			if (!has_value())
 			{
 				return forward<Fn>(action)(forward<Args>(args)...);
 			}
@@ -926,12 +951,26 @@ export namespace util
 
 		constexpr bool has_value() const noexcept
 		{
-			return hasValue;
+			if (isReverse)
+			{
+				return !hasValue;
+			}
+			else
+			{
+				return hasValue;
+			}
 		}
 
 		explicit constexpr operator bool() const noexcept
 		{
-			return hasValue;
+			if (isReverse)
+			{
+				return !hasValue;
+			}
+			else
+			{
+				return hasValue;
+			}
 		}
 
 		constexpr Monad(const Monad&) noexcept = default;
@@ -942,10 +981,8 @@ export namespace util
 
 	private:
 		bool hasValue;
+		bool isReverse;
 	};
-
-	template<typename T>
-	Monad(T) -> Monad<T>;
 }
 
 namespace util
@@ -1004,7 +1041,7 @@ namespace util
 			[](auto&&) {}
 		);
 
-		const Monad<float> expr9_6 = monad7.or_else([](int& v) -> Monad<float> {
+		const auto expr9_6 = monad7.or_else([](const int& v) -> Monad<float> {
 			return 5020.0f;
 		});
 	}
