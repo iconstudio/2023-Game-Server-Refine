@@ -1,11 +1,13 @@
+module;
+#include <optional>
+
 export module Utility.Monad;
 import Utility;
+import Utility.Traits;
+import Utility.Constraints;
 
 export namespace util
 {
-	template<typename Rx, typename Fn, typename... Args>
-	concept invocable_results = invocables<Fn, Args...>&& convertible_to<invoke_result_t<Fn, Args...>, Rx>;
-
 	template<typename Fn, typename... Args>
 	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
 
@@ -24,7 +26,7 @@ export namespace util
 
 		template<convertible_to<T> Uty>
 		constexpr Monad(Uty&& uty) noexcept(nothrow_constructibles<T, Uty&&>)
-			: myValue(util::forward<Uty>(uty))
+			: myValue(static_cast<T>(forward<Uty>(uty)))
 			, hasValue(true)
 		{}
 
@@ -576,7 +578,8 @@ export namespace util
 			return move(myValue);
 		}
 
-		constexpr T value_or(const T& failsafe) const& noexcept(nothrow_constructibles<T>)
+		template<convertible_to<T> U>
+		constexpr T value_or(const U& failsafe) const& noexcept(nothrow_constructibles<T>)
 		{
 			if (hasValue)
 			{
@@ -584,7 +587,7 @@ export namespace util
 			}
 			else
 			{
-				return failsafe;
+				return static_cast<T>(failsafe);
 			}
 		}
 
@@ -600,7 +603,8 @@ export namespace util
 			}
 		}
 
-		constexpr T value_or(const T& failsafe) && noexcept(nothrow_constructibles<T>)
+		template<convertible_to<T> U>
+		constexpr T value_or(const U& failsafe) && noexcept(nothrow_constructibles<T>)
 		{
 			if (hasValue)
 			{
@@ -608,7 +612,7 @@ export namespace util
 			}
 			else
 			{
-				return (failsafe);
+				return static_cast<T>(failsafe);
 			}
 		}
 
@@ -1064,7 +1068,7 @@ namespace util
 		const auto valor7 = monad7.value_or(42);
 
 		const auto expr8_3 = monad8.transform(
-			[](const int& v) -> float { return static_cast<unsigned>(v); },
+			[](const int& v) -> float { return static_cast<float>(v); },
 			[](const int& v) -> float { return v * 100.0f; }
 		);
 
@@ -1076,8 +1080,8 @@ namespace util
 
 		constexpr const auto& expr9_1 = monad9.if_then([](auto&&) -> float { return 3000.0; });
 
-		constexpr util::Monad<float> expr9_2 = monad9.and_then(
-			[](auto&&) -> util::Monad<float> {
+		constexpr Monad<float> expr9_2 = monad9.and_then(
+			[](auto&&) -> Monad<float> {
 			return { 3000.0 };
 		});
 
@@ -1091,12 +1095,11 @@ namespace util
 			-7
 		);
 
-		constexpr const util::Monad<int>& expr9_5 = monad9.else_then(
+		constexpr const Monad<int>& expr9_5 = monad9.else_then(
 			[](auto&&) {}
 		);
 
-		constexpr util::Monad<float> expr9_6 = monad9.or_else(
-			[](const int& v) -> util::Monad<float> {
+		const Monad<float> expr9_6 = monad7.or_else([](int& v) -> Monad<float> {
 			return 5020.0f;
 		});
 	}

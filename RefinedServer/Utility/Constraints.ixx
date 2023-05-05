@@ -86,4 +86,7 @@ export namespace util
 
 	template<typename... Ts>
 	concept specializations = is_specialization_v<clean_t<Ts>...>;
+
+	template<typename Rx, typename Fn, typename... Args>
+	concept invocable_results = invocables<Fn, Args...>&& convertible_to<std::invoke_result_t<Fn, Args...>, Rx>;
 }

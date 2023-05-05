@@ -1,10 +1,10 @@
 module;
-#include <utility>;
-#include <chrono>;
-#include <thread>;
-#include <stop_token>;
-#include <string_view>;
-#include <format>;
+#include <utility>
+#include <chrono>
+#include <thread>
+#include <stop_token>
+#include <string_view>
+#include <format>
 export module Utility.Concurrency.Thread;
 
 export namespace util

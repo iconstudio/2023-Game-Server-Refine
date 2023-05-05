@@ -5,7 +5,7 @@ module;
 #include <semaphore>
 #include <barrier>
 #include <latch>
-#include <condition_variable>;
+#include <condition_variable>
 export module Utility.Concurrency.Locks;
 
 export namespace util
@@ -103,27 +103,6 @@ export namespace util
 
 	template<lockables Lockable>
 	OwnedLock(Lockable&) -> OwnedLock<Lockable>;
-
-	template<lockables T >
-	lock_guard(T&) -> lock_guard<T>;
-
-	template<lockables... T>
-	scoped_lock(T&...) -> scoped_lock<T...>;
-
-	template<shared_lockables T>
-	shared_lock(T&) -> shared_lock<T>;
-
-	template<lockables T>
-	unique_lock(T&) -> unique_lock<T>;
-
-	template<lockables T>
-	unique_lock(T&, defer_lock_t) -> unique_lock<T>;
-
-	template<lockables T>
-	unique_lock(T&, adopt_lock_t) -> unique_lock<T>;
-
-	template<lockables T>
-	unique_lock(T&, try_to_lock_t) -> unique_lock<T>;
 }
 
 namespace util
