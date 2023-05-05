@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Identifiers">
+      <UniqueIdentifier>{2e75bf3d-12d3-4fa5-8182-05ffe2c0653b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PacketIdentifier.ixx">
+      <Filter>Identifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)UserIdentifier.ixx">
+      <Filter>Identifiers</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
