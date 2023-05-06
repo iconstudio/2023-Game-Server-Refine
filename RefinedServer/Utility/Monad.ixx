@@ -68,7 +68,7 @@ export namespace util
 			return *this;
 		}
 
-		template<invocables<const T&> Fn>
+		template<invocables<T&&> Fn>
 		inline constexpr
 			Monad&&
 			if_then(Fn&& action) &&
@@ -82,7 +82,7 @@ export namespace util
 			return move(*this);
 		}
 
-		template<invocables<const T&> Fn>
+		template<invocables<const T&&> Fn>
 		inline constexpr
 			const Monad&&
 			if_then(Fn&& action) const&&
@@ -447,7 +447,7 @@ export namespace util
 		inline constexpr
 			Monad&&
 			else_then(Fn&& action, Args&&... args) &&
-			noexcept(noexcept(forward<Fn>(action)( declval<Args>()...)))
+			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!has_value())
 			{
@@ -921,6 +921,8 @@ export namespace util
 	private:
 		bool hasValue;
 	};
+
+	using Proxy = Monad<void>;
 }
 
 namespace util
