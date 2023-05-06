@@ -1,5 +1,4 @@
 export module Utility.Identity;
-import Utility;
 import Utility.Constraints;
 
 export namespace util
@@ -47,6 +46,16 @@ export namespace util
 		constexpr const T&& value() const&& noexcept(nothrow_move_constructibles<const T>)
 		{
 			return static_cast<const T&&>(myValue);
+		}
+
+		constexpr T get() const& noexcept(nothrow_copy_constructibles<T>)
+		{
+			return myValue;
+		}
+
+		constexpr T&& get() && noexcept(nothrow_move_constructibles<T>)
+		{
+			return static_cast<T&&>(myValue);
 		}
 
 		explicit constexpr operator T () const noexcept(nothrow_copy_constructibles<T>)
