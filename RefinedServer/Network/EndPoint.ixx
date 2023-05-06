@@ -99,6 +99,16 @@ export namespace net
 			return util::addressof(endPoint);
 		}
 
+		inline constexpr size_t GetSize() const noexcept
+		{
+			return sizeof(endPoint);
+		}
+
+		inline constexpr int GetiSize() const noexcept
+		{
+			return sizeof(endPoint);
+		}
+
 		static inline EndPoint CreateStaticTCP(const AddressFamily& family, const unsigned short& port) noexcept
 		{
 			return EndPoint{ family, ::htonl(INADDR_ANY), ::htons(port) };
