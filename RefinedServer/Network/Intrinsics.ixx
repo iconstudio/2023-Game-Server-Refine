@@ -94,6 +94,18 @@ export namespace net
 			}
 		}
 
+		inline constexpr ioError CheckHandle(const void* const& handle) noexcept
+		{
+			if (nullptr == handle)
+			{
+				return util::nullopt;
+			}
+			else
+			{
+				return ioError{ debug::WSAGetLastError() };
+			}
+		}
+
 		inline constexpr ioError CheckHandle(void*&& handle) noexcept
 		{
 			if (nullptr == static_cast<void*&&>(handle))
