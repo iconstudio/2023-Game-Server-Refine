@@ -2,110 +2,95 @@ export module Utility.Monad;
 export import Utility;
 import Utility.Traits;
 import Utility.Constraints;
+import Utility.Identity;
 
 export namespace util
 {
 	template<typename Fn, typename... Args>
 	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
 
-	struct [[nodiscard]] monad_reverse_t
-	{
-		explicit constexpr monad_reverse_t() noexcept = default;
-	};
-
-	inline constexpr monad_reverse_t monad_reverse{};
-
 	template<typename T>
-	class [[nodiscard]] Monad;
-
-	template<copyable T>
-	class [[nodiscard]] Monad<T>
+	class [[nodiscard]] Monad : public Identity<T>
 	{
 	public:
+		static_assert(!same_as<T, nullopt_t>, "T must not be nullopt_t.");
+
+		using base_type = Identity<T>;
 		using value_type = T;
 
-		constexpr Monad() noexcept(nothrow_constructibles<T>)
-			: myValue()
-		{}
-
-		constexpr Monad(monad_reverse_t)
+		constexpr Monad()
 			noexcept(nothrow_constructibles<T>)
-			: myValue()
-			, isReverse(true)
+			: base_type()
 		{}
 
 		constexpr Monad(nullopt_t)
 			noexcept(nothrow_constructibles<T>)
-			: myValue()
+			: base_type()
 		{}
 
-		constexpr Monad(const T& value)
+		constexpr Monad(const T& fwd)
 			noexcept(nothrow_copy_constructibles<T>)
-			: myValue(value)
+			: base_type(fwd)
 			, hasValue(true)
 		{}
 
-		constexpr Monad(T&& value)
+		constexpr Monad(T&& fwd)
 			noexcept(nothrow_move_constructibles<T>)
-			: myValue(static_cast<T&&>(value))
+			: base_type(static_cast<T&&>(fwd))
 			, hasValue(true)
 		{}
 
-		template<typename Fn, typename... Args>
-			requires invocables<Fn, T&, Args...>
+		template<invocables<T&> Fn>
 		inline constexpr
 			Monad&
-			if_then(Fn&& action, Args&&... args) &
-			noexcept(noexcept(forward<Fn>(action)(declval<T&>(), declval<Args>()...)))
+			if_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
 		{
 			if (has_value())
 			{
-				forward<Fn>(action)(myValue, forward<Args>(args)...);
+				forward<Fn>(action)(this->value());
 			}
 
 			return *this;
 		}
 
-		template<typename Fn, typename... Args>
-			requires invocables<Fn, const T&, Args...>
+		template<invocables<const T&> Fn>
 		inline constexpr
 			const Monad&
-			if_then(Fn&& action, Args&&... args) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&>(), declval<Args>()...)))
+			if_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
 		{
 			if (has_value())
 			{
-				forward<Fn>(action)(myValue, forward<Args>(args)...);
+				forward<Fn>(action)(this->value());
 			}
 
 			return *this;
 		}
 
-		template<typename Fn, typename... Args>
-			requires invocables<Fn, T&&, Args...>
+		template<invocables<const T&> Fn>
 		inline constexpr
 			Monad&&
-			if_then(Fn&& action, Args&&... args) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<T&&>(), declval<Args>()...)))
+			if_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
 		{
 			if (has_value())
 			{
-				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				forward<Fn>(action)(this->value());
 			}
 
 			return move(*this);
 		}
 
-		template<typename Fn, typename... Args>
-			requires invocables<Fn, const T&&, Args...>
+		template<invocables<const T&> Fn>
 		inline constexpr
 			const Monad&&
-			if_then(Fn&& action, Args&&... args) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>(), declval<Args>()...)))
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
 		{
 			if (has_value())
 			{
-				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				forward<Fn>(action)(this->value());
 			}
 
 			return move(*this);
@@ -127,7 +112,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return forward<Fn>(action)(myValue, forward<Args>(args)...);
+				return forward<Fn>(action)(this->value());
 			}
 			else
 			{
@@ -151,7 +136,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return forward<Fn>(action)(myValue, forward<Args>(args)...);
+				return forward<Fn>(action)(this->value());
 			}
 			else
 			{
@@ -175,7 +160,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				return forward<Fn>(action)(this->value());
 			}
 			else
 			{
@@ -199,7 +184,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				return forward<Fn>(action)(this->value());
 			}
 			else
 			{
@@ -222,22 +207,22 @@ export namespace util
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
-					forward<Lfn>(safe_action)(myValue);
+					forward<Lfn>(safe_action)(this->value());
 				}
 				else
 				{
-					return forward<Lfn>(safe_action)(myValue);
+					return forward<Lfn>(safe_action)(this->value());
 				}
 			}
 			else
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(myValue);
+					forward<Rfn>(fail_action)(this->value());
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(myValue);
+					return forward<Rfn>(fail_action)(this->value());
 				}
 			}
 		}
@@ -257,22 +242,22 @@ export namespace util
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
-					forward<Lfn>(safe_action)(myValue);
+					forward<Lfn>(safe_action)(this->value());
 				}
 				else
 				{
-					return forward<Lfn>(safe_action)(myValue);
+					return forward<Lfn>(safe_action)(this->value());
 				}
 			}
 			else
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(myValue);
+					forward<Rfn>(fail_action)(this->value());
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(myValue);
+					return forward<Rfn>(fail_action)(this->value());
 				}
 			}
 		}
@@ -292,22 +277,22 @@ export namespace util
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
-					forward<Lfn>(safe_action)(move(myValue));
+					forward<Lfn>(safe_action)(this->value());
 				}
 				else
 				{
-					return forward<Lfn>(safe_action)(move(myValue));
+					return forward<Lfn>(safe_action)(this->value());
 				}
 			}
 			else
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(move(myValue));
+					forward<Rfn>(fail_action)(this->value());
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(move(myValue));
+					return forward<Rfn>(fail_action)(this->value());
 				}
 			}
 		}
@@ -327,22 +312,22 @@ export namespace util
 			{
 				if constexpr (is_same_v<safe_result_t, void>)
 				{
-					forward<Lfn>(safe_action)(move(myValue));
+					forward<Lfn>(safe_action)(this->value());
 				}
 				else
 				{
-					return forward<Lfn>(safe_action)(move(myValue));
+					return forward<Lfn>(safe_action)(this->value());
 				}
 			}
 			else
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(move(myValue));
+					forward<Rfn>(fail_action)(this->value());
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(move(myValue));
+					return forward<Rfn>(fail_action)(this->value());
 				}
 			}
 		}
@@ -359,7 +344,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(myValue));
+				return static_cast<Uty>(forward<Fn>(safe_action)(this->value()));
 			}
 			else
 			{
@@ -379,7 +364,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(myValue));
+				return static_cast<Uty>(forward<Fn>(safe_action)(this->value()));
 			}
 			else
 			{
@@ -399,7 +384,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(move(myValue)));
+				return static_cast<Uty>(forward<Fn>(safe_action)(this->value()));
 			}
 			else
 			{
@@ -419,7 +404,7 @@ export namespace util
 
 			if (has_value())
 			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(move(myValue)));
+				return static_cast<Uty>(forward<Fn>(safe_action)(this->value()));
 			}
 			else
 			{
@@ -503,7 +488,7 @@ export namespace util
 
 			if (!has_value())
 			{
-				return forward<Fn>(action)(myValue, forward<Args>(args)...);
+				return forward<Fn>(action)(this->value(), forward<Args>(args)...);
 			}
 			else
 			{
@@ -527,7 +512,7 @@ export namespace util
 
 			if (!has_value())
 			{
-				return forward<Fn>(action)(myValue, forward<Args>(args)...);
+				return forward<Fn>(action)(this->value(), forward<Args>(args)...);
 			}
 			else
 			{
@@ -551,7 +536,7 @@ export namespace util
 
 			if (!has_value())
 			{
-				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				return forward<Fn>(action)(this->value(), forward<Args>(args)...);
 			}
 			else
 			{
@@ -575,7 +560,7 @@ export namespace util
 
 			if (!has_value())
 			{
-				return forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				return forward<Fn>(action)(this->value(), forward<Args>(args)...);
 			}
 			else
 			{
@@ -583,32 +568,12 @@ export namespace util
 			}
 		}
 
-		constexpr T& value() & noexcept
-		{
-			return myValue;
-		}
-
-		constexpr const T& value() const& noexcept
-		{
-			return myValue;
-		}
-
-		constexpr T&& value() && noexcept(nothrow_move_constructibles<T>)
-		{
-			return static_cast<T&&>(myValue);
-		}
-
-		constexpr const T&& value() const&& noexcept(nothrow_move_constructibles<const T>)
-		{
-			return static_cast<const T&&>(myValue);
-		}
-
 		template<convertible_to<T> U>
 		constexpr T value_or(const U& failsafe) const& noexcept(nothrow_constructibles<T>)
 		{
 			if (has_value())
 			{
-				return myValue;
+				return this->value();
 			}
 			else
 			{
@@ -620,7 +585,7 @@ export namespace util
 		{
 			if (has_value())
 			{
-				return myValue;
+				return this->value();
 			}
 			else
 			{
@@ -633,7 +598,7 @@ export namespace util
 		{
 			if (has_value())
 			{
-				return move(myValue);
+				return this->value();
 			}
 			else
 			{
@@ -645,7 +610,7 @@ export namespace util
 		{
 			if (has_value())
 			{
-				return move(myValue);
+				return this->value();
 			}
 			else
 			{
@@ -653,43 +618,19 @@ export namespace util
 			}
 		}
 
-		constexpr T get() const& noexcept(nothrow_copy_constructibles<T>)
-		{
-			return myValue;
-		}
-
-		constexpr T&& get() && noexcept(nothrow_move_constructibles<T>)
-		{
-			return move(myValue);
-		}
-
 		constexpr bool has_value() const noexcept
 		{
-			if (isReverse)
-			{
-				return !hasValue;
-			}
-			else
-			{
-				return hasValue;
-			}
+			return hasValue;
 		}
 
 		explicit constexpr operator T () const noexcept(nothrow_copy_constructibles<T>)
 		{
-			return myValue;
+			return this->value();
 		}
 
 		explicit constexpr operator bool() const noexcept
 		{
-			if (isReverse)
-			{
-				return !hasValue;
-			}
-			else
-			{
-				return hasValue;
-			}
+			return hasValue;
 		}
 
 		constexpr Monad(const Monad&) noexcept(nothrow_copy_constructibles<T>) = default;
@@ -699,9 +640,7 @@ export namespace util
 		constexpr ~Monad() noexcept(nothrow_destructibles<T>) = default;
 
 	private:
-		T myValue;
 		bool hasValue = false;
-		bool isReverse = false;
 	};
 
 	template<>
@@ -710,12 +649,12 @@ export namespace util
 	public:
 		using value_type = void;
 
-		constexpr Monad(const bool& reverse = false) noexcept
-			: hasValue(true), isReverse(reverse)
+		constexpr Monad() noexcept
+			: hasValue(true)
 		{}
 
-		constexpr Monad(nullopt_t, const bool& reverse = false) noexcept
-			: hasValue(false), isReverse(reverse)
+		constexpr Monad(nullopt_t) noexcept
+			: hasValue(false)
 		{}
 
 		template<typename Fn, typename... Args>
@@ -965,26 +904,12 @@ export namespace util
 
 		constexpr bool has_value() const noexcept
 		{
-			if (isReverse)
-			{
-				return !hasValue;
-			}
-			else
-			{
-				return hasValue;
-			}
+			return hasValue;
 		}
 
 		explicit constexpr operator bool() const noexcept
 		{
-			if (isReverse)
-			{
-				return !hasValue;
-			}
-			else
-			{
-				return hasValue;
-			}
+			return hasValue;
 		}
 
 		constexpr Monad(const Monad&) noexcept = default;
@@ -995,7 +920,6 @@ export namespace util
 
 	private:
 		bool hasValue;
-		bool isReverse;
 	};
 }
 
@@ -1013,7 +937,7 @@ namespace util
 		constexpr Monad<int> monad6{ 1000 };
 		constexpr bool has6 = monad6.has_value();
 
-		Monad<int> monad7{ 80264.01954f };
+		Monad<int> monad7{ int(80264.01954f) };
 		const Monad<int> monad8{ false };
 		constexpr Monad<int> monad9{ 1000ULL };
 
