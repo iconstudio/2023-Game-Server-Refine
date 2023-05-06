@@ -144,6 +144,7 @@ export namespace net
 			return ERROR_IO_INCOMPLETE == static_cast<volatile int&&>(socket_error_code);
 		}
 
+		using ::DWORD;
 		using ::GetLastError;
 		using ::WSAGetLastError;
 	}
