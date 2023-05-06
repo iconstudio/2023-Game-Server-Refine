@@ -9,6 +9,7 @@ import Utility.Memory;
 import Net;
 import Net.EndPoint;
 import Net.Context;
+import Net.Intrinsics;
 
 export namespace net
 {

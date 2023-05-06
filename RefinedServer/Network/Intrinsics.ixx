@@ -1,7 +1,5 @@
 module;
-#include <WS2tcpip.h>
-
-export module Net.IOIntrinsic;
+export module Net.Intrinsics;
 import Utility;
 import Utility.Monad;
 import Utility.Constraints;
@@ -12,7 +10,7 @@ export namespace net
 {
 	using ioError = util::Monad<int>;
 
-	namespace io
+	export namespace io
 	{
 		inline ioError CheckPending() noexcept
 		{
