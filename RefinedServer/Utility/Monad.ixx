@@ -21,6 +21,49 @@ export namespace util
 
 	inline constexpr monad_reverse_t monad_reverse{};
 
+	template<copyable T>
+	class [[nodiscard]] Monadic
+	{
+	public:
+		using value_type = T;
+
+		constexpr Monadic() noexcept(nothrow_constructibles<T>)
+			: myValue()
+			, hasValue(false), isReverse(false)
+		{}
+
+		constexpr Monadic(monad_reverse_t, const bool& reverse)
+			noexcept(nothrow_constructibles<T>)
+			: myValue()
+			, hasValue(false), isReverse(reverse)
+		{}
+
+		constexpr Monadic(nullopt_t, const bool& reverse = false)
+			noexcept(nothrow_constructibles<T>)
+			: myValue()
+			, hasValue(false), isReverse(reverse)
+		{}
+
+		template<convertible_to<T> Uty>
+		constexpr Monadic(Uty&& uty, const bool& reverse = false)
+			noexcept(nothrow_constructibles<T, Uty&&>)
+			: myValue(static_cast<T>(uty))
+			, hasValue(true), isReverse(reverse)
+		{}
+
+		constexpr Monadic& operator=(nullopt_t) & noexcept
+		{
+			hasValue = false;
+			return *this;
+		}
+
+		constexpr Monadic&& operator=(nullopt_t) && noexcept
+		{
+			hasValue = false;
+			return static_cast<Monadic&&>(*this);
+		}
+	};
+
 	template<typename T>
 	class [[nodiscard]] Monad;
 
@@ -32,26 +75,24 @@ export namespace util
 
 		constexpr Monad() noexcept(nothrow_constructibles<T>)
 			: myValue()
-			, hasValue(false), isReverse(false)
 		{}
 
-		constexpr Monad(monad_reverse_t, const bool& reverse)
+		constexpr Monad(monad_reverse_t)
 			noexcept(nothrow_constructibles<T>)
 			: myValue()
-			, hasValue(false), isReverse(reverse)
+			, isReverse(true)
 		{}
 
 		constexpr Monad(nullopt_t)
 			noexcept(nothrow_constructibles<T>)
 			: myValue()
-			, hasValue(false), isReverse(false)
 		{}
 
 		template<convertible_to<T> Uty>
 		constexpr Monad(Uty&& uty)
 			noexcept(nothrow_constructibles<T, Uty&&>)
 			: myValue(static_cast<T>(uty))
-			, hasValue(true), isReverse(false)
+			, hasValue(true)
 		{}
 
 		template<typename Fn, typename... Args>
@@ -698,9 +739,9 @@ export namespace util
 		constexpr ~Monad() noexcept(nothrow_destructibles<T>) = default;
 
 	private:
-		T myValue = {};
-		bool hasValue;
-		bool isReverse;
+		T myValue;
+		bool hasValue = false;
+		bool isReverse = false;
 	};
 
 	template<>
