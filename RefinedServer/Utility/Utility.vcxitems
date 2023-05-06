@@ -18,6 +18,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Array.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Atomic.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Constraints.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Identity.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Locks.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Memory.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Meta.ixx" />

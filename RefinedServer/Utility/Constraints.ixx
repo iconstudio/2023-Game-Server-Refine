@@ -2,7 +2,7 @@ module;
 #include <concepts>
 
 export module Utility.Constraints;
-import Utility.Traits;
+export import Utility.Traits;
 
 export namespace util
 {
@@ -46,19 +46,22 @@ export namespace util
 	concept nothrow_convertibles = std::is_nothrow_convertible_v<T, To>;
 
 	template<typename... Ts>
-	concept nothrow_copy_constructibles = std::conjunction_v<std::is_nothrow_copy_constructible<Ts>...>;
+	concept nothrow_copy_constructibles = make_conjunction<std::is_nothrow_copy_constructible, Ts...>;
 
 	template<typename... Ts>
-	concept nothrow_move_constructibles = std::conjunction_v<std::is_nothrow_move_constructible<Ts>...>;
+	concept nothrow_move_constructibles = make_conjunction<std::is_nothrow_move_constructible, Ts...>;
 
 	template<typename... Ts>
-	concept nothrow_copy_assignables = std::conjunction_v<std::is_nothrow_copy_assignable<Ts>...>;
+	concept nothrow_copy_assignables = make_conjunction<std::is_nothrow_copy_assignable, Ts...>;
 
 	template<typename... Ts>
-	concept nothrow_move_assignables = std::conjunction_v<std::is_nothrow_move_assignable<Ts>...>;
+	concept nothrow_move_assignables = make_conjunction<std::is_nothrow_move_assignable, Ts...>;
 
 	template<typename... Ts>
-	concept nothrow_destructibles = std::conjunction_v<std::is_nothrow_destructible<Ts>...>;
+	concept nothrow_swappables = make_conjunction<std::is_nothrow_swappable, Ts...>;
+
+	template<typename... Ts>
+	concept nothrow_destructibles = make_conjunction<std::is_nothrow_destructible, Ts...>;
 
 	template<typename T, typename... Args>
 	concept nothrow_invocables = std::is_nothrow_invocable_v<T, Args...>;

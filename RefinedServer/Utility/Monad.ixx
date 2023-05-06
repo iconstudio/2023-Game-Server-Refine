@@ -1,16 +1,10 @@
-module;
-#include <optional>
-
 export module Utility.Monad;
-import Utility;
+export import Utility;
 import Utility.Traits;
 import Utility.Constraints;
 
 export namespace util
 {
-	using ::std::nullopt_t;
-	using ::std::nullopt;
-
 	template<typename Fn, typename... Args>
 	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
 
@@ -20,49 +14,6 @@ export namespace util
 	};
 
 	inline constexpr monad_reverse_t monad_reverse{};
-
-	template<copyable T>
-	class [[nodiscard]] Monadic
-	{
-	public:
-		using value_type = T;
-
-		constexpr Monadic() noexcept(nothrow_constructibles<T>)
-			: myValue()
-			, hasValue(false), isReverse(false)
-		{}
-
-		constexpr Monadic(monad_reverse_t, const bool& reverse)
-			noexcept(nothrow_constructibles<T>)
-			: myValue()
-			, hasValue(false), isReverse(reverse)
-		{}
-
-		constexpr Monadic(nullopt_t, const bool& reverse = false)
-			noexcept(nothrow_constructibles<T>)
-			: myValue()
-			, hasValue(false), isReverse(reverse)
-		{}
-
-		template<convertible_to<T> Uty>
-		constexpr Monadic(Uty&& uty, const bool& reverse = false)
-			noexcept(nothrow_constructibles<T, Uty&&>)
-			: myValue(static_cast<T>(uty))
-			, hasValue(true), isReverse(reverse)
-		{}
-
-		constexpr Monadic& operator=(nullopt_t) & noexcept
-		{
-			hasValue = false;
-			return *this;
-		}
-
-		constexpr Monadic&& operator=(nullopt_t) && noexcept
-		{
-			hasValue = false;
-			return static_cast<Monadic&&>(*this);
-		}
-	};
 
 	template<typename T>
 	class [[nodiscard]] Monad;
@@ -88,16 +39,22 @@ export namespace util
 			: myValue()
 		{}
 
-		template<convertible_to<T> Uty>
-		constexpr Monad(Uty&& uty)
-			noexcept(nothrow_constructibles<T, Uty&&>)
-			: myValue(static_cast<T>(uty))
+		constexpr Monad(const T& value)
+			noexcept(nothrow_copy_constructibles<T>)
+			: myValue(value)
+			, hasValue(true)
+		{}
+
+		constexpr Monad(T&& value)
+			noexcept(nothrow_move_constructibles<T>)
+			: myValue(static_cast<T&&>(value))
 			, hasValue(true)
 		{}
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, T&, Args...>
-		inline constexpr Monad&
+		inline constexpr
+			Monad&
 			if_then(Fn&& action, Args&&... args) &
 			noexcept(noexcept(forward<Fn>(action)(declval<T&>(), declval<Args>()...)))
 		{
@@ -111,7 +68,8 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, const T&, Args...>
-		inline constexpr const Monad&
+		inline constexpr
+			const Monad&
 			if_then(Fn&& action, Args&&... args) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&>(), declval<Args>()...)))
 		{
@@ -125,7 +83,8 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, T&&, Args...>
-		inline constexpr Monad&&
+		inline constexpr
+			Monad&&
 			if_then(Fn&& action, Args&&... args) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<T&&>(), declval<Args>()...)))
 		{
@@ -139,7 +98,8 @@ export namespace util
 
 		template<typename Fn, typename... Args>
 			requires invocables<Fn, const T&&, Args...>
-		inline constexpr const Monad&&
+		inline constexpr
+			const Monad&&
 			if_then(Fn&& action, Args&&... args) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>(), declval<Args>()...)))
 		{
@@ -635,12 +595,12 @@ export namespace util
 
 		constexpr T&& value() && noexcept(nothrow_move_constructibles<T>)
 		{
-			return move(myValue);
+			return static_cast<T&&>(myValue);
 		}
 
 		constexpr const T&& value() const&& noexcept(nothrow_move_constructibles<const T>)
 		{
-			return move(myValue);
+			return static_cast<const T&&>(myValue);
 		}
 
 		template<convertible_to<T> U>
