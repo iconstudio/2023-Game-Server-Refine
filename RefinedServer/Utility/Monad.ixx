@@ -427,63 +427,63 @@ export namespace util
 		}
 
 		template<typename Fn, typename... Args>
-			requires invocables<Fn, T&, Args...>
+			requires invocables<Fn, Args...>
 		inline constexpr
 			Monad&
 			else_then(Fn&& action, Args&&... args) &
-			noexcept(noexcept(forward<Fn>(action)(declval<T&>(), declval<Args>()...)))
+			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!has_value())
 			{
-				forward<Fn>(action)(myValue, forward<Args>(args)...);
+				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
 			return *this;
 		}
 
 		template<typename Fn, typename... Args>
-			requires invocables<Fn, const T&, Args...>
+			requires invocables<Fn, Args...>
 		inline constexpr
 			const Monad&
 			else_then(Fn&& action, Args&&... args) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&>(), declval<Args>()...)))
+			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!has_value())
 			{
-				forward<Fn>(action)(myValue, forward<Args>(args)...);
+				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
 			return *this;
 		}
 
 		template<typename Fn, typename... Args>
-			requires invocables<Fn, T&&, Args...>
+			requires invocables<Fn, Args...>
 		inline constexpr
 			Monad&&
 			else_then(Fn&& action, Args&&... args) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<T&&>(), declval<Args>()...)))
+			noexcept(noexcept(forward<Fn>(action)( declval<Args>()...)))
 		{
 			if (!has_value())
 			{
-				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return *this;
+			return util::move(*this);
 		}
 
 		template<typename Fn, typename... Args>
-			requires invocables<Fn, const T&&, Args...>
+			requires invocables<Fn, Args...>
 		inline constexpr
 			const Monad&&
 			else_then(Fn&& action, Args&&... args) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>(), declval<Args>()...)))
+			noexcept(noexcept(forward<Fn>(action)(declval<Args>()...)))
 		{
 			if (!has_value())
 			{
-				forward<Fn>(action)(move(myValue), forward<Args>(args)...);
+				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return *this;
+			return util::move(*this);
 		}
 
 		template<typename Fn, typename... Args>
@@ -1025,9 +1025,9 @@ namespace util
 
 		const auto expr8_4 = monad8.translate([](auto&&) -> long long { return 15718742LL; }, -7);
 
-		const auto& expr8_5 = monad8.else_then([](auto&&) { do_something(); });
+		const auto& expr8_5 = monad8.else_then([]() { do_something(); });
 
-		Monad<int> monad1{false};
+		Monad<int> monad1{ false };
 		const Monad<int> monad2{ false };
 		constexpr Monad<int> monad3{ false };
 
@@ -1051,7 +1051,7 @@ namespace util
 		);
 
 		constexpr const Monad<int>& expr9_5 = monad9.else_then(
-			[](auto&&) {}
+			[]() {}
 		);
 
 		const auto expr9_6 = monad7.or_else([](const int& v) -> Monad<float> {
