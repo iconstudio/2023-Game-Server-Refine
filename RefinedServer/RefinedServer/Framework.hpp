@@ -5,6 +5,8 @@ import Utility.Array;
 import Utility.Monad;
 import Net;
 import Net.EndPoint;
+import Net.Socket;
+import Net.CompletionPort;
 
 class NODISCARD Framework : util::Singleton<Framework>
 {
