@@ -14,5 +14,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Intrinsics.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Settings.ixx" />
   </ItemGroup>
 </Project>

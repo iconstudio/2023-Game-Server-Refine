@@ -2,6 +2,7 @@ module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 export module Net;
+export import :Setting;
 
 export namespace net
 {
