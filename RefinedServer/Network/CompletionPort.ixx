@@ -24,11 +24,11 @@ export namespace net
 	class [[nodiscard]] alignas(ullong) CompletionPort
 	{
 	private:
-		constexpr CompletionPort(const HANDLE& handle) noexcept
+		explicit constexpr CompletionPort(const HANDLE& handle) noexcept
 			: rawHandle(handle)
 		{}
 
-		constexpr CompletionPort(HANDLE&& handle) noexcept
+		explicit constexpr CompletionPort(HANDLE&& handle) noexcept
 			: rawHandle(static_cast<HANDLE&&>(handle))
 		{}
 
@@ -102,8 +102,8 @@ export namespace net
 
 		CompletionPort(const CompletionPort& handle) = delete;
 		CompletionPort& operator=(const CompletionPort& handle) = delete;
-		CompletionPort(CompletionPort&& handle) = delete;
-		CompletionPort& operator=(CompletionPort&& handle) = delete;
+		CompletionPort(CompletionPort&& handle) = default;
+		CompletionPort& operator=(CompletionPort&& handle) = default;
 
 	private:
 		HANDLE rawHandle;
