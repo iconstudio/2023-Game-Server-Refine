@@ -61,42 +61,42 @@ export namespace net
 				return util::nullopt;
 			}
 		}
-	}
 
-	template<typename Fn, typename... Args>
-	concept io_invocables = util::r_invocables<Fn, int, SOCKET, Args...>;
+		template<typename Fn, typename... Args>
+		concept io_invocables = util::r_invocables<Fn, int, SOCKET, Args...>;
 
-	template<typename Fn, typename... Args>
-		requires io_invocables<Fn, Args...>
-	inline
-		ioError
-		Forward(Fn&& fn, SOCKET socket, Args&&... args)
-		noexcept(noexcept(util::invoke(util::forward<Fn>(fn), util::declval<SOCKET>(), util::declval<Args>(args)...)))
-	{
-		return io::CheckIO(util::invoke(util::forward<Fn>(fn), socket, util::forward<Args>(args)...));
-	}
+		template<typename Fn, typename... Args>
+			requires io_invocables<Fn, Args...>
+		inline
+			ioError
+			Execute(Fn&& fn, SOCKET socket, Args&&... args)
+			noexcept(noexcept(util::invoke(util::forward<Fn>(fn), util::declval<SOCKET>(), util::declval<Args>()...)))
+		{
+			return CheckIO(util::forward<Fn>(fn)(socket, util::forward<Args>(args)...));
+		}
 
-	template<typename Class, typename Method, typename... Args>
-		requires io_invocables<Method, Args...>
-	static inline
-		ioError
-		Delegate(Method Class::* (&& action), Class& obj, SOCKET socket, Args&&... args)
-		noexcept(noexcept((obj.*util::forward<Method Class::*>(action))(util::declval<SOCKET>(), util::declval<Args>()...)))
-	{
-		int&& result = (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
+		template<typename Class, typename Method, typename... Args>
+			requires io_invocables<Method, Args...>
+		inline
+			ioError
+			Delegate(Method Class::* (&& action), Class& obj, SOCKET socket, Args&&... args)
+			noexcept(noexcept((obj.*util::forward<Method Class::*>(action))(util::declval<SOCKET>(), util::declval<Args>()...)))
+		{
+			int&& result = (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
 
-		return io::CheckIO(static_cast<int&&>(result));
-	}
+			return CheckIO(static_cast<int&&>(result));
+		}
 
-	template<typename Class, typename Method, typename... Args>
-		requires io_invocables<Method, Args...>
-	static inline
-		ioError
-		Delegate(Method Class::* (&& action), const Class& obj, SOCKET socket, Args&&... args)
-		noexcept(noexcept((obj.*util::forward<Method Class::*>(action))(util::declval<SOCKET>(), util::declval<Args>()...)))
-	{
-		int&& result = (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
+		template<typename Class, typename Method, typename... Args>
+			requires io_invocables<Method, Args...>
+		inline
+			ioError
+			Delegate(Method Class::* (&& action), const Class& obj, SOCKET socket, Args&&... args)
+			noexcept(noexcept((obj.*util::forward<Method Class::*>(action))(util::declval<SOCKET>(), util::declval<Args>()...)))
+		{
+			int&& result = (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
 
-		return io::CheckIO(static_cast<int&&>(result));
+			return CheckIO(static_cast<int&&>(result));
+		}
 	}
 }

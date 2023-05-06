@@ -62,28 +62,30 @@ export namespace net
 	public:
 		constexpr Socket() noexcept
 			: myHandle(abi::InvalidSocket), isOut(false)
+			, myAddress(), myEndPoint()
 		{}
 
 		constexpr Socket(Socket&& other) noexcept
 			: myHandle(static_cast<::SOCKET&&>(other.myHandle)), isOut(false)
+			, myAddress(), myEndPoint()
 		{
 			other.isOut = true;
 		}
 
 		constexpr Socket& operator=(Socket&& other) noexcept
 		{
-			myHandle = static_cast<::SOCKET&&>(other.myHandle);
+			myHandle = static_cast<SOCKET&&>(other.myHandle);
 			other.isOut = true;
 
 			return *this;
 		}
 
-		explicit constexpr Socket(const ::SOCKET& handle) noexcept
+		explicit constexpr Socket(const SOCKET& handle) noexcept
 			: myHandle(handle), isOut(false)
 		{}
 
-		explicit constexpr Socket(::SOCKET&& handle) noexcept
-			: myHandle(static_cast<::SOCKET&&>(handle)), isOut(false)
+		explicit constexpr Socket(SOCKET&& handle) noexcept
+			: myHandle(static_cast<SOCKET&&>(handle)), isOut(false)
 		{}
 
 		~Socket() noexcept
@@ -94,54 +96,33 @@ export namespace net
 			}
 		}
 
-		util::Monad<int> BeginRecv(WSABUF& buffer, Context* context, unsigned* bytes = nullptr, unsigned flags = 0) noexcept
+		ioError BeginRecv(WSABUF& buffer, Context* context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
 		{
-			const int result = ::WSARecv(myHandle, &buffer, 1, bytes, &flags, context, nullptr);
-			if (debug::CheckError(result))
-			{
-				const int error = ::WSAGetLastError();
-				if (error != WSA_IO_PENDING)
-				{
-					delete context;
-					return util::Monad<int>::Error(error);
-				}
-			}
-			return util::Monad<int>::Ok(bytes);
+			return io::Execute(::WSARecv, myHandle, &buffer, 1, bytes, &flags, context, nullptr);
 		}
 
-		template<typename Option = ios::immediately_t>
-		[[nodiscard]]
-		inline IoState Bind(const EndPoint& address, Option&& io = {})
+		inline ioError Bind(const EndPoint& target) noexcept
 		{
-			return IoState{ abi::Bind(Handle, *address), io };
+			return io::Execute(::bind, myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()).else_then([&]() {
+				myAddress = target;
+			});
 		}
 
-		template<typename Option = ios::immediately_t>
-		[[nodiscard]]
-		inline IoState Bind(EndPoint&& address, Option&& io = {})
+		inline ioError Connect(const EndPoint& target) noexcept
 		{
-			return IoState{ abi::Bind(Handle, *util::move(address)), io };
+			return io::Execute(::connect, myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()).else_then([&]() {
+				myEndPoint = target;
+			});
 		}
 
-		template<typename Option = ios::immediately_t>
-		[[nodiscard]]
-		inline IoState Connect(const ::SOCKADDR* const address, int addrlen, Option&& io = {})
+		inline ioError Connect(const ::SOCKADDR* const& address, const int& addrlen) const noexcept
 		{
-			return IoState{ ::connect(Handle, address, addrlen), io };
+			return io::Execute(::connect, myHandle, address, addrlen);
 		}
 
-		template<typename Option = ios::immediately_t>
-		[[nodiscard]]
-		inline IoState Listen(const int& backlog = constants::LISTEN_MAX, Option&& io = {}) const
+		inline ioError Listen(const int& backlog = constants::LISTEN_MAX) noexcept
 		{
-			return IoState{ ::listen(Handle, backlog), io };
-		}
-
-		template<typename Option = ios::immediately_t>
-		[[nodiscard]]
-		inline IoState Listen(int&& backlog = constants::LISTEN_MAX, Option&& io = {}) const
-		{
-			return IoState{ ::listen(Handle, util::move(backlog)), io };
+			return io::Execute(::listen, myHandle, backlog);
 		}
 
 		inline constexpr bool IsValid() const noexcept
@@ -158,7 +139,8 @@ export namespace net
 		Socket& operator=(const Socket& other) = delete;
 
 	private:
-		::SOCKET myHandle;
-		bool isOut;
+		SOCKET myHandle;
+		EndPoint myAddress, myEndPoint;
+		volatile bool isOut;
 	};
 }
