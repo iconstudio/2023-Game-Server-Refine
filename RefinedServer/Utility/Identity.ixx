@@ -9,17 +9,104 @@ export namespace util
 	public:
 		using value_type = T;
 
-		constexpr Identity() noexcept(nothrow_constructibles<T>)
+		constexpr Identity()
+			noexcept(nothrow_constructibles<T>)
 			: myValue()
 		{}
 
-		constexpr Identity(const T& value) noexcept(nothrow_copy_constructibles<T>)
+		constexpr Identity(const T& value)
+			noexcept(nothrow_copy_constructibles<T>)
 			: myValue(value)
 		{}
 
-		constexpr Identity(T&& value) noexcept(nothrow_move_constructibles<T>)
+		constexpr Identity(T&& value)
+			noexcept(nothrow_move_constructibles<T>)
 			: myValue(static_cast<T&&>(value))
 		{}
+
+		constexpr Identity& operator=(const Identity& other) &
+			noexcept(nothrow_copy_assignables<T>)
+		{
+			myValue = other.myValue;
+			return *this;
+		}
+
+		constexpr Identity& operator=(Identity&& other) &
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<T&&>(other.myValue);
+			return *this;
+		}
+
+		constexpr Identity& operator=(const Identity&& other) &
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<const T&&>(other.myValue);
+			return *this;
+		}
+
+		constexpr const Identity& operator=(const Identity& other) const&
+			noexcept(nothrow_copy_assignables<T>)
+		{
+			myValue = other.myValue;
+			return *this;
+		}
+
+		constexpr const Identity& operator=(Identity&& other) const&
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<T&&>(other.myValue);
+			return *this;
+		}
+
+		constexpr const Identity& operator=(const Identity&& other) const&
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<const T&&>(other.myValue);
+			return *this;
+		}
+
+		constexpr Identity&& operator=(const Identity& other) &&
+			noexcept(nothrow_copy_assignables<T>)
+		{
+			myValue = other.myValue;
+			return static_cast<Identity&&>(*this);
+		}
+
+		constexpr Identity&& operator=(Identity&& other) &&
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<T&&>(other.myValue);
+			return static_cast<Identity&&>(*this);
+		}
+
+		constexpr Identity&& operator=(const Identity&& other) &&
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<const T&&>(other.myValue);
+			return static_cast<Identity&&>(*this);
+		}
+
+		constexpr const Identity&& operator=(const Identity& other) const&&
+			noexcept(nothrow_copy_assignables<T>)
+		{
+			myValue = other.myValue;
+			return static_cast<const Identity&&>(*this);
+		}
+
+		constexpr const Identity&& operator=(Identity&& other) const&&
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<T&&>(other.myValue);
+			return static_cast<const Identity&&>(*this);
+		}
+
+		constexpr const Identity&& operator=(const Identity&& other) const&&
+			noexcept(nothrow_move_assignables<T>)
+		{
+			myValue = static_cast<const T&&>(other.myValue);
+			return static_cast<const Identity&&>(*this);
+		}
 
 		constexpr void swap(Identity& other) noexcept(nothrow_swappables<T>)
 		{
@@ -65,8 +152,6 @@ export namespace util
 
 		constexpr Identity(const Identity&) noexcept(nothrow_copy_constructibles<T>) = default;
 		constexpr Identity(Identity&&) noexcept(nothrow_move_constructibles<T>) = default;
-		constexpr Identity& operator=(const Identity&) noexcept(nothrow_copy_assignables<T>) = default;
-		constexpr Identity& operator=(Identity&&) noexcept(nothrow_move_assignables<T>) = default;
 		constexpr ~Identity() noexcept(nothrow_destructibles<T>) = default;
 
 	private:
