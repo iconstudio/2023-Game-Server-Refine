@@ -44,6 +44,9 @@ export namespace util
 		constexpr LooseMonad() noexcept
 		{}
 
+		constexpr LooseMonad(nullopt_t) noexcept
+		{}
+
 		template <size_t Index, typename... Args>
 			requires (Index < sizeof...(Ts))
 		constexpr
