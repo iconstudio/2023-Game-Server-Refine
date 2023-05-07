@@ -26,7 +26,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Meta.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Monad.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Print.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Proxy.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Singleton.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Thread.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Traits.ixx" />

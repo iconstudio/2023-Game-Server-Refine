@@ -183,4 +183,6 @@ export namespace net
 	private:
 		monad_t myState;
 	};
+
+	using Proxy = Promise<void>;
 }
