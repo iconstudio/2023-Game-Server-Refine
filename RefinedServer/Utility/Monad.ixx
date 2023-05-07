@@ -10,7 +10,7 @@ export namespace util
 	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
 
 	template<typename T>
-	class [[nodiscard]] Monad : public Identity<T>
+	class [[nodiscard]] Monad
 	{
 	public:
 		static_assert(!same_as<T, nullopt_t>, "T must not be nullopt_t.");
@@ -20,27 +20,25 @@ export namespace util
 
 		constexpr Monad()
 			noexcept(nothrow_constructibles<T>)
-			: base_type()
+			: myStorage()
 		{}
 
 		constexpr Monad(nullopt_t)
 			noexcept(nothrow_constructibles<T>)
-			: base_type()
+			: myStorage()
 		{}
 
 		constexpr Monad(const T& fwd)
 			noexcept(nothrow_copy_constructibles<T>)
-			: base_type(fwd)
+			: myStorage(fwd)
 			, hasValue(true)
 		{}
 
 		constexpr Monad(T&& fwd)
 			noexcept(nothrow_move_constructibles<T>)
-			: base_type(static_cast<T&&>(fwd))
+			: myStorage(static_cast<T&&>(fwd))
 			, hasValue(true)
 		{}
-
-		using base_type::value;
 
 		template<invocables<T&> Fn>
 		inline constexpr
@@ -199,7 +197,7 @@ export namespace util
 		template<invocables<const T&> Fn>
 		inline constexpr
 			const Monad&
-			operator<<(Fn&& action) const &
+			operator<<(Fn&& action) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
 		{
 			if (!has_value())
@@ -700,6 +698,46 @@ export namespace util
 			}
 		}
 
+		constexpr T& value() & noexcept
+		{
+			return *myStorage;
+		}
+
+		constexpr const T& value() const& noexcept
+		{
+			return *myStorage;
+		}
+
+		constexpr T&& value() && noexcept
+		{
+			return static_cast<T&&>(*myStorage);
+		}
+
+		constexpr const T&& value() const&& noexcept
+		{
+			return static_cast<const T&&>(*myStorage);
+		}
+
+		constexpr T& operator*() & noexcept
+		{
+			return value();
+		}
+
+		constexpr const T& operator*() const& noexcept
+		{
+			return value();
+		}
+
+		constexpr T&& operator*() && noexcept
+		{
+			return static_cast<T&&>(value());
+		}
+
+		constexpr const T&& operator*() const&& noexcept
+		{
+			return static_cast<const T&&>(value());
+		}
+
 		template<convertible_to<T> U>
 		constexpr T value_or(const U& failsafe) const& noexcept(nothrow_constructibles<T>)
 		{
@@ -772,6 +810,7 @@ export namespace util
 		constexpr ~Monad() noexcept(nothrow_destructibles<T>) = default;
 
 	private:
+		Identity<T> myStorage;
 		bool hasValue = false;
 	};
 
