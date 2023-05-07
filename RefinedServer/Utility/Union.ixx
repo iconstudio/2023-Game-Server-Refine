@@ -16,14 +16,11 @@ export namespace util
 	using ::std::in_place_index;
 
 	template <size_t Place, typename... Ts>
-	class __variant_storage
-	{
-		static inline constexpr size_t mySize = 0;
-		static inline constexpr size_t myPlace = Place;
+	class StaticUnion;
 
-		constexpr __variant_storage() noexcept {}
-		constexpr ~__variant_storage() noexcept {}
-	};
+	template <size_t Place>
+	class StaticUnion<Place>
+	{};
 
 	template <size_t Place, typename Fty, typename... Rty>
 	class StaticUnion<Place, Fty, Rty...>
