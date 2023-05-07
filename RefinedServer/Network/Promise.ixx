@@ -116,7 +116,11 @@ export namespace net
 		inline constexpr error_t      failed_io{ -1 };
 	}
 
-	class Promise
+	template<typename T>
+	class Promise;
+
+	template<>
+	class Promise<void> final
 	{
 	public:
 		using monad_t = util::LooseMonad<io::success_t<void>, io::error_t, io::defer_t>;
