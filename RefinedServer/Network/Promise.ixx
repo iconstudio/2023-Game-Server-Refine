@@ -1,6 +1,6 @@
 export module Net.Promise;
 import Utility;
-import Utility.Monad;
+import Utility.Constraints;
 import Utility.Monad.Loosen;
 import Net;
 
@@ -8,6 +8,51 @@ export namespace net
 {
 	namespace io
 	{
+		template<typename T = void>
+		struct success_t;
+
+		template<>
+		struct success_t<void>
+		{
+			explicit constexpr success_t() noexcept = default;
+		};
+
+		template<util::copyable T>
+		struct success_t<T>
+		{
+			explicit constexpr success_t(const T& value) noexcept
+				: value(value)
+			{}
+
+			explicit constexpr success_t(T&& value) noexcept
+				: value(static_cast<T&&>(value))
+			{}
+
+			constexpr operator T& () & noexcept
+			{
+				return value;
+			}
+
+			constexpr operator const T& () const& noexcept
+			{
+				return value;
+			}
+
+			constexpr operator T && () && noexcept
+			{
+				return static_cast<T&&>(value);
+			}
+
+			constexpr operator const T && () const&& noexcept
+			{
+				return static_cast<const T&&>(value);
+			}
+
+			constexpr ~success_t() noexcept(util::nothrow_destructibles<T>) = default;
+
+			T value;
+		};
+
 		struct error_t
 		{
 			constexpr error_t(const int& error_code) noexcept
