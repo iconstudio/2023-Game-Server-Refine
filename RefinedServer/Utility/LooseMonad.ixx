@@ -30,6 +30,16 @@ export namespace util
 
 		template<size_t Index>
 		using element_type = std::variant_alternative_t<Index, base_type>;
+		template<size_t Index>
+		using const_element_type = const element_type<Index>;
+		template<size_t Index>
+		using reference_type = element_type<Index>&;
+		template<size_t Index>
+		using const_reference_type = const element_type<Index>&;
+		template<size_t Index>
+		using rvalue_type = element_type<Index>&&;
+		template<size_t Index>
+		using const_rvalue_type = const element_type<Index>&&;
 
 		constexpr LooseMonad() noexcept
 		{}
@@ -50,11 +60,11 @@ export namespace util
 
 		constexpr ~LooseMonad() noexcept(nothrow_destructibles<Ts...>) = default;
 
-		template<size_t Index, invocables<element_type<Index>&> Fn>
+		template<size_t Index, invocables<reference_type<Index>> Fn>
 		inline constexpr
 			LooseMonad&
 			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<element_type<Index>&>())))
+			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
 		{
 			if (myStorage.template has_value<Index>())
 			{
@@ -64,11 +74,11 @@ export namespace util
 			return *this;
 		}
 
-		template<size_t Index, invocables<const element_type<Index>&> Fn>
+		template<size_t Index, invocables<const_reference_type<Index>> Fn>
 		inline constexpr
 			const LooseMonad&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const element_type<Index>&>())))
+			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
 		{
 			if (myStorage.template has_value<Index>())
 			{
@@ -78,11 +88,11 @@ export namespace util
 			return *this;
 		}
 
-		template<size_t Index, invocables<element_type<Index>&&> Fn>
+		template<size_t Index, invocables<rvalue_type<Index>> Fn>
 		inline constexpr
 			LooseMonad&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<element_type<Index>&&>())))
+			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
 		{
 			if (myStorage.template has_value<Index>())
 			{
@@ -92,11 +102,11 @@ export namespace util
 			return move(*this);
 		}
 
-		template<size_t Index, invocables<const element_type<Index>&&> Fn>
+		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
 		inline constexpr
 			const LooseMonad&&
 			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const element_type<Index>&&>())))
+			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
 		{
 			if (myStorage.template has_value<Index>())
 			{
@@ -195,7 +205,6 @@ export namespace util
 	private:
 		base_type myStorage;
 	};
-
 }
 
 export namespace std
