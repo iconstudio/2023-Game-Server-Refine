@@ -407,4 +407,78 @@ export namespace std
 	{
 		using type = meta::at<meta::MetaList<Ts...>, Index>;
 	};
+
+	template<size_t Place>
+	struct variant_size<util::StaticUnion<integral_constant<size_t, Place>>>
+		: integral_constant<size_t, 1>
+	{};
+
+	template<size_t Place, typename... Ts>
+	struct variant_size<util::StaticUnion<integral_constant<size_t, Place>, Ts...>>
+		: integral_constant<size_t, 1 + sizeof...(Ts)>
+	{};
+
+	template<size_t Index, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<Index>()))
+	{
+		return _Val.template get<Index>();
+	}
+
+	template<size_t Index, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<Index>()))
+	{
+		return _Val.template get<Index>();
+	}
+
+	template<size_t Index, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		noexcept(noexcept(_Val.template get<Index>()))
+	{
+		return move(_Val).template get<Index>();
+	}
+
+	template<size_t Index, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		noexcept(noexcept(_Val.template get<Index>()))
+	{
+		return move(_Val).template get<Index>();
+	}
+
+	template<typename T, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<T>()))
+	{
+		return _Val.template get<T>();
+	}
+
+	template<typename T, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<T>()))
+	{
+		return _Val.template get<T>();
+	}
+
+	template<typename T, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		noexcept(noexcept(_Val.template get<T>()))
+	{
+		return move(_Val).template get<T>();
+	}
+
+	template<typename T, size_t Place, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		noexcept(noexcept(_Val.template get<T>()))
+	{
+		return move(_Val).template get<T>();
+	}
 }
