@@ -221,8 +221,72 @@ export namespace std
 
 	template<typename... Ts>
 	struct variant_size<util::LooseMonad<Ts...>>
-		: integral_constant<size_t, sizeof...(Ts)>
+		: integral_constant<size_t, 1 + sizeof...(Ts)>
 	{};
+
+	template<size_t Index, typename... Ts>
+	constexpr decltype(auto)
+		get(util::LooseMonad<Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<Index>()))
+	{
+		return _Val.template get<Index>();
+	}
+
+	template<size_t Index, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::LooseMonad<Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<Index>()))
+	{
+		return _Val.template get<Index>();
+	}
+
+	template<size_t Index, typename... Ts>
+	constexpr decltype(auto)
+		get(util::LooseMonad<Ts...>&& _Val)
+		noexcept(noexcept(move(_Val).template get<Index>()))
+	{
+		return move(_Val).template get<Index>();
+	}
+
+	template<size_t Index, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::LooseMonad<Ts...>&& _Val)
+		noexcept(noexcept(move(_Val).template get<Index>()))
+	{
+		return move(_Val).template get<Index>();
+	}
+
+	template<typename T, typename... Ts>
+	constexpr decltype(auto)
+		get(util::LooseMonad<Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<T>()))
+	{
+		return _Val.template get<T>();
+	}
+
+	template<typename T, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::LooseMonad<Ts...>& _Val)
+		noexcept(noexcept(_Val.template get<T>()))
+	{
+		return _Val.template get<T>();
+	}
+
+	template<typename T, typename... Ts>
+	constexpr decltype(auto)
+		get(util::LooseMonad<Ts...>&& _Val)
+		noexcept(noexcept(move(_Val).template get<T>()))
+	{
+		return move(_Val).template get<T>();
+	}
+
+	template<typename T, typename... Ts>
+	constexpr decltype(auto)
+		get(const util::LooseMonad<Ts...>&& _Val)
+		noexcept(noexcept(move(_Val).template get<T>()))
+	{
+		return move(_Val).template get<T>();
+	}
 }
 
 namespace util
@@ -280,6 +344,5 @@ namespace util
 		constexpr auto& fna1 = a1.if_then<0>([](const int&) {
 			do_something();
 		});
-
 	}
 }
