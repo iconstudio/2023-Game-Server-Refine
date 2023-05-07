@@ -2,13 +2,13 @@
 import Utility;
 import Utility.Singleton;
 import Utility.Array;
-import Utility.Monad;
 import Net;
 import Net.EndPoint;
 import Net.Socket;
 import Net.CompletionPort;
+import Net.Promise;
 
-class NODISCARD Framework : util::Singleton<Framework>
+class [[nodiscard]] Framework : util::Singleton<Framework>
 {
 public:
 	Framework() noexcept;
@@ -19,25 +19,25 @@ public:
 	void Update() noexcept;
 	void UpdateOnce(const float& delta_time) noexcept;
 
-	util::Monad<int> BeginAccept();
+	net::Promise BeginAccept();
 	void EndAccept() noexcept;
 	void EndFailedAccept() noexcept;
 
-	util::Monad<int> BeginWelcome();
+	net::Promise BeginWelcome();
 	void EndWelcome() noexcept;
 	void EndFailedWelcome() noexcept;
 
-	util::Monad<int> BeginDispose();
+	net::Promise BeginDispose();
 	void EndDispose() noexcept;
 	void EndFailedDispose() noexcept;
 
-	util::Monad<int> Dispose(net::User* const& user);
+	net::Promise Dispose(net::User* const& user);
 
 	bool Poll() noexcept;
 	bool Post() noexcept;
 
 private:
-	util::Monad<int> Close(net::Socket& socket);
+	net::Promise Close(net::Socket& socket);
 
 	static inline constexpr size_t maxNPCs = 1000;
 	static inline constexpr size_t maxUsers = 1000;

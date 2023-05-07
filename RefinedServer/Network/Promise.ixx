@@ -1,5 +1,8 @@
 export module Net.Promise;
+import Utility;
+import Utility.Monad;
 import Utility.Monad.Loosen;
+import Net;
 
 export namespace net
 {
@@ -38,8 +41,16 @@ export namespace net
 	class Promise
 	{
 	public:
+		using monad_t = util::LooseMonad<io::success_t, io::error_t, io::defer_t>;
 
-	private:
-		util::LooseMonad<io::success_t, io::error_t, io::defer_t> myError;
+		constexpr Promise() noexcept
+			: myState()
+		{}
+
+		constexpr Promise(Promise&& other) noexcept
+			: myState(static_cast<monad_t&&>(other.myState))
+		{}
+
+		monad_t myState;
 	};
 }

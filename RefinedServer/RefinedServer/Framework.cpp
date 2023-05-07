@@ -14,7 +14,7 @@ void Framework::Awake()
 
 void Framework::Start() noexcept
 {
-	util::Println("ì„œë²„ë¥¼ ì‹œìž‘í•©ë‹ˆë‹¤.");
+	util::Println("¼­¹ö¸¦ ½ÃÀÛÇÕ´Ï´Ù.");
 }
 
 void Framework::Update() noexcept
@@ -28,9 +28,9 @@ void Framework::Update() noexcept
 void Framework::UpdateOnce(const float& delta_time) noexcept
 {}
 
-util::Monad<int> Framework::BeginAccept()
+Promise Framework::BeginAccept()
 {
-	return util::Monad<int>();
+	return {};
 }
 
 void Framework::EndAccept() noexcept
@@ -39,9 +39,9 @@ void Framework::EndAccept() noexcept
 void Framework::EndFailedAccept() noexcept
 {}
 
-util::Monad<int> Framework::BeginWelcome()
+Promise Framework::BeginWelcome()
 {
-	return util::Monad<int>();
+	return {};
 }
 
 void Framework::EndWelcome() noexcept
@@ -50,9 +50,9 @@ void Framework::EndWelcome() noexcept
 void Framework::EndFailedWelcome() noexcept
 {}
 
-util::Monad<int> Framework::BeginDispose()
+Promise Framework::BeginDispose()
 {
-	return util::Monad<int>();
+	return {};
 }
 
 void Framework::EndDispose() noexcept
