@@ -236,6 +236,86 @@ export namespace util
 			return move(*this);
 		}
 
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			using fwd_result_t = monad_result_t<Fn>;
+
+			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
+
+			if (!has_value<Index>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{ nullopt };
+			}
+		}
+
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			using fwd_result_t = monad_result_t<Fn>;
+
+			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
+
+			if (!has_value<Index>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{ nullopt };
+			}
+		}
+
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			using fwd_result_t = monad_result_t<Fn>;
+
+			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
+
+			if (!has_value<Index>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{ nullopt };
+			}
+		}
+
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			using fwd_result_t = monad_result_t<Fn>;
+
+			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
+
+			if (!has_value<Index>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{ nullopt };
+			}
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
