@@ -83,7 +83,7 @@ export namespace net
 			T myValue;
 		};
 
-		template<typename T>
+		template<typename T = void>
 		struct error_t final
 		{
 			constexpr error_t(const T& error_code) noexcept
