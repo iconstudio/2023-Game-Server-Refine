@@ -187,6 +187,62 @@ export namespace net
 			return *this;
 		}
 
+		template<util::invocables Fn>
+		inline constexpr
+			Promise&
+			if_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			const Promise&
+			if_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			Promise&&
+			if_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return util::move(*this);
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			const Promise&&
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return util::move(*this);
+		}
+
 	private:
 		monad_t myState;
 	};
