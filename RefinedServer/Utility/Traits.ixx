@@ -1,6 +1,5 @@
 module;
-#include <type_traits>
-#include <concepts>
+#include <utility>
 export module Utility.Traits;
 
 export namespace util
@@ -17,6 +16,26 @@ export namespace util
 	using ::std::is_move_assignable_v;
 	using ::std::constructible_from;
 	using ::std::convertible_to;
+
+	using ::std::in_place_t;
+	using ::std::in_place;
+	using ::std::in_place_type_t;
+	using ::std::in_place_type;
+	using ::std::in_place_index_t;
+	using ::std::in_place_index;
+
+	template <size_t... Indices>
+	struct in_place_indices_t
+	{
+		explicit constexpr in_place_indices_t() noexcept = default;
+		constexpr ~in_place_indices_t() noexcept = default;
+
+		explicit constexpr in_place_indices_t(std::index_sequence<Indices...>) noexcept
+		{}
+	};
+
+	template <size_t... Indices>
+	inline constexpr in_place_indices_t<Indices...> in_place_indices{};
 
 	template<typename T>
 	using clean_t = std::remove_cvref_t<T>;

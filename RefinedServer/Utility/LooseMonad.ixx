@@ -9,19 +9,6 @@ export import Utility.Union;
 
 export namespace util
 {
-	template <size_t... Indices>
-	struct in_place_indices_t
-	{
-		explicit constexpr in_place_indices_t() noexcept = default;
-		constexpr ~in_place_indices_t() noexcept = default;
-
-		explicit constexpr in_place_indices_t(std::index_sequence<Indices...>) noexcept
-		{}
-	};
-
-	template <size_t... Indices>
-	inline constexpr in_place_indices_t<Indices...> in_place_indices{};
-
 	template<typename... Ts>
 	class [[nodiscard]] LooseMonad
 	{
