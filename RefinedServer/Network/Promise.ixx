@@ -193,6 +193,62 @@ export namespace net
 			return *this;
 		}
 
+		template<util::invocables<T&> Fn>
+		inline constexpr
+			const Promise&
+			if_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&>())))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)(myState.template get_value<succeed_t>());
+			}
+
+			return *this;
+		}
+
+		template<util::invocables<const T&> Fn>
+		inline constexpr
+			const Promise&
+			if_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&>())))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)(myState.template get_value<succeed_t>());
+			}
+
+			return *this;
+		}
+
+		template<util::invocables<T&&> Fn>
+		inline constexpr
+			Promise&&
+			if_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&&>())))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)(util::move(myState).template get_value<succeed_t>());
+			}
+
+			return util::move(*this);
+		}
+
+		template<util::invocables<const T&&> Fn>
+		inline constexpr
+			const Promise&&
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&&>())))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)(util::move(myState).template get_value<succeed_t>());
+			}
+
+			return util::move(*this);
+		}
+
 	private:
 		monad_t myState;
 	};
