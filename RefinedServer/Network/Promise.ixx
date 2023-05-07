@@ -114,9 +114,9 @@ export namespace net
 			return error_t{ static_cast<int&&>(error_code) };
 		}
 
-		inline constexpr defer_t defer{ };
 		inline constexpr success_t<void> success{ };
-		inline constexpr success_t<void> fail{ };
+		inline constexpr error_t<void> fail{ };
+		inline constexpr defer_t defer{ };
 
 		template<typename T>
 		inline constexpr success_t<T> succeed_io{ };
@@ -234,12 +234,8 @@ export namespace net
 			: myState(util::in_place_type<succeed_t>, io::success)
 		{}
 
-		constexpr Promise(const failed_t& error) noexcept
-			: myState(util::in_place_type<failed_t>, error)
-		{}
-
-		constexpr Promise(failed_t&& error) noexcept
-			: myState(util::in_place_type<failed_t>, static_cast<failed_t&&>(error))
+		constexpr Promise(failed_t) noexcept
+			: myState(util::in_place_type<failed_t>, io::fail)
 		{}
 
 		constexpr Promise(defered_t) noexcept
