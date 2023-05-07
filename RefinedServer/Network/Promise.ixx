@@ -60,7 +60,25 @@ export namespace net
 
 			constexpr ~success_t() noexcept(util::nothrow_destructibles<T>) = default;
 
-			constexpr const T& operator()(const T& value) noexcept
+			constexpr T& operator()(T& value) const noexcept
+			{
+				return value;
+			}
+
+			constexpr const T& operator()(const T& value) const noexcept
+			{
+				return value;
+			}
+
+			constexpr T&& operator()(T&& value) const noexcept
+			{
+				return static_cast<T&&>(value);
+			}
+
+			constexpr const T&& operator()(const T&& value) const noexcept
+			{
+				return static_cast<const T&&>(value);
+			}
 
 			T myValue;
 		};
