@@ -13,11 +13,14 @@ export namespace util
 	using ::std::default_initializable;
 	using ::std::copy_constructible;
 	using ::std::move_constructible;
+	using ::std::is_copy_assignable_v;
+	using ::std::is_move_assignable_v;
 	using ::std::constructible_from;
 	using ::std::convertible_to;
 
 	template<typename T>
 	using clean_t = std::remove_cvref_t<T>;
+
 	template <typename T>
 	inline constexpr bool is_actual_integral_v = std::_Is_any_of_v<std::remove_cvref_t<T>, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long>;
 
