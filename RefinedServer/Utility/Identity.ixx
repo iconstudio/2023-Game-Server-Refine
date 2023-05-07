@@ -11,20 +11,17 @@ export namespace util
 		using value_type = T;
 
 		constexpr Identity()
-			noexcept(nothrow_constructibles<T>)
-			requires(default_initializables<T>)
+			noexcept(nothrow_constructibles<T>) requires(default_initializables<T>)
 			: myValue()
 		{}
 
 		constexpr Identity(const T& value)
-			noexcept(nothrow_copy_constructibles<T>)
-			requires(copy_constructibles<T>)
+			noexcept(nothrow_copy_constructibles<T>) requires(copy_constructibles<T>)
 			: myValue(value)
 		{}
 
 		constexpr Identity(T&& value)
-			noexcept(nothrow_move_constructibles<T>)
-			requires(move_constructibles<T>)
+			noexcept(nothrow_move_constructibles<T>) requires(move_constructibles<T>)
 			: myValue(static_cast<T&&>(value))
 		{}
 
@@ -163,7 +160,7 @@ export namespace util
 			return myValue;
 		}
 
-		constexpr T&& operator*() && 
+		constexpr T&& operator*() &&
 			noexcept(nothrow_move_constructibles<T>)
 			requires(move_constructibles<T>)
 		{
