@@ -119,6 +119,13 @@ export namespace net
 	template<typename T>
 	class Promise;
 
+	template<util::copyable T>
+	class Promise<T> final
+	{
+	public:
+
+	};
+
 	template<>
 	class Promise<void> final
 	{
@@ -185,4 +192,6 @@ export namespace net
 	};
 
 	using Proxy = Promise<void>;
+	template<util::copyable T>
+	using Handler = Promise<T>;
 }
