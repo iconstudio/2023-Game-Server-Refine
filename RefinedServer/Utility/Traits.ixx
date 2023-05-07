@@ -25,13 +25,26 @@ export namespace util
 	inline constexpr bool is_actual_integral_v = std::_Is_any_of_v<std::remove_cvref_t<T>, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long>;
 
 	template <typename Special, template <typename...> typename Template>
-	struct is_specialization : std::false_type {};
+	struct is_specialization : std::false_type
+	{};
 
 	template<template<typename...> typename Template, typename... Args>
-	struct is_specialization<Template<Args...>, typename Template> : std::true_type {};
+	struct is_specialization<Template<Args...>, typename Template> : std::true_type
+	{};
 
 	template<typename Special, template<typename...> typename Template>
 	inline constexpr bool is_specialization_v = is_specialization<Special, Template>::value;
+
+	template <typename Special, template <size_t...> typename Template>
+	struct is_indexed : std::false_type
+	{};
+
+	template<template<size_t...> typename Template, size_t... Indices>
+	struct is_indexed<Template<Indices...>, typename Template> : std::true_type
+	{};
+
+	template<typename Special, template<size_t...> typename Template>
+	inline constexpr bool is_indexed_v = is_indexed<Special, Template>::value;
 
 	template<template<typename> typename MetaFn, typename... Ts>
 	inline constexpr bool make_conjunction = std::conjunction_v<MetaFn<Ts>...>;
