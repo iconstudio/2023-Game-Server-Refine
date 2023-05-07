@@ -67,13 +67,11 @@ export namespace net
 		};
 
 		struct defer_t { explicit constexpr defer_t() noexcept = default; };
-		struct success_t { explicit constexpr success_t() noexcept = default; };
 
 		inline constexpr error_t error(const int& error_code) noexcept
 		{
 			return error_t{ error_code };
 		}
-
 		inline constexpr error_t error(int&& error_code) noexcept
 		{
 			return error_t{ static_cast<int&&>(error_code) };
@@ -86,16 +84,61 @@ export namespace net
 	class Promise
 	{
 	public:
-		using monad_t = util::LooseMonad<io::success_t, io::error_t, io::defer_t>;
+		using monad_t = util::LooseMonad<io::success_t<void>, io::error_t, io::defer_t>;
 
 		constexpr Promise() noexcept
 			: myState()
+		{}
+
+		constexpr Promise(util::nullopt_t) noexcept
+			: myState(util::nullopt)
+		{}
+
+		constexpr Promise(const Promise& other) noexcept
+			: myState(other.myState)
 		{}
 
 		constexpr Promise(Promise&& other) noexcept
 			: myState(static_cast<monad_t&&>(other.myState))
 		{}
 
+		explicit constexpr Promise(const monad_t& state) noexcept
+			: myState(state)
+		{}
+
+		explicit constexpr Promise(monad_t&& state) noexcept
+			: myState(static_cast<monad_t&&>(state))
+		{}
+
+		constexpr Promise(io::success_t<void>) noexcept
+			: myState(util::in_place_type<io::success_t<void>>, io::success)
+		{}
+
+		constexpr Promise(const io::error_t& error) noexcept
+			: myState(util::in_place_type<io::error_t>, error)
+		{}
+
+		constexpr Promise(io::error_t&& error) noexcept
+			: myState(util::in_place_type<io::error_t>, static_cast<io::error_t&&>(error))
+		{}
+
+		constexpr Promise(io::defer_t) noexcept
+			: myState(util::in_place_type<io::defer_t>, io::defer)
+		{}
+
+		constexpr Promise& operator=(const Promise& other) noexcept
+		{
+			myState = other.myState;
+			return *this;
+		}
+
+		constexpr Promise& operator=(Promise&& other) noexcept
+		{
+			myState = static_cast<monad_t&&>(other.myState);
+			return *this;
+		}
+
+	private:
 		monad_t myState;
 	};
 }

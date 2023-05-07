@@ -5,6 +5,7 @@ module;
 export module Net.CompletionPort;
 import Utility.Monad;
 import Net.Intrinsics;
+import Net.Promise;
 
 using ulong = unsigned long;
 using ullong = unsigned long long;
