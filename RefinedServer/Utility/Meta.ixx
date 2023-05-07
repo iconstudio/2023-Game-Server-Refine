@@ -1,5 +1,5 @@
 module;
-#include <type_traits>
+#include <utility>
 export module Utility.Meta;
 
 namespace meta::detail
@@ -308,6 +308,36 @@ export namespace meta
 		: public included_range<T, R<I, Rests...>>
 	{};
 
+	// get typeparams' count of sequence
+	template <typename...>
+	struct tsize;
+
+	template <typename... Ts>
+	inline constexpr size_t tsize_v = tsize<Ts...>::value;
+
+	template <template <typename...> typename Seq, typename... Ts>
+	struct tsize<Seq<Ts...>> : public std::integral_constant<size_t, sizeof...(Ts)>
+	{};
+
+	template <template <typename...> typename Seq>
+	struct tsize<Seq<>> : public std::integral_constant<size_t, 0>
+	{};
+
+	// get byte size of sequence
+	template <typename...>
+	struct byte_size;
+
+	template <typename... Ts>
+	inline constexpr size_t byte_size_v = byte_size<Ts...>::value;
+
+	template <typename T>
+	struct byte_size<T> : public std::integral_constant<size_t, sizeof(T)>
+	{};
+
+	template <typename T, typename... Rests>
+	struct byte_size<T, Rests...> : public std::integral_constant<size_t, sizeof(T) + byte_size_v<Rests...>>
+	{};
+
 	// merge several lists into one
 	template <typename...>
 	struct concat;
@@ -392,6 +422,35 @@ export namespace meta
 
 		using type = unzip_t<Merged>;
 	};
+}
+
+export namespace std
+{
+	template<size_t Index, typename Fty, typename... Ts>
+	struct tuple_element_t<Index, meta::MetaList<Fty, Ts...>>
+	{
+		using type = Fty;
+	};
+
+	template<size_t Index, typename Fty, typename... Ts>
+	struct tuple_element_t<Index, const meta::MetaList<Fty, Ts...>>
+	{
+		using type = Fty;
+	};
+
+	template<size_t Index>
+	struct tuple_element_t<Index, meta::MetaList<>>
+	{};
+
+	template<typename... Ts>
+	struct tuple_size<meta::MetaList<Ts...>>
+		: public integral_constant<size_t, meta::tsize_v<Ts...>>
+	{};
+
+	template<typename... Ts>
+	struct tuple_size<const meta::MetaList<Ts...>>
+		: public integral_constant<size_t, meta::tsize_v<Ts...>>
+	{};
 }
 
 namespace meta
