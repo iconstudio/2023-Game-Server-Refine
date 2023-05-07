@@ -36,6 +36,21 @@ export namespace util
 	template<typename T>
 	concept nonaggregate_classes = classes<T> && std::is_aggregate_v<clean_t<T>>;
 
+	template<typename... Ts>
+	concept default_initializables = make_conjunction<std::is_default_constructible, Ts...>;
+
+	template<typename... Ts>
+	concept copy_constructibles = make_conjunction<std::is_copy_constructible, Ts...>;
+
+	template<typename... Ts>
+	concept move_constructibles = make_conjunction<std::is_move_constructible, Ts...>;
+
+	template<typename... Ts>
+	concept copy_assignables = make_conjunction<std::is_copy_assignable, Ts...>;
+
+	template<typename... Ts>
+	concept move_assignables = make_conjunction<std::is_move_assignable, Ts...>;
+
 	template<typename T>
 	concept nothrow_default_constructibles = std::is_nothrow_default_constructible_v<T>;
 
