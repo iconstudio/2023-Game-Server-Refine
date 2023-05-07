@@ -25,5 +25,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Socket.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CompletionPort.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
   </ItemGroup>
 </Project>
