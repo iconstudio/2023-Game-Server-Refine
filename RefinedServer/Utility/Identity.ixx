@@ -1,4 +1,5 @@
 export module Utility.Identity;
+import Utility.Traits;
 import Utility.Constraints;
 
 export namespace util
@@ -11,21 +12,25 @@ export namespace util
 
 		constexpr Identity()
 			noexcept(nothrow_constructibles<T>)
+			requires(default_initializables<T>)
 			: myValue()
 		{}
 
 		constexpr Identity(const T& value)
 			noexcept(nothrow_copy_constructibles<T>)
+			requires(copy_constructibles<T>)
 			: myValue(value)
 		{}
 
 		constexpr Identity(T&& value)
 			noexcept(nothrow_move_constructibles<T>)
+			requires(move_constructibles<T>)
 			: myValue(static_cast<T&&>(value))
 		{}
 
 		constexpr Identity& operator=(const Identity& other) &
 			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>)
 		{
 			myValue = other.myValue;
 			return *this;
@@ -33,6 +38,7 @@ export namespace util
 
 		constexpr Identity& operator=(Identity&& other) &
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
 		{
 			myValue = static_cast<T&&>(other.myValue);
 			return *this;
@@ -40,6 +46,7 @@ export namespace util
 
 		constexpr Identity& operator=(const Identity&& other) &
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
 		{
 			myValue = static_cast<const T&&>(other.myValue);
 			return *this;
@@ -47,6 +54,7 @@ export namespace util
 
 		constexpr const Identity& operator=(const Identity& other) const&
 			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<const T>)
 		{
 			myValue = other.myValue;
 			return *this;
@@ -54,6 +62,7 @@ export namespace util
 
 		constexpr const Identity& operator=(Identity&& other) const&
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<const T>)
 		{
 			myValue = static_cast<T&&>(other.myValue);
 			return *this;
@@ -61,6 +70,7 @@ export namespace util
 
 		constexpr const Identity& operator=(const Identity&& other) const&
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<const T>)
 		{
 			myValue = static_cast<const T&&>(other.myValue);
 			return *this;
@@ -68,6 +78,7 @@ export namespace util
 
 		constexpr Identity&& operator=(const Identity& other) &&
 			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>)
 		{
 			myValue = other.myValue;
 			return static_cast<Identity&&>(*this);
@@ -75,6 +86,7 @@ export namespace util
 
 		constexpr Identity&& operator=(Identity&& other) &&
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
 		{
 			myValue = static_cast<T&&>(other.myValue);
 			return static_cast<Identity&&>(*this);
@@ -82,6 +94,7 @@ export namespace util
 
 		constexpr Identity&& operator=(const Identity&& other) &&
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
 		{
 			myValue = static_cast<const T&&>(other.myValue);
 			return static_cast<Identity&&>(*this);
@@ -89,6 +102,7 @@ export namespace util
 
 		constexpr const Identity&& operator=(const Identity& other) const&&
 			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<const T>)
 		{
 			myValue = other.myValue;
 			return static_cast<const Identity&&>(*this);
@@ -96,6 +110,7 @@ export namespace util
 
 		constexpr const Identity&& operator=(Identity&& other) const&&
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<const T>)
 		{
 			myValue = static_cast<T&&>(other.myValue);
 			return static_cast<const Identity&&>(*this);
@@ -103,6 +118,7 @@ export namespace util
 
 		constexpr const Identity&& operator=(const Identity&& other) const&&
 			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<const T>)
 		{
 			myValue = static_cast<const T&&>(other.myValue);
 			return static_cast<const Identity&&>(*this);
@@ -125,27 +141,57 @@ export namespace util
 			return myValue;
 		}
 
-		constexpr T&& value() && noexcept(nothrow_move_constructibles<T>)
+		constexpr T&& value() &&
+			noexcept(nothrow_move_constructibles<T>)
 		{
 			return static_cast<T&&>(myValue);
 		}
 
-		constexpr const T&& value() const&& noexcept(nothrow_move_constructibles<const T>)
+		constexpr const T&& value() const&&
+			noexcept(nothrow_move_constructibles<const T>)
 		{
 			return static_cast<const T&&>(myValue);
 		}
 
-		constexpr T get() const& noexcept(nothrow_copy_constructibles<T>)
+		constexpr T& operator*() & noexcept
 		{
 			return myValue;
 		}
 
-		constexpr T&& get() && noexcept(nothrow_move_constructibles<T>)
+		constexpr const T& operator*() const& noexcept
+		{
+			return myValue;
+		}
+
+		constexpr T&& operator*() && 
+			noexcept(nothrow_move_constructibles<T>)
+			requires(move_constructibles<T>)
 		{
 			return static_cast<T&&>(myValue);
 		}
 
-		explicit constexpr operator T () const noexcept(nothrow_copy_constructibles<T>)
+		constexpr const T&& operator*() const&&
+			noexcept(nothrow_move_constructibles<T>)
+			requires(move_constructibles<const T>)
+		{
+			return static_cast<const T&&>(myValue);
+		}
+
+		constexpr T get() const&
+			noexcept(nothrow_copy_constructibles<T>)
+		{
+			return myValue;
+		}
+
+		constexpr T&& get() &&
+			noexcept(nothrow_move_constructibles<T>)
+			requires(move_constructibles<T>)
+		{
+			return static_cast<T&&>(myValue);
+		}
+
+		explicit constexpr operator T () const
+			noexcept(nothrow_copy_constructibles<T>)
 		{
 			return myValue;
 		}
