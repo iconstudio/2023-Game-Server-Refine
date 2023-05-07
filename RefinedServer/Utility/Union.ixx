@@ -345,6 +345,36 @@ export namespace util
 			}
 		}
 
+		template <typename T>
+			requires (same_as<clean_t<T>, Fty>)
+		[[nodiscard]]
+		constexpr bool has_value() const noexcept
+		{
+			return hasValue;
+		}
+
+		template <typename T>
+			requires (!same_as<clean_t<T>, Fty>)
+		[[nodiscard]]
+		constexpr bool has_value() const noexcept
+		{
+			if (isExtended)
+			{
+				try
+				{
+					return _Tail.template has_value<T>();
+				}
+				catch (...)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		template <size_t Index>
 			requires (Index == Place)
 		[[nodiscard]]

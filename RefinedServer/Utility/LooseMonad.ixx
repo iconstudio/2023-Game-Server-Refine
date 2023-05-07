@@ -401,6 +401,13 @@ export namespace util
 			return myStorage.template has_value<Index>();
 		}
 
+		template <typename T>
+			requires meta::included_range_v<T, base_type>
+		constexpr bool has_value() const noexcept
+		{
+			return myStorage.template has_value<T>();
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		constexpr bool is_valueless() const noexcept
