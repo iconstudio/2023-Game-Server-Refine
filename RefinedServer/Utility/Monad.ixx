@@ -1095,8 +1095,8 @@ namespace util
 		constexpr const auto& expr9_1 = monad9.if_then([](auto&&) -> float { return 3000.0; });
 
 		constexpr Monad<float> expr9_2 = monad9.and_then(
-			[](auto&&) -> Monad<float> {
-			return 3000.0;
+			[](const int&) -> Monad<float> {
+			return 3000.0f;
 		});
 
 		constexpr double expr9_3 = monad9.transform(
@@ -1112,6 +1112,8 @@ namespace util
 		constexpr const Monad<int>& expr9_5 = monad9.else_then(
 			[]() {}
 		);
+
+		const auto rr = monad9 >> [](const int& val) -> Monad<float> { return 5020.0f; };
 
 		const auto expr9_6 = monad7.or_else([](const int& v) -> Monad<float> {
 			return 5020.0f;
