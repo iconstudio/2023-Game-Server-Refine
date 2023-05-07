@@ -34,6 +34,12 @@ export namespace util
 		constexpr LooseMonad(nullopt_t) noexcept
 		{}
 
+		template <typename T>
+			requires (meta::included_v<clean_t<T>, Ts...>)
+		constexpr LooseMonad(T&& object) noexcept
+			: myStorage(in_place_type<clean_t<T>>, static_cast<T&&>(object))
+		{}
+
 		template <size_t Index, typename... Args>
 			requires (Index < sizeof...(Ts))
 		constexpr
@@ -405,6 +411,9 @@ export namespace util
 	private:
 		base_type myStorage;
 	};
+
+	template<typename T, typename E>
+	using Expected = LooseMonad<T, E>;
 }
 
 export namespace std
