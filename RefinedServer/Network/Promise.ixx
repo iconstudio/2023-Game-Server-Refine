@@ -260,27 +260,13 @@ export namespace net
 
 		template<util::invocables Fn>
 		inline constexpr
-			Promise&
-			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (myState.template has_value<succeed_t>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
-		}
-
-		template<util::invocables Fn>
-		inline constexpr
 			const Promise&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (myState.template has_value<succeed_t>())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
 			return *this;
@@ -290,11 +276,11 @@ export namespace net
 		inline constexpr
 			Promise&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (myState.template has_value<succeed_t>())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
 			return util::move(*this);
@@ -302,16 +288,106 @@ export namespace net
 
 		template<util::invocables Fn>
 		inline constexpr
-			const Promise&&
-			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
+			util::monad_result_t<Fn>
+			and_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+
 			if (myState.template has_value<succeed_t>())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{ util::nullopt };
+			}
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			util::monad_result_t<Fn>
+			and_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{ util::nullopt };
+			}
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			const Promise&
+			else_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (myState.template has_value<failed_t>())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			const Promise&
+			else_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (myState.template has_value<failed_t>())
+			{
+				util::forward<Fn>(action)();
 			}
 
 			return util::move(*this);
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			util::monad_result_t<Fn>
+			or_else(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (!myState.template has_value<succeed_t>())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{ util::nullopt };
+			}
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			util::monad_result_t<Fn>
+			or_else(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (!myState.template has_value<succeed_t>())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{ util::nullopt };
+			}
 		}
 
 	private:
