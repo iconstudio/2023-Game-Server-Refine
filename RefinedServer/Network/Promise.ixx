@@ -21,36 +21,48 @@ export namespace net
 		struct success_t<T>
 		{
 			explicit constexpr success_t(const T& value) noexcept
-				: value(value)
+				: myValue(value)
 			{}
 
 			explicit constexpr success_t(T&& value) noexcept
-				: value(static_cast<T&&>(value))
+				: myValue(static_cast<T&&>(value))
 			{}
+
+			constexpr const T& operator*() const& noexcept
+			{
+				return myValue;
+			}
+
+			constexpr T&& operator*() && noexcept
+			{
+				return myValue;
+			}
 
 			constexpr operator T& () & noexcept
 			{
-				return value;
+				return myValue;
 			}
 
 			constexpr operator const T& () const& noexcept
 			{
-				return value;
+				return myValue;
 			}
 
 			constexpr operator T && () && noexcept
 			{
-				return static_cast<T&&>(value);
+				return static_cast<T&&>(myValue);
 			}
 
 			constexpr operator const T && () const&& noexcept
 			{
-				return static_cast<const T&&>(value);
+				return static_cast<const T&&>(myValue);
 			}
 
 			constexpr ~success_t() noexcept(util::nothrow_destructibles<T>) = default;
 
-			T value;
+			constexpr const T& operator()(const T& value) noexcept
+
+			T myValue;
 		};
 
 		struct error_t
