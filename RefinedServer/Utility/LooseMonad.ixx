@@ -142,6 +142,38 @@ export namespace util
 			return move(myStorage).template get<Index>();
 		}
 
+		template <typename T>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get()&
+		{
+			return myStorage.template get<T>();
+		}
+
+		template <typename T>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&
+		{
+			return myStorage.template get<T>();
+		}
+
+		template <typename T>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get()&&
+		{
+			return move(myStorage).template get<T>();
+		}
+
+		template <typename T>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&&
+		{
+			return move(myStorage).template get<T>();
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		constexpr bool has_value() const noexcept
