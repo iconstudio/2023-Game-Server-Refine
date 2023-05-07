@@ -26,7 +26,7 @@ export namespace util
 	class [[nodiscard]] LooseMonad
 	{
 	public:
-		using base_type = __variant_storage<0, Ts...>;
+		using base_type = StaticUnion<0, Ts...>;
 
 		template<size_t Index>
 		using element_type = std::variant_alternative_t<Index, base_type>;

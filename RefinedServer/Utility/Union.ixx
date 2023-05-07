@@ -26,7 +26,7 @@ export namespace util
 	};
 
 	template <size_t Place, typename Fty, typename... Rty>
-	class __variant_storage<Place, Fty, Rty...>
+	class StaticUnion<Place, Fty, Rty...>
 	{
 	public:
 		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
@@ -34,24 +34,24 @@ export namespace util
 		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
 		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_type_t<.");
 
-		using type = __variant_storage<Place, Fty, Rty...>;
+		using type = StaticUnion<Place, Fty, Rty...>;
 		using value_type = std::remove_const_t<Fty>;
-		using under_type = __variant_storage<Place + 1, Rty...>;
+		using under_type = StaticUnion<Place + 1, Rty...>;
 
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
 
 		// no initialization (no active member)
-		constexpr __variant_storage() noexcept
+		constexpr StaticUnion() noexcept
 		{}
 
 		// no initialization (no active member)
-		constexpr __variant_storage(nullopt_t) noexcept
+		constexpr StaticUnion(nullopt_t) noexcept
 		{}
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr __variant_storage(std::in_place_t, Args&&... args)
+		constexpr StaticUnion(std::in_place_t, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -59,15 +59,15 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr __variant_storage(std::in_place_index_t<Place>, Args&&... args)
+		constexpr StaticUnion(std::in_place_index_t<Place>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
-			: __variant_storage(std::in_place, static_cast<Args&&>(args)...)
+			: StaticUnion(std::in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Recursively find the place onto Tail
 		template <size_t Target, typename... Args>
 			requires (Target != Place)
-		constexpr __variant_storage(std::in_place_index_t<Target>, Args&&... args)
+		constexpr StaticUnion(std::in_place_index_t<Target>, Args&&... args)
 			noexcept(nothrow_constructibles<under_type, std::in_place_index_t<Target>, Args...>)
 			: _Tail(std::in_place_index<Target>, static_cast<Args&&>(args)...)
 			, isExtended(true)
@@ -76,15 +76,15 @@ export namespace util
 		// Initialize my value with Args
 		template <typename T, size_t Index, typename... Args>
 			requires (same_as<clean_t<T>, Fty>)
-		constexpr __variant_storage(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+		constexpr StaticUnion(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
-			: __variant_storage(std::in_place, static_cast<Args&&>(args)...)
+			: StaticUnion(std::in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Find the specified type
 		template <typename T, size_t Index, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Index <= 1 + sizeof...(Rty))
-		constexpr __variant_storage(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+		constexpr StaticUnion(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: _Tail(std::in_place_type<T>, std::integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
@@ -92,7 +92,7 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr explicit __variant_storage(std::integral_constant<size_t, 0>, Args&&... args)
+		constexpr explicit StaticUnion(std::integral_constant<size_t, 0>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -101,23 +101,23 @@ export namespace util
 		// Recursively seek the index within Tail
 		template <size_t Index, typename... Args>
 			requires (Index != Place)
-		constexpr explicit __variant_storage(std::integral_constant<size_t, Index>, Args&&... _Args)
+		constexpr explicit StaticUnion(std::integral_constant<size_t, Index>, Args&&... _Args)
 			noexcept(nothrow_constructibles<under_type, std::integral_constant<size_t, Index - 1>, Args...>)
 			: _Tail(std::integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
 			, isExtended(false)
 		{}
 
-		constexpr ~__variant_storage()
+		constexpr ~StaticUnion()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
 			requires (!make_disjunction<std::is_trivially_destructible, Fty, Rty...>)
 		{}
 
-		constexpr ~__variant_storage()
+		constexpr ~StaticUnion()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
 			requires (make_conjunction<std::is_trivially_destructible, Fty, Rty...>)
 		{}
 
-		constexpr __variant_storage& operator=(nullopt_t) noexcept
+		constexpr StaticUnion& operator=(nullopt_t) noexcept
 		{
 			hasValue = false;
 			return *this;
@@ -297,10 +297,10 @@ export namespace util
 			}
 		}
 
-		__variant_storage(__variant_storage&&) = default;
-		__variant_storage(const __variant_storage&) = default;
-		__variant_storage& operator=(__variant_storage&&) = default;
-		__variant_storage& operator=(const __variant_storage&) = default;
+		StaticUnion(StaticUnion&&) = default;
+		StaticUnion(const StaticUnion&) = default;
+		StaticUnion& operator=(StaticUnion&&) = default;
+		StaticUnion& operator=(const StaticUnion&) = default;
 
 	private:
 		friend class under_type;
@@ -318,7 +318,7 @@ export namespace util
 export namespace std
 {
 	template<size_t Index, size_t Place, typename... Ts>
-	struct variant_alternative<Index, util::__variant_storage<Place, Ts...>>
+	struct variant_alternative<Index, util::StaticUnion<Place, Ts...>>
 	{
 		using type = meta::at<meta::MetaList<Ts...>, Index>;
 	};
