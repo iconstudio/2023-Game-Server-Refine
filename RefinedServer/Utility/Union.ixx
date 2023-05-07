@@ -15,7 +15,7 @@ export namespace util
 	class StaticUnion<std::integral_constant<size_t, Place>>
 	{};
 
-	template <size_t Place, typename Fty, typename... Rty>
+	template <size_t Place, notvoids Fty, notvoids... Rty>
 	class StaticUnion<std::integral_constant<size_t, Place>, Fty, Rty...>
 	{
 	public:
