@@ -83,26 +83,27 @@ export namespace net
 			T myValue;
 		};
 
-		struct error_t
+		template<typename T>
+		struct error_t final
 		{
-			constexpr error_t(const int& error_code) noexcept
+			constexpr error_t(const T& error_code) noexcept
 				: errorCode(error_code)
 			{}
 
-			constexpr error_t(int&& error_code) noexcept
-				: errorCode(static_cast<int&&>(error_code))
+			constexpr error_t(T&& error_code) noexcept
+				: errorCode(static_cast<T&&>(error_code))
 			{}
 
-			int errorCode;
+			T errorCode;
 		};
 
 		struct defer_t { explicit constexpr defer_t() noexcept = default; };
 
-		inline constexpr error_t error(const int& error_code) noexcept
+		inline constexpr error_t<int> error(const int& error_code) noexcept
 		{
 			return error_t{ error_code };
 		}
-		inline constexpr error_t error(int&& error_code) noexcept
+		inline constexpr error_t<int> error(int&& error_code) noexcept
 		{
 			return error_t{ static_cast<int&&>(error_code) };
 		}
@@ -113,7 +114,8 @@ export namespace net
 		template<typename T>
 		inline constexpr success_t<T> succeed_io{ };
 		inline constexpr defer_t      defered_io{ };
-		inline constexpr error_t      failed_io{ -1 };
+		template<typename T>
+		inline constexpr error_t<T>   failed_io{ };
 	}
 
 	template<typename T, typename E>
