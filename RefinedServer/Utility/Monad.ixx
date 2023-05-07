@@ -997,10 +997,10 @@ export namespace util
 
 namespace util
 {
-	inline void do_something() noexcept
+	constexpr void do_something() noexcept
 	{}
 
-	void test_monad() noexcept
+	constexpr void test_monad() noexcept
 	{
 		Monad<int> monad4{ 1000 };
 		const bool has4 = monad4.has_value();
