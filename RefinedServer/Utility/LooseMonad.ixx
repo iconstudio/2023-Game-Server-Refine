@@ -26,7 +26,7 @@ export namespace util
 	class [[nodiscard]] LooseMonad
 	{
 	public:
-		using base_type = StaticUnion<0, Ts...>;
+		using base_type = StaticUnion<std::integral_constant<size_t, 0>, Ts...>;
 
 		template<size_t Index>
 		using element_type = std::variant_alternative_t<Index, base_type>;
@@ -143,6 +143,7 @@ export namespace util
 		}
 
 		template <typename T>
+			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&
@@ -151,6 +152,7 @@ export namespace util
 		}
 
 		template <typename T>
+			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
@@ -159,6 +161,7 @@ export namespace util
 		}
 
 		template <typename T>
+			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&&
@@ -167,6 +170,7 @@ export namespace util
 		}
 
 		template <typename T>
+			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&

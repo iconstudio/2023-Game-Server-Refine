@@ -282,7 +282,8 @@ export namespace meta
 
 	// determine if a type is in specialized template
 	template <typename T, typename R>
-	struct included_range;
+	struct included_range : public std::false_type
+	{};
 
 	template <typename T, typename R>
 	constexpr bool included_range_v = included_range<T, R>::value;
@@ -295,11 +296,6 @@ export namespace meta
 	template <typename T, template<typename...> typename R, typename First, typename... Rests>
 	struct included_range<T, R<First, Rests...>>
 		: public included_range<T, R<Rests...>>
-	{};
-
-	template <typename T, template<typename...> typename R>
-	struct included_range<T, R<>>
-		: public std::false_type
 	{};
 
 	// merge several lists into one

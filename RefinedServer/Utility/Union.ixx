@@ -15,15 +15,15 @@ export namespace util
 	using ::std::in_place_index_t;
 	using ::std::in_place_index;
 
-	template <size_t Place, typename... Ts>
+	template <typename... Ts>
 	class StaticUnion;
 
 	template <size_t Place>
-	class StaticUnion<Place>
+	class StaticUnion<std::integral_constant<size_t, Place>>
 	{};
 
 	template <size_t Place, typename Fty, typename... Rty>
-	class StaticUnion<Place, Fty, Rty...>
+	class StaticUnion<std::integral_constant<size_t, Place>, Fty, Rty...>
 	{
 	public:
 		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
@@ -31,9 +31,9 @@ export namespace util
 		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
 		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_type_t<.");
 
-		using type = StaticUnion<Place, Fty, Rty...>;
+		using type = StaticUnion<std::integral_constant<size_t, Place>, Fty, Rty...>;
 		using value_type = std::remove_const_t<Fty>;
-		using under_type = StaticUnion<Place + 1, Rty...>;
+		using under_type = StaticUnion<std::integral_constant<size_t, Place + 1>, Rty...>;
 
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
@@ -403,7 +403,7 @@ export namespace util
 export namespace std
 {
 	template<size_t Index, size_t Place, typename... Ts>
-	struct variant_alternative<Index, util::StaticUnion<Place, Ts...>>
+	struct variant_alternative<Index, util::StaticUnion<integral_constant<size_t, Place>, Ts...>>
 	{
 		using type = meta::at<meta::MetaList<Ts...>, Index>;
 	};
