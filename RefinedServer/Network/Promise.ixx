@@ -198,7 +198,7 @@ export namespace net
 	};
 
 	template<>
-	class Promise<void> final
+	class Promise<void, void> final
 	{
 	public:
 		using succeed_t = io::success_t<void>;
@@ -318,7 +318,7 @@ export namespace net
 		monad_t myState;
 	};
 
-	using Proxy = Promise<void>;
+	using Proxy = Promise<void, void>;
 	template<util::copyable T>
 	using Handler = Promise<T, int>;
 	using PointerHandler = Promise<void*, int>;
