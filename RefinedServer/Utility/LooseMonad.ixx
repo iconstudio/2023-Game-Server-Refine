@@ -180,6 +180,62 @@ export namespace util
 			}
 		}
 
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			LooseMonad&
+			else_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<Index>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			const LooseMonad&
+			else_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<Index>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			LooseMonad&&
+			else_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<Index>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return move(*this);
+		}
+
+		template<size_t Index, invocables Fn>
+		inline constexpr
+			const LooseMonad&&
+			else_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<Index>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return move(*this);
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
