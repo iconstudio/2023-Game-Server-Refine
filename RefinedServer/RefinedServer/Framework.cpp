@@ -1,6 +1,8 @@
 #include "pch.hpp"
 #include "Framework.hpp"
 
+import Utility.Print;
+
 using namespace net;
 
 Framework::Framework() noexcept
@@ -11,7 +13,9 @@ void Framework::Awake()
 {}
 
 void Framework::Start() noexcept
-{}
+{
+	util::Println("서버를 시작합니다.");
+}
 
 void Framework::Update() noexcept
 {
