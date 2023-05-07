@@ -97,6 +97,12 @@ export namespace net
 			T errorCode;
 		};
 
+		template<>
+		struct error_t<void> final
+		{
+			explicit constexpr error_t() noexcept = default;
+		};
+
 		struct defer_t { explicit constexpr defer_t() noexcept = default; };
 
 		inline constexpr error_t<int> error(const int& error_code) noexcept
@@ -110,6 +116,7 @@ export namespace net
 
 		inline constexpr defer_t defer{ };
 		inline constexpr success_t<void> success{ };
+		inline constexpr success_t<void> fail{ };
 
 		template<typename T>
 		inline constexpr success_t<T> succeed_io{ };
@@ -133,7 +140,7 @@ export namespace net
 	{
 	public:
 		using succeed_t = io::success_t<void>;
-		using failed_t = io::error_t;
+		using failed_t = io::error_t<void>;
 		using defered_t = io::defer_t;
 		using monad_t = util::LooseMonad<succeed_t, failed_t, defered_t>;
 
