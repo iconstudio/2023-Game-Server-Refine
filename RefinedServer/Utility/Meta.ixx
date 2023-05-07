@@ -240,6 +240,68 @@ export namespace meta
 	struct pop_back<Seq<>>
 	{};
 
+	// find a type in sequence
+	template <typename T, typename...>
+	struct find;
+
+	template <typename T, typename... Ts>
+	using find_t = typename find<T, Ts...>::type;
+
+	template <typename T, typename... Rests>
+	struct find<T, T, Rests...>
+	{
+		using type = T;
+	};
+
+	template <typename T, typename First, typename... Rests>
+	struct find<T, First, Rests...> : public find<T, Rests...>
+	{};
+
+	template <typename T>
+	struct find<T>
+	{};
+
+	// determine if a type is in sequence
+	template <typename T, typename...>
+	struct included;
+
+	template <typename T, typename... Ts>
+	constexpr bool included_v = included<T, Ts...>::value;
+
+	template <typename T, typename... Rests>
+	struct included<T, T, Rests...> : public std::true_type
+	{};
+
+	template <typename T, typename First, typename... Rests>
+	struct included<T, First, Rests...> : public included<T, Rests...>
+	{};
+
+	template <typename T>
+	struct included<T> : public std::false_type
+	{};
+
+	// determine if a type is in specialized template
+	template <typename T, typename R>
+	struct included_range;
+
+	template <typename T, typename R>
+	constexpr bool included_range_v = included_range<T, R>::value;
+
+	template <typename T, template<typename...> typename R, typename... Ts>
+	struct included_range<T, R<T, Ts...>>
+		: public std::true_type
+	{};
+
+	template <typename T, template<typename...> typename R, typename First, typename... Rests>
+	struct included_range<T, R<First, Rests...>>
+		: public included_range<T, R<Rests...>>
+	{};
+
+	template <typename T, template<typename...> typename R>
+	struct included_range<T, R<>>
+		: public std::false_type
+	{};
+
 	// merge several lists into one
 	template <typename...>
 	struct concat;
