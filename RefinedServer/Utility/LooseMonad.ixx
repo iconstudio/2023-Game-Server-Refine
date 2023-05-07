@@ -49,11 +49,27 @@ namespace util
 		{}
 
 		// Recursively find the place onto Tail
-		template <size_t Index, typename... Args>
-			requires (Index != Place)
-		constexpr __variant_storage(std::in_place_index_t<Index>, Args&&... args)
-			noexcept(nothrow_constructibles<under_type, std::in_place_index_t<Index>, Args...>)
-			: _Tail(std::in_place_index<Index>, static_cast<Args&&>(args)...)
+		template <size_t Target, typename... Args>
+			requires (Target != Place)
+		constexpr __variant_storage(std::in_place_index_t<Target>, Args&&... args)
+			noexcept(nothrow_constructibles<under_type, std::in_place_index_t<Target>, Args...>)
+			: _Tail(std::in_place_index<Target>, static_cast<Args&&>(args)...)
+		{}
+
+		// Initialize my value with Args
+		template <typename T, size_t Index, typename... Args>
+			requires (same_as<clean_t<T>, Fty>)
+		constexpr __variant_storage(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: __variant_storage(std::in_place, static_cast<Args&&>(args)...)
+		{}
+
+		// Find the specified type
+		template <typename T, size_t Index, typename... Args>
+			requires (!same_as<clean_t<T>, Fty>&& Index <= mySize)
+		constexpr __variant_storage(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+			noexcept(nothrow_constructibles<T, Args...>)
+			: _Tail(std::in_place_type<T>, std::integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
 		{}
 
 		// Initialize my value with Args
@@ -140,11 +156,27 @@ namespace util
 		{}
 
 		// Recursively find the place onto Tail
-		template <size_t Index, typename... Args>
-			requires (Index != Place)
-		constexpr __variant_storage(std::in_place_index_t<Index>, Args&&... args)
-			noexcept(nothrow_constructibles<under_type, std::in_place_index_t<Index>, Args...>)
-			: _Tail(std::in_place_index<Index>, static_cast<Args&&>(args)...)
+		template <size_t Target, typename... Args>
+			requires (Target != Place)
+		constexpr __variant_storage(std::in_place_index_t<Target>, Args&&... args)
+			noexcept(nothrow_constructibles<under_type, std::in_place_index_t<Target>, Args...>)
+			: _Tail(std::in_place_index<Target>, static_cast<Args&&>(args)...)
+		{}
+
+		// Initialize my value with Args
+		template <typename T, size_t Index, typename... Args>
+			requires (same_as<clean_t<T>, Fty>)
+		constexpr __variant_storage(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: __variant_storage(std::in_place, static_cast<Args&&>(args)...)
+		{}
+
+		// Find the specified type
+		template <typename T, size_t Index, typename... Args>
+			requires (!same_as<clean_t<T>, Fty> && Index <= mySize)
+		constexpr __variant_storage(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+			noexcept(nothrow_constructibles<T, Args...>)
+			: _Tail(std::in_place_type<T>, std::integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
 		{}
 
 		// Initialize my value with Args
@@ -239,26 +271,44 @@ export namespace util
 
 		template <size_t Place, typename... Args>
 		constexpr explicit
-			LooseMonad(std::in_place_index_t<Place>, Args&&... args)
+			LooseMonad(in_place_index_t<Place>, Args&&... args)
 			noexcept(nothrow_constructibles<__variant_route<0, Ts...>, std::in_place_index_t<Place>, Args...>)
-			: myStorage(std::in_place_index<Place>, static_cast<Args&&>(args)...)
+			: myStorage(in_place_index<Place>, static_cast<Args&&>(args)...)
+		{}
+
+		template <typename T, typename... Args>
+		constexpr explicit
+			LooseMonad(in_place_type_t<T>, Args&&... args)
+			noexcept(nothrow_constructibles<__variant_route<0, Ts...>, std::in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
+			: myStorage(in_place_type<T>, std::integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
 
 		__variant_route<0, Ts...> myStorage;
 	};
+}
 
-	void test_loose()
+namespace util
+{
+	void test_loose() noexcept
 	{
 		const LooseMonad<int, float> a0{};
 		const LooseMonad<int, float> b0{ std::in_place_index<0>, 1 };
 		const LooseMonad<int, float> c0{ std::in_place_index<1>, 1.0f };
-		const LooseMonad<int, float> d0{ std::in_place_index<0>, 1 };
-		const LooseMonad<int, float> e0{ std::in_place_index<1>, 1.0f };
 
 		constexpr LooseMonad<int, float> a1{};
-		constexpr LooseMonad<int, float> b1{ std::in_place_index<0>, 5 };
-		constexpr LooseMonad<int, float> c1{ std::in_place_index<1>, 5.0f };
-		constexpr LooseMonad<int, float> d1{ std::in_place_index<0>, 1 };
-		constexpr LooseMonad<int, float> e1{ std::in_place_index<1>, 1.0f };
+		constexpr LooseMonad<int, float> b1{ std::in_place_index<0>, 1 };
+		constexpr LooseMonad<int, float> c1{ std::in_place_index<1>, 1.0f };
+
+		const LooseMonad<int, float> b2{ std::in_place_type<int>, 500 };
+		const LooseMonad<int, float> c2{ std::in_place_type<float>, 500.0f };
+
+		constexpr LooseMonad<int, float> b3{ std::in_place_type<int>, 500 };
+		constexpr LooseMonad<int, float> c3{ std::in_place_type<float>, 500.0f };
+
+		const LooseMonad<int, float, float> d2{ std::in_place_type<float>, 500.0f };
+		const LooseMonad<int, float, int> e2{ std::in_place_type<float>, 500.0f };
+
+		constexpr LooseMonad<int, float, float> d3{ std::in_place_type<float>, 500.0f };
+		constexpr LooseMonad<int, float, int> e3{ std::in_place_type<float>, 500.0f };
 	}
 }
