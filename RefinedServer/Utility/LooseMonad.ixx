@@ -558,9 +558,5 @@ namespace util
 		constexpr auto& fnb1 = b1.if_then<0>([](const int& v) {
 			do_something();
 		});
-
-		constexpr auto& fnb2 = b1.if_then<1>([](const float& v) {
-			do_something();
-		});
 	}
 }
