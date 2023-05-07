@@ -101,7 +101,7 @@ export namespace util
 		constexpr explicit StaticUnion(std::integral_constant<size_t, Index>, Args&&... _Args)
 			noexcept(nothrow_constructibles<under_type, std::integral_constant<size_t, Index - 1>, Args...>)
 			: _Tail(std::integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
-			, isExtended(false)
+			, isExtended(true)
 		{}
 
 		constexpr ~StaticUnion()
@@ -149,6 +149,7 @@ export namespace util
 		}
 
 		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&
@@ -169,6 +170,7 @@ export namespace util
 		}
 
 		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
@@ -189,6 +191,7 @@ export namespace util
 		}
 
 		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&&
@@ -209,6 +212,7 @@ export namespace util
 		}
 
 		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
@@ -220,6 +224,90 @@ export namespace util
 			else if (isExtended)
 			{
 				return move(_Tail).template get<Index>();
+			}
+			else
+			{
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				throw std::bad_variant_access{};
+			}
+		}
+
+		template <typename T>
+			requires meta::included_v<T, Fty, Rty...>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get()&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return get();
+			}
+			else if (isExtended)
+			{
+				return _Tail.template get<T>();
+			}
+			else
+			{
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				throw std::bad_variant_access{};
+			}
+		}
+
+		template <typename T>
+			requires meta::included_v<T, Fty, Rty...>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return get();
+			}
+			else if (isExtended)
+			{
+				return _Tail.template get<T>();
+			}
+			else
+			{
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				throw std::bad_variant_access{};
+			}
+		}
+
+		template <typename T>
+			requires meta::included_v<T, Fty, Rty...>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get()&&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return move(*this).get();
+			}
+			else if (isExtended)
+			{
+				return move(_Tail).template get<T>();
+			}
+			else
+			{
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				throw std::bad_variant_access{};
+			}
+		}
+
+		template <typename T>
+			requires meta::included_v<T, Fty, Rty...>
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return move(*this).get();
+			}
+			else if (isExtended)
+			{
+				return move(_Tail).template get<T>();
 			}
 			else
 			{
