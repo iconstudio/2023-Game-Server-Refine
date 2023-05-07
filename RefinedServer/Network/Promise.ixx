@@ -78,7 +78,12 @@ export namespace net
 		}
 
 		inline constexpr defer_t defer{ };
-		inline constexpr success_t success{ };
+		inline constexpr success_t<void> success{ };
+
+		template<typename T>
+		inline constexpr success_t<T> succeed_io{ };
+		inline constexpr defer_t      defered_io{ };
+		inline constexpr error_t      failed_io{ -1 };
 	}
 
 	class Promise
