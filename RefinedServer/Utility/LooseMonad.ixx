@@ -58,7 +58,7 @@ export namespace util
 
 		constexpr ~LooseMonad() noexcept(nothrow_destructibles<Ts...>) = default;
 
-		template<size_t Index, typename Fn>
+		template<size_t Index, invocables<reference_type<Index>> Fn>
 		inline constexpr
 			LooseMonad&
 			if_then(Fn&& action) &
@@ -72,7 +72,7 @@ export namespace util
 			return *this;
 		}
 
-		template<size_t Index, typename Fn>
+		template<size_t Index, invocables<const_reference_type<Index>> Fn>
 		inline constexpr
 			const LooseMonad&
 			if_then(Fn&& action) const&
@@ -86,7 +86,7 @@ export namespace util
 			return *this;
 		}
 
-		template<size_t Index, typename Fn>
+		template<size_t Index, invocables<rvalue_type<Index>> Fn>
 		inline constexpr
 			LooseMonad&&
 			if_then(Fn&& action) &&
@@ -100,7 +100,7 @@ export namespace util
 			return move(*this);
 		}
 
-		template<size_t Index, typename Fn>
+		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
 		inline constexpr
 			const LooseMonad&&
 			if_then(Fn&& action) const&&
@@ -109,6 +109,62 @@ export namespace util
 			if (myStorage.template has_value<Index>())
 			{
 				forward<Fn>(action)(move(myStorage).template get<Index>());
+			}
+
+			return move(*this);
+		}
+
+		template<typename T, invocables<T&> Fn>
+		inline constexpr
+			LooseMonad&
+			if_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
+		{
+			if (myStorage.template has_value<T>())
+			{
+				forward<Fn>(action)(myStorage.template get<T>());
+			}
+
+			return *this;
+		}
+
+		template<typename T, invocables<const T&> Fn>
+		inline constexpr
+			LooseMonad&
+			if_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
+		{
+			if (myStorage.template has_value<T>())
+			{
+				forward<Fn>(action)(myStorage.template get<T>());
+			}
+
+			return *this;
+		}
+
+		template<typename T, invocables<T&&> Fn>
+		inline constexpr
+			LooseMonad&
+			if_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
+		{
+			if (myStorage.template has_value<T>())
+			{
+				forward<Fn>(action)(move(myStorage).template get<T>());
+			}
+
+			return move(*this);
+		}
+
+		template<typename T, invocables<const T&&> Fn>
+		inline constexpr
+			LooseMonad&
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
+		{
+			if (myStorage.template has_value<T>())
+			{
+				forward<Fn>(action)(move(myStorage).template get<T>());
 			}
 
 			return move(*this);
