@@ -459,86 +459,6 @@ export namespace util
 			}
 		}
 
-		template<invocables<T&> Fn, typename Uty>
-		inline constexpr
-			Uty
-			translate(Fn&& safe_action, Uty&& default_value) &
-			noexcept(noexcept(forward<Fn>(safe_action)(declval<T&>())))
-		{
-			using fn_result_t = monad_result_t<Fn, T&>;
-
-			static_assert(convertible_to<fn_result_t, Uty>);
-
-			if (has_value())
-			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(value()));
-			}
-			else
-			{
-				return forward<Uty>(default_value);
-			}
-		}
-
-		template<invocables<const T&> Fn, typename Uty>
-		inline constexpr
-			Uty
-			translate(Fn&& safe_action, Uty&& default_value) const&
-			noexcept(noexcept(forward<Fn>(safe_action)(declval<const T&>())))
-		{
-			using fn_result_t = monad_result_t<Fn, const T&>;
-
-			static_assert(convertible_to<fn_result_t, Uty>);
-
-			if (has_value())
-			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(value()));
-			}
-			else
-			{
-				return forward<Uty>(default_value);
-			}
-		}
-
-		template<invocables<T&&> Fn, typename Uty>
-		inline constexpr
-			Uty
-			translate(Fn&& safe_action, Uty&& default_value) &&
-			noexcept(noexcept(forward<Fn>(safe_action)(declval<T&&>())))
-		{
-			using fn_result_t = monad_result_t<Fn, T&&>;
-
-			static_assert(convertible_to<fn_result_t, Uty>);
-
-			if (has_value())
-			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(static_cast<T&&>(value())));
-			}
-			else
-			{
-				return forward<Uty>(default_value);
-			}
-		}
-
-		template<invocables<const T&&> Fn, typename Uty>
-		inline constexpr
-			Uty
-			translate(Fn&& safe_action, Uty&& default_value) const&&
-			noexcept(noexcept(forward<Fn>(safe_action)(declval<const T&&>())))
-		{
-			using fn_result_t = monad_result_t<Fn, const T&&>;
-
-			static_assert(convertible_to<fn_result_t, Uty>);
-
-			if (has_value())
-			{
-				return static_cast<Uty>(forward<Fn>(safe_action)(static_cast<const T&&>(value())));
-			}
-			else
-			{
-				return forward<Uty>(default_value);
-			}
-		}
-
 		template<invocables Fn>
 		inline constexpr
 			Monad&
@@ -1073,8 +993,6 @@ export namespace util
 	private:
 		bool hasValue;
 	};
-
-	using Proxy = Monad<void>;
 }
 
 namespace util
@@ -1102,8 +1020,6 @@ namespace util
 			[](const int& v) -> float { return v * 100.0f; }
 		);
 
-		const auto expr8_4 = monad8.translate([](auto&&) -> long long { return 15718742LL; }, -7);
-
 		const auto& expr8_5 = monad8.else_then([]() { do_something(); });
 
 		Monad<int> monad1{ false };
@@ -1122,11 +1038,6 @@ namespace util
 		constexpr double expr9_3 = monad9.transform(
 			[](const int& value) -> double { return value + 3000.0; },
 			[](auto&&) -> double { return 0.0; }
-		);
-
-		constexpr int expr9_4 = monad9.translate(
-			[](auto&&) -> long long { return 15718742LL; },
-			-7
 		);
 
 		constexpr const Monad<int>& expr9_5 = monad9.else_then(
