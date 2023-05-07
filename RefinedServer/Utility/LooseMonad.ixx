@@ -132,113 +132,81 @@ namespace util
 		}
 
 		template <size_t Index>
-			requires (Index == Place)
-		[[nodiscard]]
-		constexpr
-			Fty&
-			get() &
-			noexcept(noexcept((*this).get()))
-		{
-			return get();
-		}
-
-		template <size_t Index>
-			requires (Index == Place)
-		[[nodiscard]]
-		constexpr
-			const Fty&
-			get() const&
-			noexcept(noexcept((*this).get()))
-		{
-			return get();
-		}
-
-		template <size_t Index>
-			requires (Index == Place)
-		[[nodiscard]]
-		constexpr
-			Fty&&
-			get() &&
-			noexcept(noexcept(static_cast<__variant_storage&&>(*this).get()))
-		{
-			return static_cast<Fty&&>(get());
-		}
-
-		template <size_t Index>
-			requires (Index == Place)
-		[[nodiscard]]
-		constexpr
-			const Fty&&
-			get() const&&
-			noexcept(noexcept(static_cast<const __variant_storage&&>(*this).get()))
-		{
-			return static_cast<const Fty&&>(get());
-		}
-
-		template <size_t Index>
-			requires (Place < Index)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&
 		{
-			if (isExtended)
+			if constexpr (Index == Place)
+			{
+				return get();
+			}
+			else if (isExtended)
 			{
 				return _Tail.template get<Index>();
 			}
 			else
 			{
-				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 				throw std::bad_variant_access{};
 			}
 		}
 
 		template <size_t Index>
-			requires (Index != Place)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
 		{
-			if (isExtended)
+			if constexpr (Index == Place)
+			{
+				return get();
+			}
+			else if (isExtended)
 			{
 				return _Tail.template get<Index>();
 			}
 			else
 			{
-				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 				throw std::bad_variant_access{};
 			}
 		}
 
 		template <size_t Index>
-			requires (Index != Place)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&&
 		{
-			if (isExtended)
+			if constexpr (Index == Place)
 			{
-				return static_cast<under_type&&>(_Tail).template get<Index>();
+				return move(get());
+			}
+			else if (isExtended)
+			{
+				return move(_Tail).template get<Index>();
 			}
 			else
 			{
-				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 				throw std::bad_variant_access{};
 			}
 		}
 
 		template <size_t Index>
-			requires (Index != Place)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
 		{
-			if (isExtended)
+			if constexpr (Index == Place)
 			{
-				return static_cast<const under_type&&>(_Tail).template get<Index>();
+				return move(get());
+			}
+			else if (isExtended)
+			{
+				return move(_Tail).template get<Index>();
 			}
 			else
 			{
-				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 				throw std::bad_variant_access{};
 			}
 		}
@@ -378,8 +346,7 @@ export namespace util
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
 		constexpr decltype(auto)
-			get() &
-			noexcept(noexcept(myStorage.template get<Index>()))
+			get()&
 		{
 			return myStorage.template get<Index>();
 		}
@@ -389,7 +356,6 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
-			noexcept(noexcept(myStorage.template get<Index>()))
 		{
 			return myStorage.template get<Index>();
 		}
@@ -398,8 +364,7 @@ export namespace util
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
 		constexpr decltype(auto)
-			get() &&
-			noexcept(noexcept(move(myStorage).template get<Index>()))
+			get()&&
 		{
 			return move(myStorage).template get<Index>();
 		}
@@ -409,7 +374,6 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
-			noexcept(noexcept(move(myStorage).template get<Index>()))
 		{
 			return move(myStorage).template get<Index>();
 		}
@@ -470,10 +434,11 @@ namespace util
 		constexpr bool less_e3_0 = e3.is_valueless<0>();
 		constexpr bool less_e3_1 = e3.is_valueless<1>();
 		constexpr bool less_e3_2 = e3.is_valueless<2>();
+		constexpr auto get_e3_2 = e3.get<2>();
 		constexpr LooseMonad<int, float, float> f3{ std::in_place_type<float>, 500.0f };
-		constexpr auto get_f3_0 = f3.get<0>();
+		//constexpr auto get_f3_0 = f3.get<0>();
 		constexpr auto get_f3_1 = f3.get<1>();
-		constexpr auto get_f3_2 = f3.get<2>();
+		//constexpr auto get_f3_2 = f3.get<2>();
 		constexpr LooseMonad<int, float, int> g3{ std::in_place_type<float>, 500.0f };
 
 		constexpr size_t sz0 = sizeof(LooseMonad<int>);
