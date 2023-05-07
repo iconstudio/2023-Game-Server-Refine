@@ -132,7 +132,69 @@ export namespace net
 	class Promise<T, E> final
 	{
 	public:
+		using succeed_t = io::success_t<T>;
+		using failed_t = io::error_t<E>;
+		using defered_t = io::defer_t;
+		using monad_t = util::LooseMonad<succeed_t, failed_t, defered_t>;
 
+		constexpr Promise() noexcept
+			: myState()
+		{}
+
+		constexpr Promise(util::nullopt_t) noexcept
+			: myState(util::nullopt)
+		{}
+
+		constexpr Promise(const Promise& other) noexcept
+			: myState(other.myState)
+		{}
+
+		constexpr Promise(Promise&& other) noexcept
+			: myState(static_cast<monad_t&&>(other.myState))
+		{}
+
+		explicit constexpr Promise(const monad_t& state) noexcept
+			: myState(state)
+		{}
+
+		explicit constexpr Promise(monad_t&& state) noexcept
+			: myState(static_cast<monad_t&&>(state))
+		{}
+
+		constexpr Promise(const succeed_t& success) noexcept
+			: myState(util::in_place_type<succeed_t>, success)
+		{}
+
+		constexpr Promise(succeed_t&& success) noexcept
+			: myState(util::in_place_type<succeed_t>, static_cast<succeed_t&&>(success))
+		{}
+
+		constexpr Promise(const failed_t& error) noexcept
+			: myState(util::in_place_type<failed_t>, error)
+		{}
+
+		constexpr Promise(failed_t&& error) noexcept
+			: myState(util::in_place_type<failed_t>, static_cast<failed_t&&>(error))
+		{}
+
+		constexpr Promise(defered_t) noexcept
+			: myState(util::in_place_type<defered_t>, io::defer)
+		{}
+
+		constexpr Promise& operator=(const Promise& other) noexcept
+		{
+			myState = other.myState;
+			return *this;
+		}
+
+		constexpr Promise& operator=(Promise&& other) noexcept
+		{
+			myState = static_cast<monad_t&&>(other.myState);
+			return *this;
+		}
+
+	private:
+		monad_t myState;
 	};
 
 	template<>
@@ -258,5 +320,6 @@ export namespace net
 
 	using Proxy = Promise<void>;
 	template<util::copyable T>
-	using Handler = Promise<T>;
+	using Handler = Promise<T, int>;
+	using PointerHandler = Promise<void*, int>;
 }
