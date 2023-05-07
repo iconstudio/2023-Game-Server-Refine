@@ -18,6 +18,10 @@ namespace util
 	class __variant_storage<Place, true, Fty, Rty...>
 	{
 	public:
+		static_assert(!same_as<Fty, std::in_place_t>, "Fty must not be std::in_place_t.");
+		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
+		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_type_t<.");
+
 		using type = __variant_storage<Place, true, Fty, Rty...>;
 		using value_type = std::remove_const_t<Fty>;
 		using under_type = __variant_route<Place + 1, Rty...>;
@@ -105,6 +109,10 @@ namespace util
 	class __variant_storage<Place, false, Fty, Rty...>
 	{
 	public:
+		static_assert(!same_as<Fty, std::in_place_t>, "Fty must not be std::in_place_t.");
+		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
+		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_type_t.");
+
 		using type = __variant_storage<Place, true, Fty, Rty...>;
 		using value_type = std::remove_const_t<Fty>;
 		using under_type = __variant_route<Place + 1, Rty...>;
