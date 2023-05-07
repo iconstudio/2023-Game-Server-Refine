@@ -16,7 +16,7 @@ export namespace util
 		using base_type = StaticUnion<std::integral_constant<size_t, 0>, Ts...>;
 
 		template<size_t Index>
-		using element_type = std::variant_alternative_t<Index, base_type>;
+		using element_type = std::tuple_element_t<Index, std::tuple<Ts...>>;
 		template<size_t Index>
 		using const_element_type = const element_type<Index>;
 		template<size_t Index>
@@ -58,7 +58,7 @@ export namespace util
 
 		constexpr ~LooseMonad() noexcept(nothrow_destructibles<Ts...>) = default;
 
-		template<size_t Index, invocables<reference_type<Index>> Fn>
+		template<size_t Index, typename Fn>
 		inline constexpr
 			LooseMonad&
 			if_then(Fn&& action) &
@@ -72,7 +72,7 @@ export namespace util
 			return *this;
 		}
 
-		template<size_t Index, invocables<const_reference_type<Index>> Fn>
+		template<size_t Index, typename Fn>
 		inline constexpr
 			const LooseMonad&
 			if_then(Fn&& action) const&
@@ -86,7 +86,7 @@ export namespace util
 			return *this;
 		}
 
-		template<size_t Index, invocables<rvalue_type<Index>> Fn>
+		template<size_t Index, typename Fn>
 		inline constexpr
 			LooseMonad&&
 			if_then(Fn&& action) &&
@@ -100,7 +100,7 @@ export namespace util
 			return move(*this);
 		}
 
-		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
+		template<size_t Index, typename Fn>
 		inline constexpr
 			const LooseMonad&&
 			if_then(Fn&& action) const&&
@@ -498,9 +498,9 @@ export namespace std
 
 namespace util
 {
-	void do_something() noexcept {}
+	constexpr void do_something() noexcept {}
 
-	constexpr void test_loose() noexcept
+	void test_loose() noexcept
 	{
 		const LooseMonad<int, float> a0{};
 		const LooseMonad<int, float> b0{ std::in_place_index<0>, 1 };
@@ -528,6 +528,9 @@ namespace util
 		constexpr bool less_d3_0 = d3.is_valueless<0>();
 		constexpr bool less_d3_1 = d3.is_valueless<1>();
 		constexpr bool less_d3_2 = d3.is_valueless<2>();
+		//constexpr int get_d3_i32 = d3.get<int>();
+		constexpr float get_d3_f32 = d3.get<float>();
+		//constexpr double get_d3_f64 = d3.get<double>();
 		constexpr LooseMonad<int, float, int> e3{ std::in_place_index<2>, 500 };
 		constexpr bool has_e3_0 = e3.has_value<0>();
 		constexpr bool has_e3_1 = e3.has_value<1>();
@@ -548,7 +551,15 @@ namespace util
 		constexpr size_t sz3 = sizeof(LooseMonad<int, float, float>);
 		constexpr size_t sz4 = sizeof(LooseMonad<int, float, int>);
 
-		constexpr auto& fna1 = a1.if_then<0>([](const int&) {
+		constexpr auto& fna1 = a1.if_then<0>([](const int& v) {
+			do_something();
+		});
+
+		constexpr auto& fnb1 = b1.if_then<0>([](const int& v) {
+			do_something();
+		});
+
+		constexpr auto& fnb2 = b1.if_then<1>([](const float& v) {
 			do_something();
 		});
 	}

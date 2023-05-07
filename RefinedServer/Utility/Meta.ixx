@@ -35,7 +35,7 @@ namespace meta::detail
 	struct enumerate_for
 	{
 		template <typename T, typename... Rests>
-		static consteval T _Eval(_VoidPtrs..., T*, Rests*...) noexcept; // undefined
+		static T _Eval(_VoidPtrs..., T*, Rests*...) noexcept; // undefined
 	};
 
 	template <typename T>
@@ -48,7 +48,7 @@ namespace meta::detail
 		requires (Index < sizeof...(Ts))
 	struct __at<Seq<Ts...>, Index>
 	{
-		using type = typename decltype(create<Index, void*, enumerate_for>::_Eval(AsPointer<Ts>()...));
+		using type = typename decltype(create<Index, void*, enumerate_for>::template _Eval(AsPointer<Ts>()...));
 	};
 #endif // __clang__
 }
