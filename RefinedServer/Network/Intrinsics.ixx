@@ -7,29 +7,7 @@ import Net;
 
 export namespace net
 {
-	class ioError : public util::Monad<int>
-	{
-	public:
-		constexpr ioError() noexcept
-			: Monad()
-		{}
-
-		constexpr ioError(const int& error_code) noexcept
-			: Monad(error_code)
-		{
-			//isReverse = true;
-		}
-
-		constexpr ioError(int&& error_code) noexcept
-			: Monad(static_cast<int&&>(error_code))
-		{
-			//isReverse = true;
-		}
-
-		constexpr ioError(util::nullopt_t) noexcept
-			: Monad(util::nullopt)
-		{}
-	};
+	using ioError = util::Monad<int>;
 
 	export namespace io
 	{
