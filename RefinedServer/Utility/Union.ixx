@@ -22,7 +22,7 @@ export namespace util
 		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
 		static_assert(!same_as<Fty, std::in_place_t>, "Fty must not be std::in_place_t.");
 		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
-		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_type_t<.");
+		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_index_t.");
 
 		using type = StaticUnion<std::integral_constant<size_t, Place>, Fty, Rty...>;
 		using value_type = std::remove_const_t<Fty>;
