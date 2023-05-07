@@ -427,19 +427,19 @@ export namespace meta
 export namespace std
 {
 	template<size_t Index, typename Fty, typename... Ts>
-	struct tuple_element_t<Index, meta::MetaList<Fty, Ts...>>
+	struct tuple_element<Index, meta::MetaList<Fty, Ts...>>
 	{
 		using type = Fty;
 	};
 
 	template<size_t Index, typename Fty, typename... Ts>
-	struct tuple_element_t<Index, const meta::MetaList<Fty, Ts...>>
+	struct tuple_element<Index, const meta::MetaList<Fty, Ts...>>
 	{
 		using type = Fty;
 	};
 
 	template<size_t Index>
-	struct tuple_element_t<Index, meta::MetaList<>>
+	struct tuple_element<Index, meta::MetaList<>>
 	{};
 
 	template<typename... Ts>
