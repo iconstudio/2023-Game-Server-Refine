@@ -28,6 +28,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Singleton.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Thread.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Traits.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Union.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Utility.ixx" />
   </ItemGroup>
 </Project>
