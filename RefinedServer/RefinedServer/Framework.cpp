@@ -28,7 +28,7 @@ void Framework::Update() noexcept
 void Framework::UpdateOnce(const float& delta_time) noexcept
 {}
 
-Promise Framework::BeginAccept()
+Proxy Framework::BeginAccept()
 {
 	return {};
 }
@@ -39,7 +39,7 @@ void Framework::EndAccept() noexcept
 void Framework::EndFailedAccept() noexcept
 {}
 
-Promise Framework::BeginWelcome()
+Proxy Framework::BeginWelcome()
 {
 	return {};
 }
@@ -50,7 +50,7 @@ void Framework::EndWelcome() noexcept
 void Framework::EndFailedWelcome() noexcept
 {}
 
-Promise Framework::BeginDispose()
+Proxy Framework::BeginDispose()
 {
 	return {};
 }

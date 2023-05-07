@@ -19,25 +19,25 @@ public:
 	void Update() noexcept;
 	void UpdateOnce(const float& delta_time) noexcept;
 
-	net::Promise BeginAccept();
+	net::Proxy BeginAccept();
 	void EndAccept() noexcept;
 	void EndFailedAccept() noexcept;
 
-	net::Promise BeginWelcome();
+	net::Proxy BeginWelcome();
 	void EndWelcome() noexcept;
 	void EndFailedWelcome() noexcept;
 
-	net::Promise BeginDispose();
+	net::Proxy BeginDispose();
 	void EndDispose() noexcept;
 	void EndFailedDispose() noexcept;
 
-	net::Promise Dispose(net::User* const& user);
+	net::Proxy Dispose(net::User* const& user);
 
 	bool Poll() noexcept;
 	bool Post() noexcept;
 
 private:
-	net::Promise Close(net::Socket& socket);
+	net::Proxy Close(net::Socket& socket);
 
 	static inline constexpr size_t maxNPCs = 1000;
 	static inline constexpr size_t maxUsers = 1000;
