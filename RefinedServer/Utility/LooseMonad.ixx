@@ -44,17 +44,19 @@ export namespace util
 		constexpr LooseMonad() noexcept
 		{}
 
-		template <size_t Place, typename... Args>
+		template <size_t Index, typename... Args>
+			requires (Index < sizeof...(Ts))
 		constexpr
-			LooseMonad(in_place_index_t<Place>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, std::in_place_index_t<Place>, Args...>)
-			: myStorage(in_place_index<Place>, static_cast<Args&&>(args)...)
+			LooseMonad(in_place_index_t<Index>, Args&&... args)
+			noexcept(nothrow_constructibles<base_type, in_place_index_t<Index>, Args...>)
+			: myStorage(in_place_index<Index>, static_cast<Args&&>(args)...)
 		{}
 
 		template <typename T, typename... Args>
+			requires (meta::included_v<T, Ts...>)
 		constexpr
 			LooseMonad(in_place_type_t<T>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, std::in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
+			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
 			: myStorage(in_place_type<T>, std::integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
 
