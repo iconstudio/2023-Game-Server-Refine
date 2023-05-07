@@ -12,6 +12,9 @@ namespace util
 	template <size_t Place, typename... Ts>
 	class __variant_storage
 	{
+		static inline constexpr size_t mySize = 0;
+		static inline constexpr size_t myPlace = Place;
+
 		constexpr __variant_storage() noexcept {}
 		constexpr ~__variant_storage() noexcept {}
 	};
@@ -20,6 +23,7 @@ namespace util
 	class __variant_storage<Place, Fty, Rty...>
 	{
 	public:
+		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
 		static_assert(!same_as<Fty, std::in_place_t>, "Fty must not be std::in_place_t.");
 		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
 		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_type_t<.");
@@ -33,6 +37,10 @@ namespace util
 
 		// no initialization (no active member)
 		constexpr __variant_storage() noexcept
+		{}
+
+		// no initialization (no active member)
+		constexpr __variant_storage(nullopt_t) noexcept
 		{}
 
 		// Initialize my value with Args
@@ -102,6 +110,12 @@ namespace util
 			noexcept(nothrow_destructibles<Fty, Rty...>)
 			requires (make_conjunction<std::is_trivially_destructible, Fty, Rty...>)
 		{}
+
+		constexpr __variant_storage& operator=(nullopt_t) noexcept
+		{
+			hasValue = false;
+			return *this;
+		}
 
 		[[nodiscard]]
 		constexpr Fty& get() &
@@ -322,6 +336,8 @@ export namespace util
 	{
 	public:
 		using value_type = __variant_storage<0, Ts...>;
+		template<size_t Index>
+		using element_type = std::variant_alternative_t<Index, value_type>;
 
 		constexpr LooseMonad() noexcept
 		{}
@@ -341,6 +357,62 @@ export namespace util
 		{}
 
 		constexpr ~LooseMonad() noexcept(nothrow_destructibles<Ts...>) = default;
+
+		template<size_t Index, invocables<element_type<Index>&> Fn>
+		inline constexpr
+			LooseMonad&
+			if_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)(declval<element_type<Index>&>())))
+		{
+			if (myStorage.template has_value<Index>())
+			{
+				forward<Fn>(action)(myStorage.template get<Index>());
+			}
+
+			return *this;
+		}
+
+		template<size_t Index, invocables<const element_type<Index>&> Fn>
+		inline constexpr
+			const LooseMonad&
+			if_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)(declval<const element_type<Index>&>())))
+		{
+			if (myStorage.template has_value<Index>())
+			{
+				forward<Fn>(action)(myStorage.template get<Index>());
+			}
+
+			return *this;
+		}
+
+		template<size_t Index, invocables<element_type<Index>&&> Fn>
+		inline constexpr
+			LooseMonad&&
+			if_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)(declval<element_type<Index>&&>())))
+		{
+			if (myStorage.template has_value<Index>())
+			{
+				forward<Fn>(action)(move(myStorage).template get<Index>());
+			}
+
+			return move(*this);
+		}
+
+		template<size_t Index, invocables<const element_type<Index>&&> Fn>
+		inline constexpr
+			const LooseMonad&&
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)(declval<const element_type<Index>&&>())))
+		{
+			if (myStorage.template has_value<Index>())
+			{
+				forward<Fn>(action)(move(myStorage).template get<Index>());
+			}
+
+			return move(*this);
+		}
 
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
@@ -395,10 +467,35 @@ export namespace util
 	private:
 		value_type myStorage;
 	};
+
+}
+
+export namespace std
+{
+	template<size_t Index, size_t Place, typename... Ts>
+	struct variant_alternative<Index, util::__variant_storage<Place, Ts...>>
+	{
+		using type = meta::at<util::LooseMonad<Ts...>, Index>;
+	};
+
+	template<size_t Index, typename... Ts>
+	struct variant_alternative<Index, util::LooseMonad<Ts...>>
+	{
+		static_assert(Index < sizeof...(Ts), "Loosen index out of bounds.");
+
+		using type = meta::at<util::LooseMonad<Ts...>, Index>;
+	};
+
+	template<typename... Ts>
+	struct variant_size<util::LooseMonad<Ts...>>
+		: integral_constant<size_t, sizeof...(Ts)>
+	{};
 }
 
 namespace util
 {
+	static void do_something() noexcept {}
+
 	void test_loose() noexcept
 	{
 		const LooseMonad<int, float> a0{};
@@ -446,6 +543,10 @@ namespace util
 		constexpr size_t sz2 = sizeof(LooseMonad<int, float>);
 		constexpr size_t sz3 = sizeof(LooseMonad<int, float, float>);
 		constexpr size_t sz4 = sizeof(LooseMonad<int, float, int>);
+
+		constexpr auto& fna1 = a1.if_then<0>([](const int&) {
+			do_something();
+		});
 
 	}
 }
