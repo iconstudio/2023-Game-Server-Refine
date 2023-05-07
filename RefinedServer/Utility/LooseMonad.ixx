@@ -121,6 +121,78 @@ export namespace util
 			return move(*this);
 		}
 
+		template<size_t Index, invocables<reference_type<Index>> Fn>
+		inline constexpr
+			monad_result_t<Fn, reference_type<Index>>
+			and_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, reference_type<Index>>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<Index>())
+			{
+				return forward<Fn>(action)(myStorage.template get<Index>());
+			}
+			else
+			{
+				return monad_result_t<Fn, reference_type<Index>>{ nullopt };
+			}
+		}
+
+		template<size_t Index, invocables<const_reference_type<Index>> Fn>
+		inline constexpr
+			monad_result_t<Fn, const_reference_type<Index>>
+			and_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, const_reference_type<Index>>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<Index>())
+			{
+				return forward<Fn>(action)(myStorage.template get<Index>());
+			}
+			else
+			{
+				return monad_result_t<Fn, const_reference_type<Index>>{ nullopt };
+			}
+		}
+
+		template<size_t Index, invocables<rvalue_type<Index>> Fn>
+		inline constexpr
+			monad_result_t<Fn, rvalue_type<Index>>
+			and_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, rvalue_type<Index>>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<Index>())
+			{
+				return forward<Fn>(action)(move(myStorage).template get<Index>());
+			}
+			else
+			{
+				return monad_result_t<Fn, rvalue_type<Index>>{ nullopt };
+			}
+		}
+
+		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
+		inline constexpr
+			monad_result_t<Fn, const_rvalue_type<Index>>
+			and_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, const_rvalue_type<Index>>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<Index>())
+			{
+				return forward<Fn>(action)(move(myStorage).template get<Index>());
+			}
+			else
+			{
+				return monad_result_t<Fn, const_rvalue_type<Index>>{ nullopt };
+			}
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
