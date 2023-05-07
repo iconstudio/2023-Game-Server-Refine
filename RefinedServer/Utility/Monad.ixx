@@ -6,9 +6,6 @@ import Utility.Identity;
 
 export namespace util
 {
-	template<typename Fn, typename... Args>
-	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
-
 	template<typename T>
 	class [[nodiscard]] Monad
 	{

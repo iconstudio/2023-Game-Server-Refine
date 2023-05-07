@@ -51,4 +51,7 @@ export namespace util
 
 	template<template<typename> typename MetaFn, typename... Ts>
 	inline constexpr bool make_disjunction = std::disjunction_v<MetaFn<Ts>...>;
+
+	template<typename Fn, typename... Args>
+	using monad_result_t = clean_t<std::invoke_result_t<Fn, Args...>>;
 }
