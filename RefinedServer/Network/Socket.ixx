@@ -4,8 +4,6 @@ module;
 
 export module Net.Socket;
 import Utility;
-import Utility.Monad;
-import Utility.Memory;
 import Net;
 import Net.EndPoint;
 import Net.Context;

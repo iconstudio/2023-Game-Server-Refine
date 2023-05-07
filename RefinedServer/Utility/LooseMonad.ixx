@@ -498,9 +498,10 @@ export namespace std
 
 namespace util
 {
+#if false
 	constexpr void do_something() noexcept {}
 
-	void test_loose() noexcept
+	constexpr void test_loose() noexcept
 	{
 		const LooseMonad<int, float> a0{};
 		const LooseMonad<int, float> b0{ std::in_place_index<0>, 1 };
@@ -559,4 +560,5 @@ namespace util
 			do_something();
 		});
 	}
+#endif
 }

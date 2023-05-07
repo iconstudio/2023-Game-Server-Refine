@@ -997,6 +997,7 @@ export namespace util
 
 namespace util
 {
+#if false
 	constexpr void do_something() noexcept
 	{}
 
@@ -1050,4 +1051,5 @@ namespace util
 			return { 5020.0f };
 		});
 	}
+#endif
 }

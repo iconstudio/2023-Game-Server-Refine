@@ -16,6 +16,7 @@ export namespace net
 	class Address;
 	class EndPoint;
 	class Socket;
+	class Promise;
 	class Context;
 	class SendContext;
 	class BasicSession;
