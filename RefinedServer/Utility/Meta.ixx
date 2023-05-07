@@ -298,6 +298,16 @@ export namespace meta
 		: public included_range<T, R<Rests...>>
 	{};
 
+	template <typename T, typename V, template<V, typename...> typename R, V I, typename... Ts>
+	struct included_range<T, R<I, T, Ts...>> // ignore the value
+		: public std::true_type
+	{};
+
+	template <typename T, typename V, template<V, typename...> typename R, V I, typename First, typename... Rests>
+	struct included_range<T, R<I, First, Rests...>> // ignore the value
+		: public included_range<T, R<I, Rests...>>
+	{};
+
 	// merge several lists into one
 	template <typename...>
 	struct concat;
