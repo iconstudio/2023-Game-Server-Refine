@@ -116,11 +116,11 @@ export namespace net
 		inline constexpr error_t      failed_io{ -1 };
 	}
 
-	template<typename T>
+	template<typename T, typename E>
 	class Promise;
 
-	template<util::copyable T>
-	class Promise<T> final
+	template<util::copyable T, util::copyable E>
+	class Promise<T, E> final
 	{
 	public:
 
