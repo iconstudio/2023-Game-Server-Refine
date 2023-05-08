@@ -24,9 +24,8 @@ export namespace util
 		static_assert(!is_specialization_v<Fty, in_place_type_t>, "Fty must not be in_place_type_t.");
 		static_assert(!is_indexed_v<Fty, in_place_index_t>, "Fty must not be in_place_index_t.");
 
-		using type = StaticUnion<integral_constant<size_t, Place>, Fty, Rty...>;
-		using value_type = remove_const_t<Fty>;
-		using under_type = StaticUnion<integral_constant<size_t, Place + 1>, Rty...>;
+		using type = remove_const_t<Fty>;
+		using node_type = StaticUnion<integral_constant<size_t, Place + 1>, Rty...>;
 
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
@@ -68,7 +67,7 @@ export namespace util
 		template <size_t Target, typename... Args>
 			requires (Target != Place)
 		constexpr StaticUnion(in_place_index_t<Target>, Args&&... args)
-			noexcept(nothrow_constructibles<under_type, in_place_index_t<Target>, Args...>)
+			noexcept(nothrow_constructibles<node_type, in_place_index_t<Target>, Args...>)
 			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
@@ -102,7 +101,7 @@ export namespace util
 		template <size_t Index, typename... Args>
 			requires (Index != Place)
 		constexpr explicit StaticUnion(integral_constant<size_t, Index>, Args&&... _Args)
-			noexcept(nothrow_constructibles<under_type, integral_constant<size_t, Index - 1>, Args...>)
+			noexcept(nothrow_constructibles<node_type, integral_constant<size_t, Index - 1>, Args...>)
 			: _Tail(integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
 			, isExtended(true)
 		{}
@@ -518,12 +517,12 @@ export namespace util
 		}
 
 	private:
-		friend class under_type;
+		friend class node_type;
 
 		union
 		{
-			value_type myValue;
-			under_type _Tail;
+			type myValue;
+			node_type _Tail;
 		};
 
 		bool hasValue = false;
