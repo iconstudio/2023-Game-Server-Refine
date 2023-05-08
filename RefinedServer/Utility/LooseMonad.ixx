@@ -384,6 +384,48 @@ export namespace util
 			return *this;
 		}
 
+		template<typename T, invocables Fn>
+		inline constexpr
+			const LooseMonad&
+			else_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<T>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<typename T, invocables Fn>
+		inline constexpr
+			LooseMonad&&
+			else_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<T>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return move(*this);
+		}
+
+		template<typename T, invocables Fn>
+		inline constexpr
+			const LooseMonad&&
+			else_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<T>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return move(*this);
+		}
+
 		template<size_t Index, invocables Fn>
 		inline constexpr
 			monad_result_t<Fn>
