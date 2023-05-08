@@ -167,7 +167,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&
-			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, reference_type>)
+			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, value_type>)
 		{
 			if constexpr (Index == Place)
 			{
@@ -189,7 +189,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
-			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, const_reference_type>)
+			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, const_value_type>)
 		{
 			if constexpr (Index == Place)
 			{
@@ -210,7 +210,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&&
-			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, rvalue_type>)
+			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, value_type>)
 		{
 			if constexpr (Index == Place)
 			{
@@ -231,7 +231,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
-			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, const_rvalue_type>)
+			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, const_value_type>)
 		{
 			if constexpr (Index == Place)
 			{
