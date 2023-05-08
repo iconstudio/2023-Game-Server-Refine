@@ -25,7 +25,7 @@ export namespace util
 			: myValue(static_cast<T&&>(value))
 		{}
 
-		constexpr Identity& operator=(const Identity& other) &
+		constexpr Identity& operator=(const Identity& other)
 			noexcept(nothrow_copy_assignables<T>)
 			requires(copy_assignables<T>)
 		{
@@ -33,92 +33,12 @@ export namespace util
 			return *this;
 		}
 
-		constexpr Identity& operator=(Identity&& other) &
+		constexpr Identity& operator=(Identity&& other)
 			noexcept(nothrow_move_assignables<T>)
 			requires(move_assignables<T>)
 		{
 			myValue = static_cast<T&&>(other.myValue);
 			return *this;
-		}
-
-		constexpr Identity& operator=(const Identity&& other) &
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<T>)
-		{
-			myValue = static_cast<const T&&>(other.myValue);
-			return *this;
-		}
-
-		constexpr const Identity& operator=(const Identity& other) const&
-			noexcept(nothrow_copy_assignables<T>)
-			requires(copy_assignables<const T>)
-		{
-			myValue = other.myValue;
-			return *this;
-		}
-
-		constexpr const Identity& operator=(Identity&& other) const&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<const T>)
-		{
-			myValue = static_cast<T&&>(other.myValue);
-			return *this;
-		}
-
-		constexpr const Identity& operator=(const Identity&& other) const&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<const T>)
-		{
-			myValue = static_cast<const T&&>(other.myValue);
-			return *this;
-		}
-
-		constexpr Identity&& operator=(const Identity& other) &&
-			noexcept(nothrow_copy_assignables<T>)
-			requires(copy_assignables<T>)
-		{
-			myValue = other.myValue;
-			return static_cast<Identity&&>(*this);
-		}
-
-		constexpr Identity&& operator=(Identity&& other) &&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<T>)
-		{
-			myValue = static_cast<T&&>(other.myValue);
-			return static_cast<Identity&&>(*this);
-		}
-
-		constexpr Identity&& operator=(const Identity&& other) &&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<T>)
-		{
-			myValue = static_cast<const T&&>(other.myValue);
-			return static_cast<Identity&&>(*this);
-		}
-
-		constexpr const Identity&& operator=(const Identity& other) const&&
-			noexcept(nothrow_copy_assignables<T>)
-			requires(copy_assignables<const T>)
-		{
-			myValue = other.myValue;
-			return static_cast<const Identity&&>(*this);
-		}
-
-		constexpr const Identity&& operator=(Identity&& other) const&&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<const T>)
-		{
-			myValue = static_cast<T&&>(other.myValue);
-			return static_cast<const Identity&&>(*this);
-		}
-
-		constexpr const Identity&& operator=(const Identity&& other) const&&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<const T>)
-		{
-			myValue = static_cast<const T&&>(other.myValue);
-			return static_cast<const Identity&&>(*this);
 		}
 
 		constexpr void swap(Identity& other) noexcept(nothrow_swappables<T>)
@@ -187,7 +107,6 @@ export namespace util
 			return static_cast<T&&>(myValue);
 		}
 
-
 		constexpr operator T& () & noexcept(nothrow_move_constructibles<T>)
 		{
 			return myValue;
@@ -223,8 +142,30 @@ export namespace util
 	public:
 		using value_type = void;
 
-		explicit constexpr Identity() noexcept = default;
+		constexpr Identity() noexcept = default;
+		constexpr Identity(const Identity&) noexcept = default;
+		constexpr Identity(Identity&&) noexcept = default;
 		constexpr ~Identity() noexcept = default;
+
+		constexpr Identity& operator=(Identity) & noexcept
+		{
+			return *this;
+		}
+
+		constexpr const Identity& operator=(Identity) const& noexcept
+		{
+			return *this;
+		}
+
+		constexpr Identity&& operator=(Identity) && noexcept
+		{
+			return move(*this);
+		}
+
+		constexpr const Identity&& operator=(Identity) const&& noexcept
+		{
+			return move(*this);
+		}
 
 		constexpr void swap(Identity& other) noexcept
 		{}
@@ -237,7 +178,7 @@ export namespace util
 	Identity(T, Tag) -> Identity<T, Tag>;
 
 	template<typename T>
-	Identity(T)->Identity<T, void>;
+	Identity(T) -> Identity<T, void>;
 }
 
 export namespace std
