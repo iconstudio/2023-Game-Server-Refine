@@ -410,14 +410,24 @@ export namespace util
 		}
 
 		template <size_t Index, typename Uty>
-			requires (Index <= 1 + Place + sizeof...(Rty))
+			requires (Index == Place)
+		constexpr PlacedVariant& try_set(Uty&& value) &
+		{
+			return set(forward<Uty>(value));
+		}
+
+		template <size_t Index, typename Uty>
+			requires (Index == Place)
+		constexpr PlacedVariant&& try_set(Uty&& value) &&
+		{
+			return set(forward<Uty>(value));
+		}
+
+		template <size_t Index, typename Uty>
+			requires (Index != Place && Index <= 1 + Place + sizeof...(Rty))
 		constexpr decltype(auto) try_set(Uty&& value)
 		{
-			if constexpr (Index == Place)
-			{
-				return set(forward<Uty>(value));
-			}
-			else if constexpr (1 < mySize)
+			if constexpr (1 < mySize)
 			{
 				return _Tail.template try_set<Index>(forward<Uty>(value));
 			}
@@ -775,8 +785,10 @@ namespace util
 		bb0 = bb1;
 		bb0.reset();
 
-		bb0.try_set<0>(0);
-		bb0.try_set<1>(0UL);
+		// PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float, double>
+		auto& rb0_tset_0 = bb0.try_set<0>(0);
+		// PlacedVariant<integral_constant<size_t, 1>, unsigned long, float, double>
+		auto& rb0_tset_1 = bb0.try_set<1>(0UL);
 
 		constexpr Union<int, int, int> cc{};
 		constexpr Union<bool, int, long> dd{};
