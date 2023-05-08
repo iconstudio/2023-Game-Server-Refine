@@ -1,6 +1,8 @@
 module;
 #include <utility>
+
 export module Utility.Meta;
+import Utility.Traits;
 
 namespace meta::detail
 {
@@ -35,9 +37,9 @@ namespace meta::detail
 	struct enumerate_for
 	{
 		template <typename T, typename... Rests>
-		static consteval T _Eval(_VoidPtrs..., T*, Rests*...) noexcept // undefined
+		static consteval T _Eval(_VoidPtrs..., T*, Rests*...) noexcept
 		{
-			static_assert(std::_Always_false<T>, "Cannot instantiate _Eval()");
+			static_assert(util::always_false<T>, "Cannot instantiate _Eval()");
 		}
 	};
 
@@ -47,12 +49,29 @@ namespace meta::detail
 		return nullptr;
 	}
 
+	template<template<typename...> typename Seq, size_t Index>
+	struct __at<Seq<>, Index>
+	{
+		static_assert(util::always_false<std::integral_constant<size_t, Index>>, "sequence's index out of bounds");
+	};
+
+	template <template<typename...> typename Seq, typename Fty, typename... Rty>
+	struct __at<Seq<Fty, Rty...>, 0>
+	{
+		using type = Fty;
+	};
+
+	template <template<typename...> typename Seq, size_t Index, class Fty, class... Rty>
+	struct __at<Seq<Fty, Rty...>, Index>
+		: __at<Seq<Rty...>, Index - 1> {};
+
+	/*
 	template <template <typename...> typename Seq, size_t Index, typename... Ts>
 		requires (Index < sizeof...(Ts))
 	struct __at<Seq<Ts...>, Index>
 	{
 		using type = typename decltype(create<Index, void*, enumerate_for>::template _Eval(AsPointer<Ts>()...));
-	};
+	};*/
 #endif // __clang__
 }
 
