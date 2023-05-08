@@ -329,7 +329,7 @@ export namespace net
 		template<util::cr_invocable<T> Fn>
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_crvalue_t<T>>
-			operator>>(Promise&& promise, Fn&& action)
+			operator>>(const Promise&& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
 		{
 			if (promise.IsSuccess())
