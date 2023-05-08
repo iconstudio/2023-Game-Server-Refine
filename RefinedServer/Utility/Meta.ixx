@@ -37,7 +37,7 @@ namespace meta::detail
 	};
 #else // ^^^ __clang__ / !__clang__ vvv
 	template <typename... _VoidPtrs>
-	struct enumerate_for
+	struct enumerate_ptrs
 	{
 		template <typename T, typename... Rests>
 		static consteval T _Eval(_VoidPtrs..., T*, Rests*...) noexcept
@@ -73,7 +73,7 @@ namespace meta::detail
 		requires (Index < sizeof...(Ts))
 	struct __at<Seq<Ts...>, Index>
 	{
-		using type = typename decltype(create<Index, void*, enumerate_for>::template _Eval(AsPointer<Ts>()...));
+		using type = typename decltype(create<Index, void*, enumerate_ptrs>::template _Eval(AsPointer<Ts>()...));
 	};*/
 #endif // __clang__
 }
@@ -101,7 +101,7 @@ export namespace meta
 	using invoke = typename Fn::template result<Args...>;
 
 	template <typename Fn, typename... Args>
-	using invoke_r = typename Fn::template result<Args...>::type;
+	using invoke_r = typename Fn::template result<Args...>::template type;
 
 	// encapsulate a template into a meta-callable type
 	template <template <typename...> typename Fn>
@@ -124,7 +124,7 @@ export namespace meta
 	struct apply;
 
 	template <class Fn, class Seq>
-	using apply_t = typename apply<Fn, Seq>::type;
+	using apply_t = typename apply<Fn, Seq>::template type;
 
 	// invoke meta-callable Functor with the parameters of a template specialization
 	template <typename Fn, template <typename...> typename Seq, typename... Ts>
@@ -153,35 +153,16 @@ export namespace meta
 	template <typename Fn, class Seq>
 	using transform_t = typename transform<Fn, Seq>::type;
 
-	template <typename Ty, size_t>
-	using repeater = Ty;
-
-	template <typename Seq, typename Fn, typename Indexer>
-	struct repeat;
-
-	template <typename T, typename Fn, typename Indexer>
-	using repeat_t = typename repeat<T, Fn, Indexer>::type;
-
-	template <template <typename...> typename Seq, typename Fn, size_t... Indices, typename... Ts>
-	struct repeat<Seq<Ts...>, Fn, std::index_sequence<Indices...>>
-	{
-		using type = Seq<invoke_r<Fn, repeater<Ts, Indices>>...>;
-	};
-
-	template <template <typename...> typename Seq, typename Fn>
-	struct repeat<Seq, Fn, std::index_sequence<>>
-	{};
-
 	template <typename Fn, typename T, typename... Ts>
 	struct foldl;
 
 	template <typename Fn, typename T, typename... Ts>
-	using foldl_t = typename foldl<Fn, T, Ts...>::type;
+	using foldl_t = typename foldl<Fn, T, Ts...>::template type;
 
 	template <typename Fn, typename T, typename U, typename... Rests>
 	struct foldl<Fn, T, U, Rests...>
 	{
-		using type = typename foldl<Fn, invoke_r<Fn, T, U>, Rests...>::type;
+		using type = typename foldl<Fn, invoke_r<Fn, T, U>, Rests...>::template type;
 	};
 
 	template <typename Fn, typename T>
@@ -204,7 +185,9 @@ export namespace meta
 
 	template <template <typename...> typename Seq>
 	struct front<Seq<>>
-	{};
+	{
+		static_assert(util::always_false<Seq<>>, "An empty sequence has no element.");
+	};
 
 	template <typename Seq>
 	struct back;
@@ -224,7 +207,9 @@ export namespace meta
 
 	template <template <typename...> typename Seq>
 	struct back<Seq<>>
-	{};
+	{
+		static_assert(util::always_false<Seq<>>, "An empty sequence has no element.");
+	};
 
 	template <typename LTy, typename RTy>
 	struct push;
@@ -276,7 +261,9 @@ export namespace meta
 
 	template <template <typename...> typename Seq>
 	struct pop<Seq<>>
-	{};
+	{
+		static_assert(util::always_false<Seq<>>, "An empty sequence has no element.");
+	};
 
 	template <typename Seq>
 	struct pop_back;
@@ -321,7 +308,9 @@ export namespace meta
 
 	template <typename T>
 	struct find<T>
-	{};
+	{
+		static_assert(util::always_false<T>, "Cannot find the type in the sequence.");
+	};
 
 	// determine if a type is in sequence
 	template <typename T, typename...>
@@ -371,11 +360,9 @@ export namespace meta
 	{};
 
 	// get typeparams' count of sequence
-	template <typename...>
-	struct tsize;
-
-	template <typename... Ts>
-	inline constexpr size_t tsize_v = tsize<Ts...>::value;
+	template <typename>
+	struct tsize : public std::integral_constant<size_t, 0>
+	{};
 
 	template <template <typename...> typename Seq, typename... Ts>
 	struct tsize<Seq<Ts...>> : public std::integral_constant<size_t, sizeof...(Ts)>
@@ -384,6 +371,9 @@ export namespace meta
 	template <template <typename...> typename Seq>
 	struct tsize<Seq<>> : public std::integral_constant<size_t, 0>
 	{};
+
+	template <typename T>
+	inline constexpr size_t tsize_v = tsize<T>::value;
 
 	// get byte size of sequence
 	template <typename...>
@@ -445,19 +435,36 @@ export namespace meta
 	template <typename Seq, size_t Index>
 	using at = typename detail::__at<Seq, Index>::template type;
 
+	// get an index from index sequence
+	template <typename Indexer>
+	struct peek_index;
+
+	template <typename Indexer>
+	inline constexpr size_t peek_index_v = peek_index<Indexer>::value;
+
+	template <size_t C, size_t... Indices>
+	struct peek_index<std::index_sequence<C, Indices...>>
+	{
+		static inline constexpr size_t value = C;
+	};
+
+	template <>
+	struct peek_index<std::index_sequence<>>
+	{};
+
 	// transform a list of lists of elements into a single list containing those elements
 	template <typename ListOfLists>
 	using unzip = apply<wrap<concat>, ListOfLists>;
 
 	template <typename ListOfLists>
-	using unzip_t = typename unzip<ListOfLists>::type;
+	using unzip_t = typename unzip<ListOfLists>::template type;
 
 	template <typename>
 	struct _Meta_cartesian_product_;
 
 	// find the n-ary Cartesian Product of the lists in the input list
 	template <typename ListOfLists>
-	using cartesian_product = typename _Meta_cartesian_product_<ListOfLists>::type;
+	using cartesian_product = typename _Meta_cartesian_product_<ListOfLists>::template type;
 
 	template <template <typename...> typename Seq>
 	struct _Meta_cartesian_product_<Seq<>>
@@ -482,7 +489,7 @@ export namespace meta
 		using Next = cartesian_product<Seq0<Rests...>>;
 		using Merged = Seq0<transform_t<bind<Adder, Ts>, Next>...>;
 
-		using type = unzip_t<Merged>;
+		using type = typename unzip<Merged>::template type;
 	};
 }
 
@@ -517,7 +524,38 @@ export namespace std
 
 namespace meta
 {
-	static inline void test_metafunctions() noexcept
+	template <typename T, size_t>
+	using repeater = T;
+
+	template <typename Seq>
+	struct picker
+	{
+		template<size_t I>
+		using result = at<Seq, I>;
+	};
+
+	// enumberate sequence with a function
+	template <typename Fn, typename Seq, typename Indexer>
+	struct enumerate;
+
+	template <typename Fn, typename Seq, typename Indexer = std::make_index_sequence<tsize_v<Seq>>>
+	using enumerate_t = typename enumerate<Fn, Seq, Indexer>::template type;
+
+	template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t I, size_t... Indices>
+	struct enumerate<Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
+		: enumerate<Fn, invoke_r<bind<Fn, Seq<Ts...>>>, std::index_sequence<Indices...>>
+	{};
+
+	template <typename Fn, typename Seq, size_t Count>
+	using enumerate_n = typename enumerate<Fn, Seq, std::make_index_sequence<Count>>::template type;
+
+	template <typename Fn, typename Seq>
+	struct enumerate<Fn, Seq, std::index_sequence<>>
+	{
+		using type = Seq;
+	};
+
+	void test_metafunctions() noexcept
 	{
 		using test_seq = MetaList<int, float, double>;
 		constexpr front_t<test_seq> a000{};
@@ -682,5 +720,60 @@ namespace meta
 		constexpr front_t<cartesian_product<NewSeq>> a080_f{};
 		constexpr front_t<front_t<cartesian_product<NewSeq>>> a080_ff{};
 		constexpr front_t<front_t<front_t<cartesian_product<NewSeq>>>> a080_fff{};
+	}
+
+	void test_repeats() noexcept
+	{
+		using test_rp_list = MetaList<int, float, double>;
+		using test_fullrange = std::make_index_sequence<tsize_v<test_rp_list>>;
+		using test_range_0 = std::make_index_sequence<0>;
+		using test_range_1 = std::make_index_sequence<1>;
+		using test_range_2 = std::make_index_sequence<2>;
+		using test_range_3 = std::make_index_sequence<3>;
+
+		constexpr size_t sz_klist = tsize_v<test_rp_list>;
+
+		// ¿Ã∞≈ ∏«∂•ø° æ≤∏È ≈Õ¡¸
+		//invoke_r<wrap<pop>, test_rp_list>;
+
+		using en0 = enumerate<wrap<pop>, test_rp_list, test_range_0>;
+		using en0_t = en0::type;
+		using en0_top = front_t<en0_t>;
+		using en0_bot = back_t<en0_t>;
+		using en0_alt = enumerate_n<wrap<pop>, test_rp_list, 0>;
+		using en0_alt_top = front_t<en0_alt>;
+		using en0_alt_bot = back_t<en0_alt>;
+
+		static_assert(std::is_same_v<en0_t, MetaList<int, float, double>>, "1");
+		static_assert(std::is_same_v<en0_alt, MetaList<int, float, double>>, "1");
+
+		using en1 = enumerate<wrap<pop>, test_rp_list, test_range_1>;
+		using en1_t = en1::type;
+		using raw_en1 = invoke_r<bind<wrap<pop>, test_rp_list>>;
+
+		static_assert(std::is_same_v<en1_t, MetaList<float, double>>, "1");
+		using en1_top = front_t<en1_t>;
+		using en1_bot = back_t<en1_t>;
+
+		using en2 = enumerate<wrap<pop>, test_rp_list, test_range_2>;
+		using en2_t = en2::type;
+		using raw_en2 = invoke_r<bind<wrap<pop>, raw_en1>>;
+
+		static_assert(std::is_same_v<en2_t, MetaList<double>>, "2");
+		using en2_top = front_t<en2_t>;
+		using en2_bot = back_t<en2_t>;
+
+		using en3 = enumerate<wrap<pop>, test_rp_list, test_range_3>;
+		using en3_t = en3::type;
+
+		static_assert(std::is_same_v<en3_t, MetaList<>>, "3");
+		//using en3_top = front_t<en3_t>;
+		//using en3_bot = back_t<en3_t>;
+
+		using en4_t = enumerate_t<wrap<pop>, test_rp_list>;
+
+		static_assert(std::is_same_v<en4_t, MetaList<>>, "4");
+		//using en4_top = front_t<en4_t>;
+		//using en4_bot = back_t<en4_t>;
 	}
 }
