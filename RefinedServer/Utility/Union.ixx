@@ -353,6 +353,80 @@ export namespace util
 			}
 		}
 
+		constexpr PlacedVariant& set(const Fty& value) &
+			noexcept(nothrow_copy_constructibles<Fty>)
+		{
+			myValue = value;
+			hasValue = true;
+
+			return *this;
+		}
+
+		constexpr PlacedVariant& set(Fty&& value) &
+			noexcept(nothrow_move_constructibles<Fty>)
+		{
+			myValue = move(value);
+			hasValue = true;
+
+			return *this;
+		}
+
+		constexpr PlacedVariant&& set(const Fty& value) &&
+			noexcept(nothrow_copy_constructibles<Fty>)
+		{
+			myValue = value;
+			hasValue = true;
+
+			return move(*this);
+		}
+
+		constexpr PlacedVariant&& set(Fty&& value) &&
+			noexcept(nothrow_move_constructibles<Fty>)
+		{
+			myValue = move(value);
+			hasValue = true;
+
+			return move(*this);
+		}
+
+		template <typename... Args>
+		constexpr Fty& emplace(Args&&... args) &
+			noexcept(nothrow_constructibles<Fty, Args&&...>)
+		{
+			myValue = Fty{ forward<Args>(args)... };
+			hasValue = true;
+
+			return myValue;
+		}
+
+		template <typename... Args>
+		constexpr Fty&& emplace(Args&&... args) &&
+			noexcept(nothrow_constructibles<Fty, Args&&...>)
+		{
+			myValue = Fty{ forward<Args>(args)... };
+			hasValue = true;
+
+			return move(myValue);
+		}
+
+		template <size_t Index, typename Uty>
+			requires (Index <= 1 + Place + sizeof...(Rty))
+		constexpr decltype(auto) try_set(Uty&& value)
+		{
+			if constexpr (Index == Place)
+			{
+				return set(forward<Uty>(value));
+			}
+			else if constexpr (1 < mySize)
+			{
+				return _Tail.template try_set<Index>(forward<Uty>(value));
+			}
+			else
+			{
+				static_assert(always_false<Uty>, "This Monad does not have the indexed type.");
+			}
+		}
+
 		constexpr void reset() noexcept
 		{
 			if constexpr (1 < mySize)
