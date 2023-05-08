@@ -690,7 +690,12 @@ namespace util
 {
 	constexpr void test_union()
 	{
-		constexpr StaticUnion<integral_constant<size_t, 0>, int, int, int> aa{};
+		using aa_t = StaticUnion<integral_constant<size_t, 0>, int, unsigned long, float>;
+		constexpr aa_t aa{};
+		using aa_0_t = aa_t::element_type<0>;
+		using aa_1_t = aa_t::element_type<1>;
+		using aa_2_t = aa_t::element_type<2>;
+		//using aa_3_t = aa_t::element_type<3>;
 
 		aa.myPlace;
 		aa.mySize;
@@ -703,9 +708,17 @@ namespace util
 		constexpr bool a_has_1 = aa.has_value<1>();
 		constexpr bool a_has_2 = aa.has_value<2>();
 
+		using bb_t = StaticUnion<integral_constant<size_t, 0>, int, unsigned long, float, double>;
+		bb_t bb0{};
+		//bb_t bb1{};
+		bb_t bb1(in_place_type<float>, integral_constant<size_t, 0>{}, 4000.034124f);
 
-		//const StaticUnion<bool, int, long> bb{};
-		//const StaticUnion<float, unsigned long long, char> cc{};
-		//const StaticUnion<double, unsigned char, short> dd{};
+		bb0 = bb1;
+		bb0.reset();
+
+		//StaticUnion<integral_constant<size_t, 0>, int, int, int> cc{};
+		//const StaticUnion<bool, int, long> dd{};
+		//const StaticUnion<float, unsigned long long, char> ee{};
+		//const StaticUnion<double, unsigned char, short> ff{};
 	}
 }

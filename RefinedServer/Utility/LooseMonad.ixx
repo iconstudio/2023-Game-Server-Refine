@@ -766,7 +766,7 @@ export namespace std
 
 namespace util
 {
-#if false
+#if true
 	constexpr void do_something() noexcept {}
 
 	constexpr void test_loose() noexcept
