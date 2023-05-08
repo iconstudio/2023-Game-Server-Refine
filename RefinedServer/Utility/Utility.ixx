@@ -84,7 +84,4 @@ export namespace util
 	using ::std::cend;
 	using ::std::size;
 	using ::std::ssize;
-
-	template<typename T>
-	inline constexpr bool always_false = false;
 }

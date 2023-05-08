@@ -65,6 +65,9 @@ export namespace util
 	using ::std::in_place_index_t;
 	using ::std::in_place_index;
 
+	template<typename T>
+	inline constexpr bool always_false = false;
+
 	template <size_t... Indices>
 	struct in_place_indices_t
 	{
