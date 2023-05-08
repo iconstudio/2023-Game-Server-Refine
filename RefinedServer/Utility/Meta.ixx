@@ -35,7 +35,10 @@ namespace meta::detail
 	struct enumerate_for
 	{
 		template <typename T, typename... Rests>
-		static T _Eval(_VoidPtrs..., T*, Rests*...) noexcept; // undefined
+		static consteval T _Eval(_VoidPtrs..., T*, Rests*...) noexcept // undefined
+		{
+			static_assert(std::_Always_false<T>, "Cannot instantiate _Eval()");
+		}
 	};
 
 	template <typename T>
@@ -473,7 +476,7 @@ namespace meta
 		constexpr wrap<front> a014{};
 		constexpr wrap<pop> a015{};
 		constexpr wrap<pop_back> a016{};
-		constexpr wrap<push> a017{};
+		constexpr wrap<push>::result<test_seq, long>::type a017{};
 
 		constexpr wrap<front>::result<test_seq> _a014{};
 		constexpr wrap<pop>::result<test_seq> _a015{};
