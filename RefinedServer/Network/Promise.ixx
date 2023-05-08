@@ -1,6 +1,7 @@
 export module Net.Promise;
 import Utility;
 import Utility.Constraints;
+import Utility.Identity;
 import Utility.Monad.Loosen;
 import Net;
 
@@ -8,102 +9,13 @@ export namespace net
 {
 	namespace io
 	{
-		template<typename T = void>
-		struct success_t;
+		template<typename T>
+		using success_t = util::Identity<T>;
 
-		template<>
-		struct success_t<void>
-		{
-			explicit constexpr success_t() noexcept = default;
-		};
+		template<typename T>
+		using error_t = util::Identity<T>;
 
-		template<util::copyable T>
-		struct success_t<T>
-		{
-			explicit constexpr success_t(const T& value) noexcept
-				: myValue(value)
-			{}
-
-			explicit constexpr success_t(T&& value) noexcept
-				: myValue(static_cast<T&&>(value))
-			{}
-
-			constexpr const T& operator*() const& noexcept
-			{
-				return myValue;
-			}
-
-			constexpr T&& operator*() && noexcept
-			{
-				return myValue;
-			}
-
-			constexpr operator T& () & noexcept
-			{
-				return myValue;
-			}
-
-			constexpr operator const T& () const& noexcept
-			{
-				return myValue;
-			}
-
-			constexpr operator T && () && noexcept
-			{
-				return static_cast<T&&>(myValue);
-			}
-
-			constexpr operator const T && () const&& noexcept
-			{
-				return static_cast<const T&&>(myValue);
-			}
-
-			constexpr ~success_t() noexcept(util::nothrow_destructibles<T>) = default;
-
-			constexpr T& operator()(T& value) const noexcept
-			{
-				return value;
-			}
-
-			constexpr const T& operator()(const T& value) const noexcept
-			{
-				return value;
-			}
-
-			constexpr T&& operator()(T&& value) const noexcept
-			{
-				return static_cast<T&&>(value);
-			}
-
-			constexpr const T&& operator()(const T&& value) const noexcept
-			{
-				return static_cast<const T&&>(value);
-			}
-
-			T myValue;
-		};
-
-		template<typename T = void>
-		struct error_t final
-		{
-			constexpr error_t(const T& error_code) noexcept
-				: errorCode(error_code)
-			{}
-
-			constexpr error_t(T&& error_code) noexcept
-				: errorCode(static_cast<T&&>(error_code))
-			{}
-
-			T errorCode;
-		};
-
-		template<>
-		struct error_t<void> final
-		{
-			explicit constexpr error_t() noexcept = default;
-		};
-
-		struct defer_t { explicit constexpr defer_t() noexcept = default; };
+		using defer_t = util::Identity<void>;
 
 		inline constexpr error_t<int> error(const int& error_code) noexcept
 		{
@@ -249,6 +161,21 @@ export namespace net
 			return util::move(*this);
 		}
 
+		inline constexpr bool IsSuccess() const noexcept
+		{
+			return myState.has_value<succeed_t>();
+		}
+
+		inline constexpr bool IsFailed() const noexcept
+		{
+			return myState.has_value<failed_t>();
+		}
+
+		inline constexpr bool IsDeferec() const noexcept
+		{
+			return myState.has_value<defered_t>();
+		}
+
 	private:
 		monad_t myState;
 	};
@@ -308,6 +235,62 @@ export namespace net
 		{
 			myState = static_cast<monad_t&&>(other.myState);
 			return *this;
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			const Promise&
+			operator>>(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			Promise&&
+			operator>>(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return util::move(*this);
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			const Promise&
+			operator<<(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		template<util::invocables Fn>
+		inline constexpr
+			Promise&&
+			operator<<(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return util::move(*this);
 		}
 
 		template<util::invocables Fn>
