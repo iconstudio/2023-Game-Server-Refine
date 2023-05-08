@@ -519,24 +519,12 @@ export namespace util
 	private:
 		friend class under_type;
 
-		union Data
+		union
 		{
-			constexpr Data() noexcept
-			{}
-
-			constexpr Data(nullopt_t) noexcept
-			{}
-
-			constexpr ~Data() noexcept(nothrow_destructibles<value_type, under_type>)
-			{}
-
 			value_type myValue;
 			under_type _Tail;
-		}
-		myData;
+		};
 
-		value_type& myValue = myData.myValue;
-		under_type& _Tail = myData._Tail;
 		bool hasValue = false;
 		bool isExtended = false;
 	};
