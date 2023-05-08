@@ -81,7 +81,7 @@ export namespace util
 
 		// Recursively find the place onto Tail
 		template <size_t Target, typename... Args>
-			requires (Place < Target && Target < Place + 1 + sizeof...(Rty))
+			requires (Place < Target&& Target < Place + 1 + sizeof...(Rty))
 		constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
 			noexcept(nothrow_constructibles<node_type, in_place_index_t<Target>, Args...>)
 			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
@@ -461,7 +461,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr bool is_valueless() const noexcept
 		{
-			if constexpr(1 < mySize)
+			if constexpr (1 < mySize)
 			{
 				if (isExtended)
 				{
