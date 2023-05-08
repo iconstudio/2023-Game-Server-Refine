@@ -9,14 +9,14 @@ import Utility.Meta;
 export namespace util
 {
 	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
-	class StaticUnion;
+	class PlacedVariant;
 
 	template <size_t Place>
-	class StaticUnion<integral_constant<size_t, Place>>
+	class PlacedVariant<integral_constant<size_t, Place>>
 	{};
 
 	template <size_t Place, notvoids Fty, notvoids... Rty>
-	class StaticUnion<integral_constant<size_t, Place>, Fty, Rty...>
+	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
 	{
 	public:
 		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
@@ -25,7 +25,7 @@ export namespace util
 		static_assert(!is_indexed_v<Fty, in_place_index_t>, "Fty must not be in_place_index_t.");
 
 		using type = remove_const_t<Fty>;
-		using node_type = StaticUnion<integral_constant<size_t, Place + 1>, Rty...>;
+		using node_type = PlacedVariant<integral_constant<size_t, Place + 1>, Rty...>;
 
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
@@ -57,16 +57,16 @@ export namespace util
 			|| (Index != myPlace && 1 < mySize && nothrow_move_constructibles<Indexer<Index>>);
 
 		// no initialization (no active member)
-		constexpr StaticUnion() noexcept
+		constexpr PlacedVariant() noexcept
 		{}
 
 		// no initialization (no active member)
-		constexpr StaticUnion(nullopt_t) noexcept
+		constexpr PlacedVariant(nullopt_t) noexcept
 		{}
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr StaticUnion(in_place_t, Args&&... args)
+		constexpr PlacedVariant(in_place_t, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -74,15 +74,15 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr StaticUnion(in_place_index_t<Place>, Args&&... args)
+		constexpr PlacedVariant(in_place_index_t<Place>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
-			: StaticUnion(in_place, static_cast<Args&&>(args)...)
+			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Recursively find the place onto Tail
 		template <size_t Target, typename... Args>
 			requires (Target != Place)
-		constexpr StaticUnion(in_place_index_t<Target>, Args&&... args)
+		constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
 			noexcept(nothrow_constructibles<node_type, in_place_index_t<Target>, Args...>)
 			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
 			, isExtended(true)
@@ -91,15 +91,15 @@ export namespace util
 		// Initialize my value with Args
 		template <typename T, size_t Index, typename... Args>
 			requires (same_as<clean_t<T>, Fty>)
-		constexpr StaticUnion(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
+		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
-			: StaticUnion(in_place, static_cast<Args&&>(args)...)
+			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Find the specified type
 		template <typename T, size_t Index, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Index <= 1 + sizeof...(Rty))
-		constexpr StaticUnion(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
+		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: _Tail(in_place_type<T>, integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
@@ -107,7 +107,7 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		explicit constexpr StaticUnion(integral_constant<size_t, 0>, Args&&... args)
+		explicit constexpr PlacedVariant(integral_constant<size_t, 0>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -116,23 +116,23 @@ export namespace util
 		// Recursively seek the index within Tail
 		template <size_t Index, typename... Args>
 			requires (Index != Place)
-		explicit constexpr StaticUnion(integral_constant<size_t, Index>, Args&&... _Args)
+		explicit constexpr PlacedVariant(integral_constant<size_t, Index>, Args&&... _Args)
 			noexcept(nothrow_constructibles<node_type, integral_constant<size_t, Index - 1>, Args...>)
 			: _Tail(integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
 			, isExtended(true)
 		{}
 
-		constexpr ~StaticUnion()
+		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
 			requires (!make_disjunction<std::is_trivially_destructible, Fty, Rty...>)
 		{}
 
-		constexpr ~StaticUnion()
+		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
 			requires (make_conjunction<std::is_trivially_destructible, Fty, Rty...>)
 		{}
 
-		constexpr StaticUnion& operator=(nullopt_t) noexcept
+		constexpr PlacedVariant& operator=(nullopt_t) noexcept
 		{
 			hasValue = false;
 			return *this;
@@ -469,10 +469,10 @@ export namespace util
 			}
 		}
 
-		constexpr StaticUnion(const StaticUnion&) noexcept = default;
-		constexpr StaticUnion(StaticUnion&&) noexcept = default;
+		constexpr PlacedVariant(const PlacedVariant&) noexcept = default;
+		constexpr PlacedVariant(PlacedVariant&&) noexcept = default;
 
-		constexpr StaticUnion& operator=(const StaticUnion& other) & noexcept
+		constexpr PlacedVariant& operator=(const PlacedVariant& other) & noexcept
 		{
 			// make empty itself
 			reset();
@@ -490,7 +490,7 @@ export namespace util
 			return *this;
 		}
 
-		constexpr StaticUnion& operator=(StaticUnion&& other) & noexcept
+		constexpr PlacedVariant& operator=(PlacedVariant&& other) & noexcept
 		{
 			// make empty itself
 			reset();
@@ -508,7 +508,7 @@ export namespace util
 			return *this;
 		}
 
-		constexpr StaticUnion&& operator=(const StaticUnion& other) && noexcept
+		constexpr PlacedVariant&& operator=(const PlacedVariant& other) && noexcept
 		{
 			// make empty itself
 			reset();
@@ -526,7 +526,7 @@ export namespace util
 			return move(*this);
 		}
 
-		constexpr StaticUnion&& operator=(StaticUnion&& other) && noexcept
+		constexpr PlacedVariant&& operator=(PlacedVariant&& other) && noexcept
 		{
 			// make empty itself
 			reset();
@@ -561,24 +561,24 @@ export namespace util
 export namespace std
 {
 	template<size_t Index, size_t Place, typename... Ts>
-	struct variant_alternative<Index, util::StaticUnion<integral_constant<size_t, Place>, Ts...>>
+	struct variant_alternative<Index, util::PlacedVariant<integral_constant<size_t, Place>, Ts...>>
 	{
 		using type = meta::at<meta::MetaList<Ts...>, Index>;
 	};
 
 	template<size_t Place>
-	struct variant_size<util::StaticUnion<integral_constant<size_t, Place>>>
+	struct variant_size<util::PlacedVariant<integral_constant<size_t, Place>>>
 		: integral_constant<size_t, 1>
 	{};
 
 	template<size_t Place, typename... Ts>
-	struct variant_size<util::StaticUnion<integral_constant<size_t, Place>, Ts...>>
+	struct variant_size<util::PlacedVariant<integral_constant<size_t, Place>, Ts...>>
 		: integral_constant<size_t, 1 + sizeof...(Ts)>
 	{};
 
 	template<size_t Index, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<Index>()))
 	{
 		return _Val.template get<Index>();
@@ -586,7 +586,7 @@ export namespace std
 
 	template<size_t Index, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<Index>()))
 	{
 		return _Val.template get<Index>();
@@ -594,7 +594,7 @@ export namespace std
 
 	template<size_t Index, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<Index>()))
 	{
 		return move(_Val).template get<Index>();
@@ -602,7 +602,7 @@ export namespace std
 
 	template<size_t Index, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<Index>()))
 	{
 		return move(_Val).template get<Index>();
@@ -610,7 +610,7 @@ export namespace std
 
 	template<typename T, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<T>()))
 	{
 		return _Val.template get<T>();
@@ -618,7 +618,7 @@ export namespace std
 
 	template<typename T, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<T>()))
 	{
 		return _Val.template get<T>();
@@ -626,7 +626,7 @@ export namespace std
 
 	template<typename T, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
@@ -634,7 +634,7 @@ export namespace std
 
 	template<typename T, size_t Place, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::StaticUnion<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
@@ -645,7 +645,7 @@ namespace util
 {
 	void test_union()
 	{
-		using aa_t = StaticUnion<integral_constant<size_t, 0>, int, unsigned long, float>;
+		using aa_t = PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float>;
 		constexpr aa_t aa{};
 		using aa_0_t = aa_t::element_type<0>;
 		static_assert(is_same_v<aa_0_t, int>, "int");
@@ -670,7 +670,7 @@ namespace util
 		constexpr bool a_has_1 = aa.has_value<1>();
 		constexpr bool a_has_2 = aa.has_value<2>();
 
-		using bb_t = StaticUnion<integral_constant<size_t, 0>, int, unsigned long, float, double>;
+		using bb_t = PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float, double>;
 		bb_t bb0{};
 		//bb_t bb1{};
 		bb_t bb1(in_place_type<float>, integral_constant<size_t, 0>{}, 4000.034124f);
@@ -678,9 +678,9 @@ namespace util
 		bb0 = bb1;
 		bb0.reset();
 
-		//StaticUnion<integral_constant<size_t, 0>, int, int, int> cc{};
-		//const StaticUnion<bool, int, long> dd{};
-		//const StaticUnion<float, unsigned long long, char> ee{};
-		//const StaticUnion<double, unsigned char, short> ff{};
+		//PlacedVariant<integral_constant<size_t, 0>, int, int, int> cc{};
+		//const PlacedVariant<bool, int, long> dd{};
+		//const PlacedVariant<float, unsigned long long, char> ee{};
+		//const PlacedVariant<double, unsigned char, short> ff{};
 	}
 }
