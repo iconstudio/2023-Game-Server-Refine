@@ -84,7 +84,7 @@ export namespace meta
 	/// a sequence of types
 	/// </summary>
 	template <typename... Ts>
-	struct MetaList {};
+	struct MetaList { consteval MetaList() noexcept = default; };
 	struct MetaNil {};
 
 	template <typename Void, template <typename...> typename Fn, typename... Args>
