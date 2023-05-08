@@ -173,14 +173,20 @@ export namespace util
 			{
 				return get();
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<Index>();
+				if (isExtended)
+				{
+					return _Tail.template get<Index>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
 				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
-				throw std::bad_variant_access{};
 			}
 		}
 
@@ -195,9 +201,16 @@ export namespace util
 			{
 				return get();
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<Index>();
+				if (isExtended)
+				{
+					return _Tail.template get<Index>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -216,9 +229,16 @@ export namespace util
 			{
 				return move(get());
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<Index>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<Index>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -237,9 +257,16 @@ export namespace util
 			{
 				return move(get());
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<Index>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<Index>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -257,9 +284,16 @@ export namespace util
 			{
 				return get();
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<T>();
+				if (isExtended)
+				{
+					return _Tail.template get<T>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -277,9 +311,16 @@ export namespace util
 			{
 				return get();
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<T>();
+				if (isExtended)
+				{
+					return _Tail.template get<T>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -297,9 +338,16 @@ export namespace util
 			{
 				return move(*this).get();
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<T>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<T>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -317,9 +365,16 @@ export namespace util
 			{
 				return move(*this).get();
 			}
-			else if constexpr (1 < mySize && isExtended)
+			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<T>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<T>();
+				}
+				else
+				{
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -361,13 +416,20 @@ export namespace util
 		[[nodiscard]]
 		constexpr bool has_value() const noexcept
 		{
-			if (isExtended)
+			if constexpr (1 < mySize)
 			{
-				try
+				if (isExtended)
 				{
-					return _Tail.template has_value<Index>();
+					try
+					{
+						return _Tail.template has_value<Index>();
+					}
+					catch (...)
+					{
+						return false;
+					}
 				}
-				catch (...)
+				else
 				{
 					return false;
 				}
@@ -391,13 +453,20 @@ export namespace util
 		[[nodiscard]]
 		constexpr bool has_value() const noexcept
 		{
-			if (isExtended)
+			if constexpr (1 < mySize)
 			{
-				try
+				if (isExtended)
 				{
-					return _Tail.template has_value<T>();
+					try
+					{
+						return _Tail.template has_value<T>();
+					}
+					catch (...)
+					{
+						return false;
+					}
 				}
-				catch (...)
+				else
 				{
 					return false;
 				}
@@ -421,15 +490,22 @@ export namespace util
 		[[nodiscard]]
 		constexpr bool is_valueless() const noexcept
 		{
-			if (isExtended)
+			if constexpr(1 < mySize && isExtended)
 			{
-				try
+				if (isExtended)
 				{
-					return _Tail.template is_valueless<Index>();
+					try
+					{
+						return _Tail.template is_valueless<Index>();
+					}
+					catch (...)
+					{
+						return false;
+					}
 				}
-				catch (...)
+				else
 				{
-					return true;
+					return false;
 				}
 			}
 			else
@@ -453,10 +529,7 @@ export namespace util
 			}
 			else if (other.isExtended)
 			{
-				if (isExtended)
-				{
-					_Tail.operator=(other._Tail);
-				}
+				_Tail.operator=(other._Tail);
 			}
 
 			return *this;
@@ -474,10 +547,7 @@ export namespace util
 			}
 			else if (other.isExtended)
 			{
-				if (isExtended)
-				{
-					_Tail.operator=(move(other._Tail));
-				}
+				_Tail.operator=(move(other._Tail));
 			}
 
 			return *this;
@@ -495,10 +565,7 @@ export namespace util
 			}
 			else if (other.isExtended)
 			{
-				if (isExtended)
-				{
-					_Tail.operator=(other._Tail);
-				}
+				_Tail.operator=(other._Tail);
 			}
 
 			return move(*this);
@@ -516,10 +583,7 @@ export namespace util
 			}
 			else if (other.isExtended)
 			{
-				if (isExtended)
-				{
-					_Tail.operator=(move(other._Tail));
-				}
+				_Tail.operator=(move(other._Tail));
 			}
 
 			return move(*this);
