@@ -5,7 +5,7 @@ import Utility.Constraints;
 export namespace util
 {
 	template<typename T, typename Tag = void>
-	class [[nodiscard]] Identity
+	class Identity
 	{
 	public:
 		using value_type = T;
@@ -48,38 +48,45 @@ export namespace util
 			other.myValue = static_cast<T&&>(temp);
 		}
 
+		[[nodiscard]]
 		constexpr T& value() & noexcept
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr const T& value() const& noexcept
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr T&& value() &&
 			noexcept(nothrow_move_constructibles<T>)
 		{
 			return static_cast<T&&>(myValue);
 		}
 
+		[[nodiscard]]
 		constexpr const T&& value() const&&
 			noexcept(nothrow_move_constructibles<const T>)
 		{
 			return static_cast<const T&&>(myValue);
 		}
 
+		[[nodiscard]]
 		constexpr T& operator*() & noexcept
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr const T& operator*() const& noexcept
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr T&& operator*() &&
 			noexcept(nothrow_move_constructibles<T>)
 			requires(move_constructibles<T>)
@@ -87,6 +94,7 @@ export namespace util
 			return static_cast<T&&>(myValue);
 		}
 
+		[[nodiscard]]
 		constexpr const T&& operator*() const&&
 			noexcept(nothrow_move_constructibles<T>)
 			requires(move_constructibles<const T>)
@@ -94,12 +102,14 @@ export namespace util
 			return static_cast<const T&&>(myValue);
 		}
 
+		[[nodiscard]]
 		constexpr T get() const&
 			noexcept(nothrow_copy_constructibles<T>)
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr T&& get() &&
 			noexcept(nothrow_move_constructibles<T>)
 			requires(move_constructibles<T>)
