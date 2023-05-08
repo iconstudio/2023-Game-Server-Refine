@@ -198,6 +198,26 @@ export namespace net
 			return util::move(myState).get<succeed_t>();
 		}
 
+		constexpr failed_t& GetError() & noexcept
+		{
+			return myState.get<failed_t>();
+		}
+
+		constexpr const failed_t& GetError() const& noexcept
+		{
+			return myState.get<failed_t>();
+		}
+
+		constexpr failed_t&& GetError() && noexcept
+		{
+			return static_cast<monad_t&&>(myState).get<failed_t>();
+		}
+
+		constexpr const failed_t&& GetError() const&& noexcept
+		{
+			return static_cast<const monad_t&&>(myState).get<failed_t>();
+		}
+
 		constexpr bool IsSuccess() const noexcept
 		{
 			return myState.has_value<succeed_t>();
