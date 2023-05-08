@@ -35,6 +35,14 @@ export namespace util
 
 		template <size_t Index>
 		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
+		template <size_t Index>
+		using value_type = clean_t<element_type<Index>>;
+		template <size_t Index>
+		using const_value_type = add_const_t<value_type<Index>>;
+		template <size_t Index>
+		using reference_type = add_lvalue_reference_t<value_type<Index>>;
+		template <size_t Index>
+		using const_reference_type = add_lvalue_reference_t<value_type<Index>>;
 
 		template <size_t Index, template<typename> typename Predicate>
 		static inline constexpr bool nothrowGetter = (Index == myPlace && Predicate<Fty>)
