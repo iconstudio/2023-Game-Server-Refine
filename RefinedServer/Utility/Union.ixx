@@ -81,27 +81,43 @@ export namespace util
 
 		// Recursively find the place onto Tail
 		template <size_t Target, typename... Args>
-			requires (Target != Place)
+			requires (Place < Target && Target < Place + 1 + sizeof...(Rty))
 		constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
 			noexcept(nothrow_constructibles<node_type, in_place_index_t<Target>, Args...>)
 			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
 
+		// Can't find the place onto Tail
+		template <size_t Target, typename... Args>
+			requires (Place + 1 + sizeof...(Rty) <= Target)
+		explicit constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
+		{
+			static_assert(always_false<in_place_index_t<Target>>, "Target index is out of range.");
+		}
+
+		// Place the specified type
+		template <typename T, typename... Args>
+			requires (!same_as<clean_t<T>, Fty>)
+		constexpr PlacedVariant(in_place_type_t<T>, Args&&... args)
+			noexcept(nothrow_constructibles<T, Args...>)
+			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
+		{}
+
 		// Initialize my value with Args
-		template <typename T, size_t Index, typename... Args>
+		template <typename T, size_t Hint, typename... Args>
 			requires (same_as<clean_t<T>, Fty>)
-		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
+		explicit constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
 
-		// Find the specified type
-		template <typename T, size_t Index, typename... Args>
-			requires (!same_as<clean_t<T>, Fty>&& Index <= 1 + sizeof...(Rty))
-		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
+		// Place the specified type from hint
+		template <typename T, size_t Hint, typename... Args>
+			requires (!same_as<clean_t<T>, Fty>&& Hint <= 1 + sizeof...(Rty))
+		explicit constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
-			: _Tail(in_place_type<T>, integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
+			: _Tail(in_place_type<T>, integral_constant<size_t, Hint + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
 
