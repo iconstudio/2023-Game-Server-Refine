@@ -442,12 +442,27 @@ export namespace net
 			}
 		}
 
+		inline constexpr bool IsSuccess() const noexcept
+		{
+			return myState.has_value<succeed_t>();
+		}
+
+		inline constexpr bool IsFailed() const noexcept
+		{
+			return myState.has_value<failed_t>();
+		}
+
+		inline constexpr bool IsDeferec() const noexcept
+		{
+			return myState.has_value<defered_t>();
+		}
+
 	private:
 		monad_t myState;
 	};
 
 	using Proxy = Promise<void, void>;
 	template<util::copyable T>
-	using Handler = Promise<T, int>;
-	using PointerHandler = Promise<void*, int>;
+	using ErrorHandler = Promise<T, int>;
+	using PointerHandler = ErrorHandler<void*>;
 }
