@@ -13,7 +13,7 @@ export namespace util
 	class [[nodiscard]] LooseMonad
 	{
 	public:
-		using base_type = PlacedVariant<std::integral_constant<size_t, 0>, Ts...>;
+		using base_type = Union<Ts...>;
 
 		template<size_t Index>
 		using element_type = std::tuple_element_t<Index, std::tuple<Ts...>>;

@@ -556,6 +556,12 @@ export namespace util
 		bool hasValue = false;
 		bool isExtended = false;
 	};
+
+	using ::std::integral_constant;
+	using FirstIndexer = integral_constant<size_t, 0>;
+
+	template <typename... Ts>
+	using Union = PlacedVariant<FirstIndexer, Ts...>;
 }
 
 export namespace std
@@ -645,7 +651,7 @@ namespace util
 {
 	void test_union()
 	{
-		using aa_t = PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float>;
+		using aa_t = Union<int, unsigned long, float>;
 		constexpr aa_t aa{};
 		using aa_0_t = aa_t::element_type<0>;
 		static_assert(is_same_v<aa_0_t, int>, "int");
@@ -670,7 +676,7 @@ namespace util
 		constexpr bool a_has_1 = aa.has_value<1>();
 		constexpr bool a_has_2 = aa.has_value<2>();
 
-		using bb_t = PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float, double>;
+		using bb_t = Union<int, unsigned long, float, double>;
 		bb_t bb0{};
 		//bb_t bb1{};
 		bb_t bb1(in_place_type<float>, integral_constant<size_t, 0>{}, 4000.034124f);
@@ -678,9 +684,9 @@ namespace util
 		bb0 = bb1;
 		bb0.reset();
 
-		//PlacedVariant<integral_constant<size_t, 0>, int, int, int> cc{};
-		//const PlacedVariant<bool, int, long> dd{};
-		//const PlacedVariant<float, unsigned long long, char> ee{};
-		//const PlacedVariant<double, unsigned char, short> ff{};
+		constexpr Union<int, int, int> cc{};
+		constexpr Union<bool, int, long> dd{};
+		constexpr Union<float, unsigned long long, char> ee{};
+		constexpr Union<double, unsigned char, short> ff{};
 	}
 }
