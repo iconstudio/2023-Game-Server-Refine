@@ -309,6 +309,18 @@ export namespace util
 			}
 		}
 
+		constexpr void reset() noexcept
+		{
+			if (isExtended)
+			{
+				_Tail.reset();
+			}
+
+			myData = Data{};
+			hasValue = false;
+			isExtended = false;
+		}
+
 		[[nodiscard]]
 		constexpr bool has_value() const noexcept
 		{
@@ -405,19 +417,126 @@ export namespace util
 			}
 		}
 
-		StaticUnion(StaticUnion&&) = default;
-		StaticUnion(const StaticUnion&) = default;
-		StaticUnion& operator=(StaticUnion&&) = default;
-		StaticUnion& operator=(const StaticUnion&) = default;
+		constexpr StaticUnion(const StaticUnion&) noexcept = default;
+		constexpr StaticUnion(StaticUnion&&) noexcept = default;
+
+		constexpr StaticUnion& operator=(const StaticUnion& other) & noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				if (isExtended)
+				{
+					_Tail = {};
+					isExtended = false;
+				}
+
+				myValue = other.myValue;
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				if (isExtended)
+				{
+					_Tail.operator=(other._Tail);
+				}
+			}
+
+			return *this;
+		}
+
+		constexpr StaticUnion& operator=(StaticUnion&& other) & noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				if (isExtended)
+				{
+					_Tail = {};
+					isExtended = false;
+				}
+
+				myValue = move(other.myValue);
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				if (isExtended)
+				{
+					_Tail.operator=(move(other._Tail));
+				}
+			}
+
+			return *this;
+		}
+
+		constexpr StaticUnion&& operator=(const StaticUnion& other) && noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				myValue = other.myValue;
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				if (isExtended)
+				{
+					_Tail.operator=(other._Tail);
+				}
+			}
+
+			return move(*this);
+		}
+
+		constexpr StaticUnion&& operator=(StaticUnion&& other) && noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				myValue = move(other.myValue);
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				if (isExtended)
+				{
+					_Tail.operator=(move(other._Tail));
+				}
+			}
+
+			return move(*this);
+		}
 
 	private:
 		friend class under_type;
 
-		union
+		union Data
 		{
+			constexpr Data() noexcept
+			{}
+
+			constexpr Data(nullopt_t) noexcept
+			{}
+
+			constexpr ~Data() noexcept(nothrow_destructibles<value_type, under_type>)
+			{}
+
 			value_type myValue;
 			under_type _Tail;
-		};
+		}
+		myData;
+
+		value_type& myValue = myData.myValue;
+		under_type& _Tail = myData._Tail;
 		bool hasValue = false;
 		bool isExtended = false;
 	};
