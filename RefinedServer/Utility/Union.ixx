@@ -113,11 +113,11 @@ export namespace util
 		{}
 
 		// Place the specified type from hint
-		template <typename T, size_t Hint, typename... Args>
-			requires (!same_as<clean_t<T>, Fty>&& Hint <= 1 + sizeof...(Rty))
-		explicit constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+		template <typename T, size_t Guard, typename... Args>
+			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
+		explicit constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
-			: _Tail(in_place_type<T>, integral_constant<size_t, Hint + 1>{}, static_cast<Args&&>(args)...)
+			: _Tail(in_place_type<T>, integral_constant<size_t, Guard + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
 
