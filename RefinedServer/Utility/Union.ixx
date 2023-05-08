@@ -8,25 +8,25 @@ import Utility.Meta;
 
 export namespace util
 {
-	template <typename... Ts>
+	template <typename Indexer = integral_constant<size_t, Place>, typename... Ts>
 	class StaticUnion;
 
 	template <size_t Place>
-	class StaticUnion<std::integral_constant<size_t, Place>>
+	class StaticUnion<integral_constant<size_t, Place>>
 	{};
 
 	template <size_t Place, notvoids Fty, notvoids... Rty>
-	class StaticUnion<std::integral_constant<size_t, Place>, Fty, Rty...>
+	class StaticUnion<integral_constant<size_t, Place>, Fty, Rty...>
 	{
 	public:
 		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
-		static_assert(!same_as<Fty, std::in_place_t>, "Fty must not be std::in_place_t.");
-		static_assert(!is_specialization_v<Fty, std::in_place_type_t>, "Fty must not be std::in_place_type_t.");
-		static_assert(!is_indexed_v<Fty, std::in_place_index_t>, "Fty must not be std::in_place_index_t.");
+		static_assert(!same_as<Fty, in_place_t>, "Fty must not be in_place_t.");
+		static_assert(!is_specialization_v<Fty, in_place_type_t>, "Fty must not be in_place_type_t.");
+		static_assert(!is_indexed_v<Fty, in_place_index_t>, "Fty must not be in_place_index_t.");
 
-		using type = StaticUnion<std::integral_constant<size_t, Place>, Fty, Rty...>;
-		using value_type = std::remove_const_t<Fty>;
-		using under_type = StaticUnion<std::integral_constant<size_t, Place + 1>, Rty...>;
+		using type = StaticUnion<integral_constant<size_t, Place>, Fty, Rty...>;
+		using value_type = remove_const_t<Fty>;
+		using under_type = StaticUnion<integral_constant<size_t, Place + 1>, Rty...>;
 
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
@@ -41,7 +41,7 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr StaticUnion(std::in_place_t, Args&&... args)
+		constexpr StaticUnion(in_place_t, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -49,40 +49,40 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr StaticUnion(std::in_place_index_t<Place>, Args&&... args)
+		constexpr StaticUnion(in_place_index_t<Place>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
-			: StaticUnion(std::in_place, static_cast<Args&&>(args)...)
+			: StaticUnion(in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Recursively find the place onto Tail
 		template <size_t Target, typename... Args>
 			requires (Target != Place)
-		constexpr StaticUnion(std::in_place_index_t<Target>, Args&&... args)
-			noexcept(nothrow_constructibles<under_type, std::in_place_index_t<Target>, Args...>)
-			: _Tail(std::in_place_index<Target>, static_cast<Args&&>(args)...)
+		constexpr StaticUnion(in_place_index_t<Target>, Args&&... args)
+			noexcept(nothrow_constructibles<under_type, in_place_index_t<Target>, Args...>)
+			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
 
 		// Initialize my value with Args
 		template <typename T, size_t Index, typename... Args>
 			requires (same_as<clean_t<T>, Fty>)
-		constexpr StaticUnion(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+		constexpr StaticUnion(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
-			: StaticUnion(std::in_place, static_cast<Args&&>(args)...)
+			: StaticUnion(in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Find the specified type
 		template <typename T, size_t Index, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Index <= 1 + sizeof...(Rty))
-		constexpr StaticUnion(std::in_place_type_t<T>, std::integral_constant<size_t, Index>, Args&&... args)
+		constexpr StaticUnion(in_place_type_t<T>, integral_constant<size_t, Index>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
-			: _Tail(std::in_place_type<T>, std::integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
+			: _Tail(in_place_type<T>, integral_constant<size_t, Index + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr explicit StaticUnion(std::integral_constant<size_t, 0>, Args&&... args)
+		constexpr explicit StaticUnion(integral_constant<size_t, 0>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -91,9 +91,9 @@ export namespace util
 		// Recursively seek the index within Tail
 		template <size_t Index, typename... Args>
 			requires (Index != Place)
-		constexpr explicit StaticUnion(std::integral_constant<size_t, Index>, Args&&... _Args)
-			noexcept(nothrow_constructibles<under_type, std::integral_constant<size_t, Index - 1>, Args...>)
-			: _Tail(std::integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
+		constexpr explicit StaticUnion(integral_constant<size_t, Index>, Args&&... _Args)
+			noexcept(nothrow_constructibles<under_type, integral_constant<size_t, Index - 1>, Args...>)
+			: _Tail(integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
 			, isExtended(true)
 		{}
 
