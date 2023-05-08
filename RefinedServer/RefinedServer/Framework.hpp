@@ -1,5 +1,6 @@
 #pragma once
 import Utility;
+import Utility.Traits;
 import Utility.Singleton;
 import Utility.Array;
 import Net;

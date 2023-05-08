@@ -643,14 +643,21 @@ export namespace std
 
 namespace util
 {
-	constexpr void test_union()
+	void test_union()
 	{
 		using aa_t = StaticUnion<integral_constant<size_t, 0>, int, unsigned long, float>;
 		constexpr aa_t aa{};
 		using aa_0_t = aa_t::element_type<0>;
+		static_assert(is_same_v<aa_0_t, int>, "int");
 		using aa_1_t = aa_t::element_type<1>;
+		//static_assert(is_same_v<aa_1_t, int>, "unsigned long");
 		using aa_2_t = aa_t::element_type<2>;
+		//static_assert(is_same_v<aa_2_t, int>, "float");
 		//using aa_3_t = aa_t::element_type<3>;
+
+		constexpr aa_0_t aa_ty_0_v = 0;
+		constexpr aa_1_t aa_ty_1_v = 0;
+		constexpr aa_2_t aa_ty_2_v = 0;
 
 		aa.myPlace;
 		aa.mySize;

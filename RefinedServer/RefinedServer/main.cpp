@@ -11,4 +11,3 @@ int main()
 	myFramework->Start();
 	myFramework->Update();
 }
-

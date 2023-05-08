@@ -22,7 +22,10 @@ namespace meta::detail
 	template <size_t Count, typename T, template <typename...> typename Predicate>
 	using create = typename enumerate<T, std::make_index_sequence<Count>, Predicate>::template type;
 
-	// Extract the Index-th type from Sequence
+	template <size_t Index, typename Void, template <typename...> typename Seq, typename...>
+	struct __at_impl;
+
+	// extract the Index-th type from Sequence
 	template <typename Seq, size_t Index, typename = void>
 	struct __at;
 
