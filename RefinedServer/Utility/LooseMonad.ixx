@@ -64,7 +64,7 @@ export namespace util
 			if_then(Fn&& action) &
 			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
 		{
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				forward<Fn>(action)(myStorage.template get<Index>());
 			}
@@ -78,7 +78,7 @@ export namespace util
 			if_then(Fn&& action) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
 		{
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				forward<Fn>(action)(myStorage.template get<Index>());
 			}
@@ -92,7 +92,7 @@ export namespace util
 			if_then(Fn&& action) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
 		{
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				forward<Fn>(action)(move(myStorage).template get<Index>());
 			}
@@ -106,7 +106,7 @@ export namespace util
 			if_then(Fn&& action) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
 		{
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				forward<Fn>(action)(move(myStorage).template get<Index>());
 			}
@@ -120,7 +120,7 @@ export namespace util
 			if_then(Fn&& action) &
 			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
 		{
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				forward<Fn>(action)(myStorage.template get<T>());
 			}
@@ -134,7 +134,7 @@ export namespace util
 			if_then(Fn&& action) const&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
 		{
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				forward<Fn>(action)(myStorage.template get<T>());
 			}
@@ -148,7 +148,7 @@ export namespace util
 			if_then(Fn&& action) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
 		{
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				forward<Fn>(action)(move(myStorage).template get<T>());
 			}
@@ -162,7 +162,7 @@ export namespace util
 			if_then(Fn&& action) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
 		{
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				forward<Fn>(action)(move(myStorage).template get<T>());
 			}
@@ -178,7 +178,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, reference_type<Index>>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				return forward<Fn>(action)(myStorage.template get<Index>());
 			}
@@ -196,7 +196,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, const_reference_type<Index>>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				return forward<Fn>(action)(myStorage.template get<Index>());
 			}
@@ -214,7 +214,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, rvalue_type<Index>>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				return forward<Fn>(action)(move(myStorage).template get<Index>());
 			}
@@ -232,7 +232,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, const_rvalue_type<Index>>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<Index>())
+			if (has_value<Index>())
 			{
 				return forward<Fn>(action)(move(myStorage).template get<Index>());
 			}
@@ -250,7 +250,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, T&>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				return forward<Fn>(action)(myStorage.template get<T>());
 			}
@@ -268,7 +268,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, const T&>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				return forward<Fn>(action)(myStorage.template get<T>());
 			}
@@ -286,7 +286,7 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, T&&>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<T>())
+			if (has_value<T>())
 			{
 				return forward<Fn>(action)(move(myStorage).template get<T>());
 			}
@@ -368,6 +368,20 @@ export namespace util
 			}
 
 			return move(*this);
+		}
+
+		template<typename T, invocables Fn>
+		inline constexpr
+			LooseMonad&
+			else_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			if (!has_value<T>())
+			{
+				forward<Fn>(action)();
+			}
+
+			return *this;
 		}
 
 		template<size_t Index, invocables Fn>
