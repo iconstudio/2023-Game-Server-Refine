@@ -17,6 +17,23 @@ export namespace util
 	using ::std::add_rvalue_reference;
 	using ::std::add_rvalue_reference_t;
 
+	using ::std::remove_const;
+	using ::std::remove_const_t;
+	using ::std::remove_volatile;
+	using ::std::remove_volatile_t;
+	using ::std::remove_cv;
+	using ::std::remove_cv_t;
+	using ::std::remove_pointer;
+	using ::std::remove_pointer_t;
+	using ::std::remove_extent;
+	using ::std::remove_extent_t;
+	using ::std::remove_all_extents;
+	using ::std::remove_all_extents_t;
+	using ::std::remove_reference;
+	using ::std::remove_reference_t;
+	using ::std::remove_cvref;
+	using ::std::remove_cvref_t;
+
 	using ::std::conditional;
 	using ::std::conditional_t;
 	using ::std::enable_if;
