@@ -614,7 +614,7 @@ namespace meta
 		constexpr wrap<pop>::result<test_seq> a018{};
 		constexpr wrap<pop>::result<test_seq>::type t_a018{};
 		constexpr wrap<pop>::result<push_t<long, test_seq>> a019{};
-		constexpr wrap<pop>::result<push_t<long, test_seq>>::type t_a019{};
+		constexpr wrap<pop>::template result<push_t<long, test_seq>>::type t_a019{};
 
 		constexpr apply<wrap<front>, test_seq> a020{};
 		constexpr apply_t<wrap<front>, test_seq> a021{};
@@ -647,14 +647,54 @@ namespace meta
 
 		constexpr back_t<push_t<SeqOfSeq, long>> a049{};
 
-		using NewSeq = transform_t<bind<wrap<push>, test_seq>, test_seq>;
+		using NewPusher = wrap<push>;
+		constexpr NewPusher::result<test_seq, long>::type pusher_test{};
 
+		using NewBinder = bind<NewPusher, test_seq>;
+		constexpr NewBinder::result<long>::type binder_test{};
+		constexpr invoke_r<NewBinder, long> invoker_r_test{};
+
+		using NewTransform = transform<NewBinder, test_seq>;
+		constexpr NewTransform transform_test{};
+
+		using NewTransformT = typename transform<NewBinder, test_seq>::template type;
+		constexpr NewTransformT transform_t_test{};
+
+		using NewTransformT_0 = typename at<NewTransformT, 0>;
+		using NewTransformT_0_Int = typename at<NewTransformT, 0>::MetaList;
+		constexpr NewTransformT_0_Int transform_t0_test{};
+
+		using NewTransformT_1 = typename at<NewTransformT, 1>;
+		using NewTransformT_1_Int = typename at<NewTransformT, 1>::MetaList;
+		constexpr NewTransformT_1_Int transform_t1_test{};
+
+		using NewTransformT_2 = typename at<NewTransformT, 2>;
+		using NewTransformT_2_Int = typename at<NewTransformT, 2>::MetaList;
+		constexpr NewTransformT_2_Int transform_t2_test{};
+
+		//using NewTransformT_3 = typename at<NewTransformT, 3>;
+		//using NewTransformT_3_Int = typename at<NewTransformT, 3>::MetaList;
+		//constexpr NewTransformT_3_Int transform_t3_test{};
+
+		using NewSeq = typename transform<NewBinder, test_seq>::template type;
 		constexpr NewSeq a050{};
-		constexpr pop_back<NewSeq> a051{};
-		constexpr pop_back_t<NewSeq> t_a051{};
 
-		constexpr front<NewSeq> a052{};
-		constexpr front_t<NewSeq> t_a052{};
+		//constexpr pop_back<NewSeq> a051{};
+		//using t_a051_t = typename pop_back<NewSeq>::template type;
+		//constexpr t_a051_t t_a051{};
+
+		//constexpr front<NewSeq> a052{};
+		//using t_a052_t_0 = typename front<NewSeq>::template type;
+		//constexpr t_a052_t_0 t_a052_0{};
+		//using t_a052_t_0_0 = typename front<front<NewSeq>>::template type;
+		//constexpr t_a052_t_0_0 t_a052_0_0{};
+		//using t_a052_t_0_0_0 = typename front<front<front<NewSeq>>>::template type;
+		//constexpr t_a052_t_0_0_0 t_a052_0_0_0{};
+		//using t_a052_t_0_0_0_0 = typename front<front<front<front<NewSeq>>>>::template type;
+		//constexpr t_a052_t_0_0_0_0 t_a052_0_0_0_0{};
+
+		//static_assert(std::is_same_v<int, t_a052_t>, "t_a052 is not int");
+		//static_assert(std::is_same_v<int, t_a052_t_0>, "t_a052_0 is not int");
 
 		constexpr back_t<front_t<NewSeq>> a053_0{};
 		constexpr front_t<back_t<NewSeq>> a054_1{};
@@ -691,8 +731,9 @@ namespace meta
 		constexpr at<at<Product, 0>, 0> r_a080_at0_at0{};
 
 		constexpr at<at<at<Product, 0>, 0>, 0>        r_a080_at0_at0_at0{};
-		constexpr at<at<at<at<Product, 0>, 0>, 0>, 0> r_a080_at0_at0_at0_at0{};
-		constexpr at<at<at<at<Product, 0>, 0>, 0>, 1> r_a080_at0_at0_at0_at1{};
+		//constexpr at<at<at<at<Product, 0>, 0>, 0>, 0> r_a080_at0_at0_at0_at0{};
+		//constexpr at<at<at<at<Product, 0>, 0>, 0>, 1> r_a080_at0_at0_at0_at1{};
+
 		constexpr at<at<at<Product, 0>, 0>, 1>        r_a080_at0_at0_at1{};
 		constexpr at<at<at<at<Product, 0>, 0>, 1>, 0> r_a080_at0_at0_at1_at0{};
 		constexpr at<at<at<at<Product, 0>, 0>, 1>, 1> r_a080_at0_at0_at1_at1{};
@@ -728,25 +769,28 @@ namespace meta
 
 		constexpr front_t<at<Product, 0>> r_a080_at0_f{};
 		constexpr front_t<front_t<at<Product, 0>>> r_a080_at0_ff{};
-		constexpr at<front_t<front_t<at<Product, 0>>>, 0> r_a080_at0_ff_at0{};
-		constexpr at<front_t<front_t<at<Product, 0>>>, 1> r_a080_at0_ff_at1{};
+		//constexpr at<front_t<front_t<at<Product, 0>>>, 0> r_a080_at0_ff_at0{};
+		//constexpr at<front_t<front_t<at<Product, 0>>>, 1> r_a080_at0_ff_at1{};
 
 		constexpr back_t<front_t<at<Product, 0>>> r_a080_at0_bf{};
 		//constexpr at<back_t<front_t<at<Product, 0>>>, 0> r_a080_at0_bf_at0{};
 		//constexpr at<back_t<front_t<at<Product, 0>>>, 1> r_a080_at0_bf_at1{};
 
 		constexpr front_t<front_t<at<Product, 1>>> r_a080_at1_ff{};
-		constexpr at<front_t<front_t<at<Product, 1>>>, 0> r_a080_at1_ff_at0{};
-		constexpr at<front_t<front_t<at<Product, 1>>>, 1> r_a080_at1_ff_at1{};
+		//constexpr at<front_t<front_t<at<Product, 1>>>, 0> r_a080_at1_ff_at0{};
+		//constexpr at<front_t<front_t<at<Product, 1>>>, 1> r_a080_at1_ff_at1{};
 
 		constexpr front_t<front_t<at<Product, 2>>> r_a080_at2_ff{};
-		constexpr at<front_t<front_t<at<Product, 2>>>, 0> r_a080_at2_ff_at0{};
-		constexpr at<front_t<front_t<at<Product, 2>>>, 1> r_a080_at2_ff_at1{};
+		//constexpr at<front_t<front_t<at<Product, 2>>>, 0> r_a080_at2_ff_at0{};
+		//constexpr at<front_t<front_t<at<Product, 2>>>, 1> r_a080_at2_ff_at1{};
 
-		constexpr front_t<front_t<front_t<at<Product, 0>>>> r_a080_at0_fff{};
+		//constexpr front_t<front_t<front_t<at<Product, 0>>>> r_a080_at0_fff{};
 
+		// list of list
 		constexpr front_t<cartesian_product<NewSeq>> a080_f{};
+		// int, float
 		constexpr front_t<front_t<cartesian_product<NewSeq>>> a080_ff{};
+		// int
 		constexpr front_t<front_t<front_t<cartesian_product<NewSeq>>>> a080_fff{};
 	}
 
