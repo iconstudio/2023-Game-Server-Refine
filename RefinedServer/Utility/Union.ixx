@@ -626,9 +626,22 @@ namespace util
 {
 	constexpr void test_union()
 	{
-		const StaticUnion<int, int, int> aa{};
-		const StaticUnion<bool, int, long> bb{};
-		const StaticUnion<float, unsigned long long, char> cc{};
-		const StaticUnion<double, unsigned char, short> dd{};
+		constexpr StaticUnion<integral_constant<size_t, 0>, int, int, int> aa{};
+
+		aa.myPlace;
+		aa.mySize;
+		aa.relativeIndex<0>;
+		aa.relativeIndex<1>;
+		aa.relativeIndex<2>;
+		aa.relativeIndex<3>;
+
+		constexpr bool a_has_0 = aa.has_value<0>();
+		constexpr bool a_has_1 = aa.has_value<1>();
+		constexpr bool a_has_2 = aa.has_value<2>();
+
+
+		//const StaticUnion<bool, int, long> bb{};
+		//const StaticUnion<float, unsigned long long, char> cc{};
+		//const StaticUnion<double, unsigned char, short> dd{};
 	}
 }
