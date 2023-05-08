@@ -96,12 +96,21 @@ export namespace meta
 		using type = typename Fn<Args...>;
 	};
 
+	// needs result type
+	template <typename Fn, typename... Args>
+	concept meta_invocables = requires
+	{
+		typename Fn::template result<Args...>;
+	};
+
 	// invoke meta-callable Functor with Arguments
 	template <typename Fn, typename... Args>
+		requires meta_invocables<Fn, Args...>
 	using invoke = typename Fn::template result<Args...>;
 
 	template <typename Fn, typename... Args>
-	using invoke_r = typename Fn::template result<Args...>::template type;
+		requires meta_invocables<Fn, Args...>
+	using invoke_r = typename invoke<Fn, Args...>::template type;
 
 	// encapsulate a template into a meta-callable type
 	template <template <typename...> typename Fn>
@@ -116,7 +125,8 @@ export namespace meta
 	struct bind
 	{
 		template <typename... Ty>
-		using result = typename Fn::template result<Ty..., Args...>;
+			requires meta_invocables<Fn, Args..., Ty...>
+		using result = typename Fn::template result<Args..., Ty...>;
 	};
 
 	// pick a type from a sequence of types by an index
@@ -133,10 +143,12 @@ export namespace meta
 	struct apply;
 
 	template <class Fn, class Seq>
+		requires meta_invocables<Fn, Seq>
 	using apply_t = typename apply<Fn, Seq>::template type;
 
 	// invoke meta-callable Functor with the parameters of a template specialization
 	template <typename Fn, template <typename...> typename Seq, typename... Ts>
+		requires meta_invocables<Fn, Seq<Ts...>>
 	struct apply<Fn, Seq<Ts...>>
 	{
 		using type = typename Fn::template result<Seq<Ts...>>::type;
@@ -144,6 +156,7 @@ export namespace meta
 
 	// invoke meta-callable Functor with the elements of an integer_sequence
 	template <typename Fn, typename T, T... Values>
+		requires meta_invocables<Fn, std::integer_sequence<T, Values...>>
 	struct apply<Fn, std::integer_sequence<T, Values...>>
 	{
 		using type = typename Fn::template result<std::integral_constant<T, Values>...>;
@@ -464,26 +477,37 @@ export namespace meta
 	template <typename T, size_t>
 	using repeater = T;
 
-	// enumberate sequence with a function
+	template <typename Fn, typename Seq>
+		requires meta_invocables<Fn, Seq>
+	concept meta_enumerables = requires(Fn fn, Seq seq)
+	{
+		{ fn(seq) } -> std::same_as<Seq>;
+	};
+
+	// enumerate sequence with a function
 	template <typename Fn, typename Seq, typename Indexer>
+		requires meta_invocables<Fn, Seq>
 	struct enumerate;
 
 	template <typename Fn, typename Seq, typename Indexer = std::make_index_sequence<tsize_v<Seq>>>
+		requires meta_invocables<Fn, Seq>
 	using enumerate_t = typename enumerate<Fn, Seq, Indexer>::template type;
 
 	template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t I, size_t... Indices>
+		requires meta_invocables<Fn, Seq<Ts...>>
 	struct enumerate<Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
 		: enumerate<Fn, invoke_r<bind<Fn, Seq<Ts...>>>, std::index_sequence<Indices...>>
 	{};
-
-	template <typename Fn, typename Seq, size_t Count>
-	using enumerate_n = typename enumerate<Fn, Seq, std::make_index_sequence<Count>>::template type;
 
 	template <typename Fn, typename Seq>
 	struct enumerate<Fn, Seq, std::index_sequence<>>
 	{
 		using type = Seq;
 	};
+
+	template <typename Fn, typename Seq, size_t Count>
+		requires meta_invocables<Fn, Seq>
+	using enumerate_n = typename enumerate<Fn, Seq, std::make_index_sequence<Count>>::template type;
 
 	// transform a list of lists of elements into a single list containing those elements
 	template <typename ListOfLists>
