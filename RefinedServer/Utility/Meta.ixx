@@ -478,8 +478,7 @@ export namespace meta
 	using repeater = T;
 
 	template <typename Fn, typename Seq>
-		requires meta_invocables<Fn, Seq>
-	concept meta_enumerables = requires(Fn fn, Seq seq)
+	concept meta_enumerables = meta_invocables<Fn, Seq> &&requires(Fn fn, Seq seq)
 	{
 		{ fn(seq) } -> std::same_as<Seq>;
 	};
