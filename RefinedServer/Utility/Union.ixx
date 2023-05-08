@@ -179,7 +179,7 @@ export namespace util
 			}
 			else
 			{
-				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 				throw std::bad_variant_access{};
 			}
 		}
@@ -201,8 +201,7 @@ export namespace util
 			}
 			else
 			{
-				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
-				throw std::bad_variant_access{};
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 			}
 		}
 
@@ -223,8 +222,7 @@ export namespace util
 			}
 			else
 			{
-				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
-				throw std::bad_variant_access{};
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 			}
 		}
 
@@ -245,8 +243,7 @@ export namespace util
 			}
 			else
 			{
-				//static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
-				throw std::bad_variant_access{};
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 			}
 		}
 
