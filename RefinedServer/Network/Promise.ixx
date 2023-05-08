@@ -9,32 +9,39 @@ export namespace net
 {
 	namespace io
 	{
-		template<typename T>
-		using success_t = util::Identity<T>;
-
-		template<typename T>
-		using error_t = util::Identity<T>;
-
-		using defer_t = util::Identity<void>;
-
-		inline constexpr error_t<int> error(const int& error_code) noexcept
+		namespace tags
 		{
-			return error_t{ error_code };
-		}
-		inline constexpr error_t<int> error(int&& error_code) noexcept
-		{
-			return error_t{ static_cast<int&&>(error_code) };
+			enum class io_success {};
+			enum class io_failure {};
+			enum class io_defered {};
 		}
 
-		inline constexpr success_t<void> success{ };
-		inline constexpr error_t<void> fail{ };
-		inline constexpr defer_t defer{ };
+		template<typename T>
+		using success_t = util::Identity<T, tags::io_success>;
 
 		template<typename T>
-		inline constexpr success_t<T> succeed_io{ };
-		inline constexpr defer_t      defered_io{ };
+		using error_t = util::Identity<T, tags::io_failure>;
+
+		using defer_t = util::Identity<void, tags::io_defered>;
+
+		constexpr error_t<int> error(const int& error_code) noexcept
+		{
+			return error_t<int>{ error_code };
+		}
+		constexpr error_t<int> error(int&& error_code) noexcept
+		{
+			return error_t<int>{ static_cast<int&&>(error_code) };
+		}
+
+		constexpr success_t<void> success{ };
+		constexpr error_t<void> fail{ };
+		constexpr defer_t defer{ };
+
 		template<typename T>
-		inline constexpr error_t<T>   failed_io{ };
+		constexpr success_t<T> succeed_io{ };
+		constexpr defer_t      defered_io{ };
+		template<typename T>
+		constexpr error_t<T>   failed_io{ };
 	}
 
 	template<typename T, typename E>
@@ -106,7 +113,7 @@ export namespace net
 		}
 
 		template<util::invocables<T&> Fn>
-		inline constexpr
+		constexpr
 			const Promise&
 			if_then(Fn&& action) &
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&>())))
@@ -120,7 +127,7 @@ export namespace net
 		}
 
 		template<util::invocables<const T&> Fn>
-		inline constexpr
+		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&>())))
@@ -134,7 +141,7 @@ export namespace net
 		}
 
 		template<util::invocables<T&&> Fn>
-		inline constexpr
+		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&&>())))
@@ -148,7 +155,7 @@ export namespace net
 		}
 
 		template<util::invocables<const T&&> Fn>
-		inline constexpr
+		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&&>())))
@@ -161,17 +168,17 @@ export namespace net
 			return util::move(*this);
 		}
 
-		inline constexpr bool IsSuccess() const noexcept
+		constexpr bool IsSuccess() const noexcept
 		{
 			return myState.has_value<succeed_t>();
 		}
 
-		inline constexpr bool IsFailed() const noexcept
+		constexpr bool IsFailed() const noexcept
 		{
 			return myState.has_value<failed_t>();
 		}
 
-		inline constexpr bool IsDeferec() const noexcept
+		constexpr bool IsDeferec() const noexcept
 		{
 			return myState.has_value<defered_t>();
 		}
@@ -238,63 +245,63 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		inline friend constexpr
 			const Promise&
-			operator>>(Fn&& action) const&
+			operator>>(const Promise& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (promise.IsSuccess())
 			{
 				util::forward<Fn>(action)();
 			}
 
-			return *this;
+			return promise;
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		inline friend constexpr
 			Promise&&
-			operator>>(Fn&& action) &&
+			operator>>(Promise&& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (promise.IsFailed())
 			{
 				util::forward<Fn>(action)();
 			}
 
-			return util::move(*this);
+			return util::move(promise);
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		inline friend constexpr
 			const Promise&
-			operator<<(Fn&& action) const&
+			operator<<(const Promise& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (!myState.template has_value<succeed_t>())
+			if (promise.IsSuccess())
 			{
 				util::forward<Fn>(action)();
 			}
 
-			return *this;
+			return promise;
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		inline friend constexpr
 			Promise&&
-			operator<<(Fn&& action) &&
+			operator<<(Promise&& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (!myState.template has_value<succeed_t>())
+			if (promise.IsFailed())
 			{
 				util::forward<Fn>(action)();
 			}
 
-			return util::move(*this);
+			return util::move(promise);
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -308,7 +315,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -322,7 +329,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			util::monad_result_t<Fn>
 			and_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -340,7 +347,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			util::monad_result_t<Fn>
 			and_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -358,7 +365,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			const Promise&
 			else_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -372,7 +379,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			const Promise&
 			else_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -386,7 +393,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			util::monad_result_t<Fn>
 			or_else(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -406,7 +413,7 @@ export namespace net
 		}
 
 		template<util::invocables Fn>
-		inline constexpr
+		constexpr
 			util::monad_result_t<Fn>
 			or_else(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)()))
@@ -425,17 +432,17 @@ export namespace net
 			}
 		}
 
-		inline constexpr bool IsSuccess() const noexcept
+		constexpr bool IsSuccess() const noexcept
 		{
 			return myState.has_value<succeed_t>();
 		}
 
-		inline constexpr bool IsFailed() const noexcept
+		constexpr bool IsFailed() const noexcept
 		{
 			return myState.has_value<failed_t>();
 		}
 
-		inline constexpr bool IsDeferec() const noexcept
+		constexpr bool IsDeferec() const noexcept
 		{
 			return myState.has_value<defered_t>();
 		}
