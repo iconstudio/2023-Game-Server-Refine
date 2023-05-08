@@ -47,7 +47,7 @@ export namespace net
 	template<typename T, typename E>
 	class Promise;
 
-	template<util::copyable T, util::copyable E>
+	template<typename T, util::copyable E>
 	class Promise<T, E> final
 	{
 	public:
@@ -112,7 +112,7 @@ export namespace net
 			return *this;
 		}
 
-		template<util::invocables<T&> Fn>
+		template<util::lv_invocable<T> Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) &
@@ -126,7 +126,7 @@ export namespace net
 			return *this;
 		}
 
-		template<util::invocables<const T&> Fn>
+		template<util::cl_invocable<T> Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
@@ -140,7 +140,7 @@ export namespace net
 			return *this;
 		}
 
-		template<util::invocables<T&&> Fn>
+		template<util::rv_invocable<T> Fn>
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
@@ -154,7 +154,7 @@ export namespace net
 			return util::move(*this);
 		}
 
-		template<util::invocables<const T&&> Fn>
+		template<util::cr_invocable<T> Fn>
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
@@ -467,4 +467,24 @@ export namespace net
 	template<util::copyable T>
 	using ErrorHandler = Promise<T, int>;
 	using PointerHandler = ErrorHandler<void*>;
+}
+
+namespace net
+{
+	constexpr void test_promise() noexcept
+	{
+		constexpr auto fnl0 = [](const int& v) -> int {
+			return 300;
+		};
+
+		constexpr auto fnr0 = [](int&&) -> int {
+			return 300;
+		};
+
+		const Promise<void, int> vpromise0{};
+		const Promise<void, void> vpromise1{};
+
+		constexpr Promise<void, int> cvpromise0{};
+		constexpr Promise<void, void> cvpromise1{};
+	}
 }
