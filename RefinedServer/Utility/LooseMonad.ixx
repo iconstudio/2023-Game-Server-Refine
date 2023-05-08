@@ -506,6 +506,78 @@ export namespace util
 			}
 		}
 
+		template<typename T, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
+
+			if (!has_value<T>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return monad_result_t<Fn>{ nullopt };
+			}
+		}
+
+		template<typename T, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
+
+			if (!has_value<T>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return monad_result_t<Fn>{ nullopt };
+			}
+		}
+
+		template<typename T, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
+
+			if (!has_value<T>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return monad_result_t<Fn>{ nullopt };
+			}
+		}
+
+		template<typename T, invocables Fn>
+		inline constexpr
+			monad_result_t<Fn>
+			or_else(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)()))
+		{
+			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
+
+			if (!has_value<T>())
+			{
+				return forward<Fn>(action)();
+			}
+			else
+			{
+				return monad_result_t<Fn>{ nullopt };
+			}
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
