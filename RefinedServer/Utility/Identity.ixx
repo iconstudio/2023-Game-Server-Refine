@@ -187,10 +187,25 @@ export namespace util
 			return static_cast<T&&>(myValue);
 		}
 
-		explicit constexpr operator T () const
-			noexcept(nothrow_copy_constructibles<T>)
+
+		constexpr operator T& () & noexcept(nothrow_move_constructibles<T>)
 		{
 			return myValue;
+		}
+
+		constexpr operator const T& () const& noexcept(nothrow_move_constructibles<const T>)
+		{
+			return myValue;
+		}
+
+		constexpr operator T && () && noexcept(nothrow_copy_constructibles<T>)
+		{
+			return static_cast<T&&>(myValue);
+		}
+
+		constexpr operator const T && () const&& noexcept(nothrow_copy_constructibles<const T>)
+		{
+			return static_cast<const T&&>(myValue);
 		}
 
 		constexpr Identity(const Identity&) noexcept(nothrow_copy_constructibles<T>) = default;
@@ -199,6 +214,23 @@ export namespace util
 
 	private:
 		T myValue;
+	};
+
+
+	template<>
+	class [[nodiscard]] Identity<void>
+	{
+	public:
+		using value_type = void;
+
+		explicit constexpr Identity() noexcept = default;
+		constexpr ~Identity() noexcept = default;
+
+		constexpr void swap(Identity& other) noexcept
+		{}
+
+		constexpr void operator*() const noexcept
+		{}
 	};
 }
 
