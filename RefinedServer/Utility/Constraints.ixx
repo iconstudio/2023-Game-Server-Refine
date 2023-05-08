@@ -37,10 +37,10 @@ export namespace util
 	concept rv_invocable = invocables<Fn, make_rvalue_t<T>>;
 
 	template<typename Fn, typename T>
-	concept rv_invocable = invocables<Fn, make_clvalue_t<T>>;
+	concept cl_invocable = invocables<Fn, make_clvalue_t<T>>;
 
 	template<typename Fn, typename T>
-	concept rv_invocable = invocables<Fn, make_crvalue_t<T>>;
+	concept cr_invocable = invocables<Fn, make_crvalue_t<T>>;
 
 	template<typename T>
 	concept aggregate_classes = classes<T> && std::is_aggregate_v<clean_t<T>>;
