@@ -137,7 +137,7 @@ export namespace util
 
 
 	template<typename Tag>
-	class [[nodiscard]] Identity<void, Tag>
+	class Identity<void, Tag>
 	{
 	public:
 		using value_type = void;
@@ -147,27 +147,27 @@ export namespace util
 		constexpr Identity(Identity&&) noexcept = default;
 		constexpr ~Identity() noexcept = default;
 
-		constexpr Identity& operator=(Identity) & noexcept
+		constexpr Identity& operator=([[maybe_unused]] Identity) & noexcept
 		{
 			return *this;
 		}
 
-		constexpr const Identity& operator=(Identity) const& noexcept
+		constexpr const Identity& operator=([[maybe_unused]] Identity) const& noexcept
 		{
 			return *this;
 		}
 
-		constexpr Identity&& operator=(Identity) && noexcept
+		constexpr Identity&& operator=([[maybe_unused]] Identity) && noexcept
 		{
 			return move(*this);
 		}
 
-		constexpr const Identity&& operator=(Identity) const&& noexcept
+		constexpr const Identity&& operator=([[maybe_unused]] Identity) const&& noexcept
 		{
 			return move(*this);
 		}
 
-		constexpr void swap(Identity& other) noexcept
+		constexpr void swap([[maybe_unused]] Identity& other) noexcept
 		{}
 
 		constexpr void operator*() const noexcept
