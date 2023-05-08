@@ -378,67 +378,131 @@ export namespace net
 			}
 		}
 
-		template<util::invocables Fn>
+		template<util::lv_invocable<T> Fn>
 		constexpr
 			const Promise&
-			if_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)()))
+			if_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
 		{
 			if (myState.template has_value<succeed_t>())
 			{
-				util::forward<Fn>(action)();
+				util::forward<Fn>(action)(GetResult());
 			}
 
 			return *this;
 		}
 
-		template<util::invocables Fn>
+		template<util::cl_invocable<T> Fn>
 		constexpr
-			Promise&&
-			if_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)()))
+			const Promise&
+			if_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
 		{
 			if (myState.template has_value<succeed_t>())
 			{
-				util::forward<Fn>(action)();
+				util::forward<Fn>(action)(GetResult());
+			}
+
+			return *this;
+		}
+
+		template<util::rv_invocable<T> Fn>
+		constexpr
+			Promise&&
+			if_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+		{
+			if (myState.template has_value<succeed_t>())
+			{
+				util::forward<Fn>(action)(GetResult());
 			}
 
 			return util::move(*this);
 		}
 
-		template<util::invocables Fn>
+		template<util::cr_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn>
-			and_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)()))
+			const Promise&&
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
-
 			if (myState.template has_value<succeed_t>())
 			{
-				util::forward<Fn>(action)();
+				util::forward<Fn>(action)(GetResult());
+			}
+
+			return util::move(*this);
+		}
+
+		template<util::lv_invocable<T> Fn>
+		constexpr
+			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			and_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (myState.has_value<succeed_t>())
+			{
+				return util::forward<Fn>(action)(GetResult());
 			}
 			else
 			{
-				return util::monad_result_t<Fn>{ util::nullopt };
+				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
 			}
 		}
 
-		template<util::invocables Fn>
+		template<util::cl_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn>
-			and_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)()))
+			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			and_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
 
-			if (myState.template has_value<succeed_t>())
+			if (myState.has_value<succeed_t>())
 			{
-				util::forward<Fn>(action)();
+				return util::forward<Fn>(action)(GetResult());
 			}
 			else
 			{
-				return util::monad_result_t<Fn>{ util::nullopt };
+				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+			}
+		}
+
+		template<util::rv_invocable<T> Fn>
+		constexpr
+			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			and_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (myState.has_value<succeed_t>())
+			{
+				return util::forward<Fn>(action)(GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+			}
+		}
+
+		template<util::cr_invocable<T> Fn>
+		constexpr
+			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			and_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (myState.has_value<succeed_t>())
+			{
+				return util::forward<Fn>(action)(GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
 			}
 		}
 
@@ -509,7 +573,7 @@ export namespace net
 				return fwd_result_t{ util::nullopt };
 			}
 		}
-		
+
 		consteval void GetResult() const noexcept
 			requires (!util::notvoids<T>)
 		{
@@ -579,11 +643,18 @@ namespace net
 
 		Promise<int> vpromise0{};
 		const auto r0 = vpromise0 >> fnl0;
-
-
 		Promise<long long> vpromise1{};
 
-		constexpr Promise<void, int> cvpromise0{};
-		constexpr Promise<void, long long> cvpromise1{};
+		constexpr Promise<int, void> cvpromise0{};
+		const auto& cr0_0 = cvpromise0.if_then(
+			[](const int& v) -> int {
+			return 300;
+		});
+		const auto cr0_1 = cvpromise0.and_then(
+			[](const int& v) -> Promise<int, void> {
+			return Promise<int, void>::succeed_t{ 300 };
+		});
+
+		constexpr Promise<long long, void> cvpromise1{};
 	}
 }
