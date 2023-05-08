@@ -119,6 +119,14 @@ export namespace meta
 		using result = typename Fn::template result<Ty..., Args...>;
 	};
 
+	// pick a type from a sequence of types by an index
+	template <typename Seq>
+	struct picker
+	{
+		template<size_t I>
+		using result = at<Seq, I>;
+	};
+
 	// unpack List into the parameters of meta-callable Functor
 	template <typename Fn, typename Seq>
 	struct apply;
@@ -452,6 +460,30 @@ export namespace meta
 	struct peek_index<std::index_sequence<>>
 	{};
 
+	template <typename T, size_t>
+	using repeater = T;
+
+	// enumberate sequence with a function
+	template <typename Fn, typename Seq, typename Indexer>
+	struct enumerate;
+
+	template <typename Fn, typename Seq, typename Indexer = std::make_index_sequence<tsize_v<Seq>>>
+	using enumerate_t = typename enumerate<Fn, Seq, Indexer>::template type;
+
+	template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t I, size_t... Indices>
+	struct enumerate<Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
+		: enumerate<Fn, invoke_r<bind<Fn, Seq<Ts...>>>, std::index_sequence<Indices...>>
+	{};
+
+	template <typename Fn, typename Seq, size_t Count>
+	using enumerate_n = typename enumerate<Fn, Seq, std::make_index_sequence<Count>>::template type;
+
+	template <typename Fn, typename Seq>
+	struct enumerate<Fn, Seq, std::index_sequence<>>
+	{
+		using type = Seq;
+	};
+
 	// transform a list of lists of elements into a single list containing those elements
 	template <typename ListOfLists>
 	using unzip = apply<wrap<concat>, ListOfLists>;
@@ -524,37 +556,6 @@ export namespace std
 
 namespace meta
 {
-	template <typename T, size_t>
-	using repeater = T;
-
-	template <typename Seq>
-	struct picker
-	{
-		template<size_t I>
-		using result = at<Seq, I>;
-	};
-
-	// enumberate sequence with a function
-	template <typename Fn, typename Seq, typename Indexer>
-	struct enumerate;
-
-	template <typename Fn, typename Seq, typename Indexer = std::make_index_sequence<tsize_v<Seq>>>
-	using enumerate_t = typename enumerate<Fn, Seq, Indexer>::template type;
-
-	template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t I, size_t... Indices>
-	struct enumerate<Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
-		: enumerate<Fn, invoke_r<bind<Fn, Seq<Ts...>>>, std::index_sequence<Indices...>>
-	{};
-
-	template <typename Fn, typename Seq, size_t Count>
-	using enumerate_n = typename enumerate<Fn, Seq, std::make_index_sequence<Count>>::template type;
-
-	template <typename Fn, typename Seq>
-	struct enumerate<Fn, Seq, std::index_sequence<>>
-	{
-		using type = Seq;
-	};
-
 	void test_metafunctions() noexcept
 	{
 		using test_seq = MetaList<int, float, double>;
