@@ -207,14 +207,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return _Tail.template get<Index>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return _Tail.template get<Index>();
 			}
 			else
 			{
@@ -235,14 +228,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return move(_Tail).template get<Index>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return move(_Tail).template get<Index>();
 			}
 			else
 			{
@@ -263,14 +249,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return move(_Tail).template get<Index>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return move(_Tail).template get<Index>();
 			}
 			else
 			{
@@ -290,14 +269,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return _Tail.template get<T>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return _Tail.template get<T>();
 			}
 			else
 			{
@@ -317,14 +289,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return _Tail.template get<T>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return _Tail.template get<T>();
 			}
 			else
 			{
@@ -344,14 +309,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return move(_Tail).template get<T>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return move(_Tail).template get<T>();
 			}
 			else
 			{
@@ -371,14 +329,7 @@ export namespace util
 			}
 			else if constexpr (1 < mySize)
 			{
-				if (isExtended)
-				{
-					return move(_Tail).template get<T>();
-				}
-				else
-				{
-					throw std::bad_variant_access{};
-				}
+				return move(_Tail).template get<T>();
 			}
 			else
 			{
