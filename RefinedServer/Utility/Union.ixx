@@ -490,7 +490,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr bool is_valueless() const noexcept
 		{
-			if constexpr(1 < mySize && isExtended)
+			if constexpr(1 < mySize)
 			{
 				if (isExtended)
 				{
