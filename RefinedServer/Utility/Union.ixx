@@ -31,6 +31,12 @@ export namespace util
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
 
+		template <size_t Index>
+		static inline constexpr size_t relativeIndex = Index - Place;
+
+		template <size_t Index>
+		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
+
 		// no initialization (no active member)
 		constexpr StaticUnion() noexcept
 		{}
