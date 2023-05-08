@@ -174,25 +174,25 @@ export namespace net
 			return;
 		}
 
-		constexpr auto GetResult() & noexcept
+		constexpr succeed_t& GetResult() & noexcept
 			requires util::notvoids<T>
 		{
 			return myState.get<succeed_t>();
 		}
 
-		constexpr auto GetResult() const& noexcept
+		constexpr const succeed_t& GetResult() const& noexcept
 			requires util::notvoids<T>
 		{
 			return myState.get<succeed_t>();
 		}
 
-		constexpr auto GetResult() && noexcept
+		constexpr succeed_t&& GetResult() && noexcept
 			requires util::notvoids<T>
 		{
 			return util::move(myState).get<succeed_t>();
 		}
 
-		constexpr auto GetResult() const&& noexcept
+		constexpr const succeed_t&& GetResult() const&& noexcept
 			requires util::notvoids<T>
 		{
 			return util::move(myState).get<succeed_t>();
