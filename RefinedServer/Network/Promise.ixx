@@ -113,6 +113,142 @@ export namespace net
 		}
 
 		template<util::lv_invocable<T> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			operator>>(Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+		{
+			if (promise.IsSuccess())
+			{
+				return util::forward<Fn>(action)(promise.GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
+			}
+		}
+
+		template<util::cl_invocable<T> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			operator>>(const Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+		{
+			if (promise.IsSuccess())
+			{
+				return util::forward<Fn>(action)(promise.GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+			}
+		}
+
+		template<util::rv_invocable<T> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			operator>>(Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+		{
+			if (promise.IsSuccess())
+			{
+				return util::forward<Fn>(action)(util::move(promise).GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+			}
+		}
+
+		template<util::cr_invocable<T> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			operator>>(const Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+		{
+			if (promise.IsSuccess())
+			{
+				return util::forward<Fn>(action)(util::move(promise).GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+			}
+		}
+
+		template<util::invocables<E&> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, E&>
+			operator<<(Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, E&>, void>, "Error monadic result cannot be void.");
+
+			if (promise.IsFailed())
+			{
+				return util::forward<Fn>(action)(promise.GetError());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, E&>{};
+			}
+		}
+
+		template<util::invocables<const E&> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, const E&>
+			operator<<(const Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, const E&>, void>, "Error monadic result cannot be void.");
+
+			if (promise.IsFailed())
+			{
+				return util::forward<Fn>(action)(promise.GetError());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, const E&>{};
+			}
+		}
+
+		template<util::invocables<E&&> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, E&&>
+			operator<<(Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&&>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, E&&>, void>, "Error monadic result cannot be void.");
+
+			if (promise.IsFailed())
+			{
+				return util::forward<Fn>(action)(static_cast<Promise&&>(promise).GetError());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, E&&>{};
+			}
+		}
+
+		template<util::invocables<const E&&> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, const E&&>
+			operator<<(const Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&&>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, const E&&>, void>, "Error monadic result cannot be void.");
+
+			if (promise.IsFailed())
+			{
+				return util::forward<Fn>(action)(static_cast<const Promise&&>(promise).GetError());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, const E&&>{};
+			}
+		}
+
+		template<util::lv_invocable<T> Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) &
