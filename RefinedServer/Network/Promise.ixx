@@ -246,58 +246,70 @@ export namespace net
 
 		template<util::invocables Fn>
 		inline friend constexpr
-			const Promise&
+			util::monad_result_t<Fn>
 			operator>>(const Promise& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (promise.IsSuccess())
 			{
-				util::forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
-
-			return promise;
-		}
-
-		template<util::invocables Fn>
-		inline friend constexpr
-			Promise&&
-			operator>>(Promise&& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)()))
-		{
-			if (promise.IsFailed())
+			else
 			{
-				util::forward<Fn>(action)();
+				return util::monad_result_t<Fn>{};
 			}
-
-			return util::move(promise);
 		}
 
 		template<util::invocables Fn>
 		inline friend constexpr
-			const Promise&
-			operator<<(const Promise& promise, Fn&& action)
+			util::monad_result_t<Fn>
+			operator>>(Promise&& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (promise.IsSuccess())
 			{
-				util::forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
-
-			return promise;
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
 		}
 
 		template<util::invocables Fn>
 		inline friend constexpr
-			Promise&&
+			util::monad_result_t<Fn>
+			operator<<(const Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+
+			if (promise.IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		template<util::invocables Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn>
 			operator<<(Promise&& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+
 			if (promise.IsFailed())
 			{
-				util::forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
-
-			return util::move(promise);
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
 		}
 
 		template<util::invocables Fn>
