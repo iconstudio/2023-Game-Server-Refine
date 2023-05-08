@@ -173,7 +173,7 @@ export namespace util
 			{
 				return get();
 			}
-			else if (isExtended)
+			else if constexpr (1 < mySize && isExtended)
 			{
 				return _Tail.template get<Index>();
 			}
@@ -195,7 +195,7 @@ export namespace util
 			{
 				return get();
 			}
-			else if (isExtended)
+			else if constexpr (1 < mySize && isExtended)
 			{
 				return _Tail.template get<Index>();
 			}
@@ -217,7 +217,7 @@ export namespace util
 			{
 				return move(get());
 			}
-			else if (isExtended)
+			else if constexpr (1 < mySize && isExtended)
 			{
 				return move(_Tail).template get<Index>();
 			}
@@ -239,7 +239,7 @@ export namespace util
 			{
 				return move(get());
 			}
-			else if (isExtended)
+			else if constexpr (1 < mySize && isExtended)
 			{
 				return move(_Tail).template get<Index>();
 			}
