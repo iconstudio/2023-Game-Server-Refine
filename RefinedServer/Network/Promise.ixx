@@ -168,6 +168,36 @@ export namespace net
 			return util::move(*this);
 		}
 
+		consteval void GetResult() const noexcept
+			requires (!util::notvoids<T>)
+		{
+			return;
+		}
+
+		constexpr auto GetResult() & noexcept
+			requires util::notvoids<T>
+		{
+			return myState.get<succeed_t>();
+		}
+
+		constexpr auto GetResult() const& noexcept
+			requires util::notvoids<T>
+		{
+			return myState.get<succeed_t>();
+		}
+
+		constexpr auto GetResult() && noexcept
+			requires util::notvoids<T>
+		{
+			return util::move(myState).get<succeed_t>();
+		}
+
+		constexpr auto GetResult() const&& noexcept
+			requires util::notvoids<T>
+		{
+			return util::move(myState).get<succeed_t>();
+		}
+
 		constexpr bool IsSuccess() const noexcept
 		{
 			return myState.has_value<succeed_t>();
@@ -248,35 +278,67 @@ export namespace net
 			return *this;
 		}
 
-		template<util::invocables Fn>
+		template<util::lv_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn>
-			operator>>(const Promise& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)()))
+			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			operator>>(Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)();
+				return util::forward<Fn>(action)(promise.GetResult());
 			}
 			else
 			{
-				return util::monad_result_t<Fn>{};
+				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
 			}
 		}
 
-		template<util::invocables Fn>
+		template<util::cl_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn>
-			operator>>(Promise&& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)()))
+			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			operator>>(const Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)();
+				return util::forward<Fn>(action)(promise.GetResult());
 			}
 			else
 			{
-				return util::monad_result_t<Fn>{};
+				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+			}
+		}
+
+		template<util::rv_invocable<T> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			operator>>(Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+		{
+			if (promise.IsSuccess())
+			{
+				return util::forward<Fn>(action)(util::move(promise).GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+			}
+		}
+
+		template<util::cr_invocable<T> Fn>
+		inline friend constexpr
+			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			operator>>(Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+		{
+			if (promise.IsSuccess())
+			{
+				return util::forward<Fn>(action)(util::move(promise).GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
 			}
 		}
 
@@ -448,31 +510,31 @@ export namespace net
 			}
 		}
 		
-		consteval void GetSuccess() const noexcept
+		consteval void GetResult() const noexcept
 			requires (!util::notvoids<T>)
 		{
 			return;
 		}
 
-		constexpr auto GetSuccess() & noexcept
+		constexpr auto GetResult() & noexcept
 			requires util::notvoids<T>
 		{
 			return myState.get<succeed_t>();
 		}
 
-		constexpr auto GetSuccess() const& noexcept
+		constexpr auto GetResult() const& noexcept
 			requires util::notvoids<T>
 		{
 			return myState.get<succeed_t>();
 		}
 
-		constexpr auto GetSuccess() && noexcept
+		constexpr auto GetResult() && noexcept
 			requires util::notvoids<T>
 		{
 			return util::move(myState).get<succeed_t>();
 		}
 
-		constexpr auto GetSuccess() const&& noexcept
+		constexpr auto GetResult() const&& noexcept
 			requires util::notvoids<T>
 		{
 			return util::move(myState).get<succeed_t>();
@@ -515,10 +577,13 @@ namespace net
 			return 300;
 		};
 
-		const Promise<void, int> vpromise0{};
-		const Promise<void, void> vpromise1{};
+		Promise<int> vpromise0{};
+		const auto r0 = vpromise0 >> fnl0;
+
+
+		Promise<long long> vpromise1{};
 
 		constexpr Promise<void, int> cvpromise0{};
-		constexpr Promise<void, void> cvpromise1{};
+		constexpr Promise<void, long long> cvpromise1{};
 	}
 }
