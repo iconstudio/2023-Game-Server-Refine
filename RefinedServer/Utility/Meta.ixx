@@ -123,8 +123,9 @@ export namespace meta
 	template <typename Seq>
 	struct picker
 	{
+		// this is callable
 		template<size_t I>
-		using result = at<Seq, I>;
+		using result = typename detail::template __at<Seq, I>;
 	};
 
 	// unpack List into the parameters of meta-callable Functor
@@ -541,7 +542,9 @@ export namespace std
 
 	template<size_t Index>
 	struct tuple_element<Index, meta::MetaList<>>
-	{};
+	{
+		static_assert(util::always_false<integral_constant<size_t, Index>>, "tuple_element index out of range");
+	};
 
 	template<typename... Ts>
 	struct tuple_size<meta::MetaList<Ts...>>
