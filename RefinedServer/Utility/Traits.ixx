@@ -4,8 +4,16 @@ export module Utility.Traits;
 
 export namespace util
 {
+	using ::std::integral_constant;
+	using ::std::true_type;
+	using ::std::false_type;
+
 	using ::std::is_same;
 	using ::std::is_same_v;
+	using ::std::conditional;
+	using ::std::conditional_t;
+	using ::std::void_t;
+
 	using ::std::same_as;
 	using ::std::copyable;
 	using ::std::movable;

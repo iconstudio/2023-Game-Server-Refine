@@ -10,12 +10,6 @@ export module Utility;
 
 export namespace util
 {
-	using ::std::true_type;
-	using ::std::false_type;
-	using ::std::conditional;
-	using ::std::conditional_t;
-	using ::std::void_t;
-
 	using ::std::type_identity;
 	using ::std::type_identity_t;
 	using ::std::identity;
