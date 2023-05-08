@@ -43,6 +43,10 @@ export namespace util
 		using reference_type = add_lvalue_reference_t<value_type<Index>>;
 		template <size_t Index>
 		using const_reference_type = add_lvalue_reference_t<value_type<Index>>;
+		template <size_t Index>
+		using rvalue_type = add_rvalue_reference_t<value_type<Index>>;
+		template <size_t Index>
+		using const_rvalue_type = add_rvalue_reference_t<value_type<Index>>;
 
 		template <size_t Index, template<typename> typename Predicate, template<size_t> typename Indexer>
 		static inline constexpr bool nothrowPursuer = (Index == myPlace && Predicate<Fty>)
