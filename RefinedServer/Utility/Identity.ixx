@@ -4,7 +4,7 @@ import Utility.Constraints;
 
 export namespace util
 {
-	template<typename T>
+	template<typename T, typename Tag = void>
 	class [[nodiscard]] Identity
 	{
 	public:
@@ -217,8 +217,8 @@ export namespace util
 	};
 
 
-	template<>
-	class [[nodiscard]] Identity<void>
+	template<typename Tag>
+	class [[nodiscard]] Identity<void, Tag>
 	{
 	public:
 		using value_type = void;
@@ -233,8 +233,11 @@ export namespace util
 		{}
 	};
 
+	template<typename T, typename Tag>
+	Identity(T, Tag) -> Identity<T, Tag>;
+
 	template<typename T>
-	util::Identity(T) -> util::Identity<T>;
+	Identity(T)->Identity<T, void>;
 }
 
 export namespace std
