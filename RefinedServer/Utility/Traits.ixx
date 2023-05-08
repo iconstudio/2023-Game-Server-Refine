@@ -4,15 +4,31 @@ export module Utility.Traits;
 
 export namespace util
 {
+	using ::std::add_const;
+	using ::std::add_const_t;
+	using ::std::add_volatile;
+	using ::std::add_volatile_t;
+	using ::std::add_cv;
+	using ::std::add_cv_t;
+	using ::std::add_pointer;
+	using ::std::add_pointer_t;
+	using ::std::add_lvalue_reference;
+	using ::std::add_lvalue_reference_t;
+	using ::std::add_rvalue_reference;
+	using ::std::add_rvalue_reference_t;
+
+	using ::std::conditional;
+	using ::std::conditional_t;
+	using ::std::enable_if;
+	using ::std::enable_if_t;
+	using ::std::void_t;
+
 	using ::std::integral_constant;
 	using ::std::true_type;
 	using ::std::false_type;
 
 	using ::std::is_same;
 	using ::std::is_same_v;
-	using ::std::conditional;
-	using ::std::conditional_t;
-	using ::std::void_t;
 
 	using ::std::same_as;
 	using ::std::copyable;
