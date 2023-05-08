@@ -739,7 +739,7 @@ export namespace std
 
 namespace util
 {
-	void test_union()
+	static void test_union() noexcept
 	{
 		using aa_t = Union<int, unsigned long, float>;
 		constexpr aa_t aa{};
@@ -770,9 +770,13 @@ namespace util
 		bb_t bb0{};
 		//bb_t bb1{};
 		bb_t bb1(in_place_type<float>, integral_constant<size_t, 0>{}, 4000.034124f);
+		bb0.set(0);
 
 		bb0 = bb1;
 		bb0.reset();
+
+		bb0.try_set<0>(0);
+		bb0.try_set<1>(0UL);
 
 		constexpr Union<int, int, int> cc{};
 		constexpr Union<bool, int, long> dd{};

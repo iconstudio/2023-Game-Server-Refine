@@ -787,7 +787,7 @@ export namespace net
 
 namespace net
 {
-	constexpr void test_promise() noexcept
+	static void test_promise() noexcept
 	{
 		constexpr auto fnl0 = [](const int& v) -> int {
 			return 300;
