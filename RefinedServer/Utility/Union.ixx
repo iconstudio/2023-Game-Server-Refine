@@ -311,12 +311,15 @@ export namespace util
 
 		constexpr void reset() noexcept
 		{
-			if (isExtended)
+			if constexpr (1 < mySize)
 			{
-				_Tail.reset();
+				if (isExtended)
+				{
+					_Tail.reset();
+				}
 			}
 
-			myData = Data{};
+			//myData = Data{};
 			hasValue = false;
 			isExtended = false;
 		}
@@ -427,12 +430,6 @@ export namespace util
 
 			if (other.hasValue)
 			{
-				if (isExtended)
-				{
-					_Tail = {};
-					isExtended = false;
-				}
-
 				myValue = other.myValue;
 				hasValue = true;
 			}
@@ -454,12 +451,6 @@ export namespace util
 
 			if (other.hasValue)
 			{
-				if (isExtended)
-				{
-					_Tail = {};
-					isExtended = false;
-				}
-
 				myValue = move(other.myValue);
 				hasValue = true;
 			}
