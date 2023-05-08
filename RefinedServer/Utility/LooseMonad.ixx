@@ -671,6 +671,11 @@ export namespace util
 			return myStorage.template is_valueless<Index>();
 		}
 
+		constexpr LooseMonad(LooseMonad&&) noexcept = default;
+		constexpr LooseMonad(const LooseMonad&) noexcept = default;
+		constexpr LooseMonad& operator=(LooseMonad&&) noexcept = default;
+		constexpr LooseMonad& operator=(const LooseMonad&) noexcept = default;
+
 	private:
 		base_type myStorage;
 	};
