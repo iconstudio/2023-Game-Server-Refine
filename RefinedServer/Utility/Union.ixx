@@ -8,7 +8,7 @@ import Utility.Meta;
 
 export namespace util
 {
-	template <typename Indexer = integral_constant<size_t, Place>, typename... Ts>
+	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
 	class StaticUnion;
 
 	template <size_t Place>
@@ -601,5 +601,16 @@ export namespace std
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
+	}
+}
+
+namespace util
+{
+	constexpr void test_union()
+	{
+		const StaticUnion<int, int, int> aa{};
+		const StaticUnion<bool, int, long> bb{};
+		const StaticUnion<float, unsigned long long, char> cc{};
+		const StaticUnion<double, unsigned char, short> dd{};
 	}
 }
