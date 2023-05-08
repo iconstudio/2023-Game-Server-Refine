@@ -48,9 +48,13 @@ export namespace util
 		template <size_t Index>
 		using const_rvalue_type = add_rvalue_reference_t<value_type<Index>>;
 
-		template <size_t Index, template<typename> typename Predicate, template<size_t> typename Indexer>
-		static inline constexpr bool nothrowPursuer = (Index == myPlace && Predicate<Fty>)
-			|| (Index != myPlace && 1 < mySize && Predicate<Indexer<Index>>);
+		template <size_t Index, template<size_t> typename Indexer>
+		static inline constexpr bool nothrowCopyPursuer = (Index == myPlace && nothrow_copy_constructibles<Fty>)
+			|| (Index != myPlace && 1 < mySize && nothrow_copy_constructibles<Indexer<Index>>);
+
+		template <size_t Index, template<size_t> typename Indexer>
+		static inline constexpr bool nothrowMovePursuer = (Index == myPlace && nothrow_move_constructibles<Fty>)
+			|| (Index != myPlace && 1 < mySize && nothrow_move_constructibles<Indexer<Index>>);
 
 		// no initialization (no active member)
 		constexpr StaticUnion() noexcept
@@ -167,7 +171,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &
-			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, value_type>)
+			noexcept(nothrowCopyPursuer<Index, value_type>)
 		{
 			if constexpr (Index == Place)
 			{
@@ -195,7 +199,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
-			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, const_value_type>)
+			noexcept(nothrowCopyPursuer<Index, const_value_type>)
 		{
 			if constexpr (Index == Place)
 			{
@@ -223,7 +227,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &&
-			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, value_type>)
+			noexcept(nothrowMovePursuer<Index, value_type>)
 		{
 			if constexpr (Index == Place)
 			{
@@ -251,7 +255,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
-			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, const_value_type>)
+			noexcept(nothrowMovePursuer<Index, const_value_type>)
 		{
 			if constexpr (Index == Place)
 			{
