@@ -37,6 +37,10 @@ export namespace util
 		template <size_t Index>
 		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
 
+		template <size_t Index, template<typename> typename Predicate>
+		static inline constexpr bool nothrowGetter = (Index == myPlace && Predicate<Fty>)
+			|| (Index != myPlace && Predicate<element_type<Index>>);
+
 		// no initialization (no active member)
 		constexpr StaticUnion() noexcept
 		{}
