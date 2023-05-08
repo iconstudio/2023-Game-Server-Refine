@@ -103,7 +103,7 @@ export namespace util
 
 		// Initialize my value with Args
 		template <typename... Args>
-		constexpr explicit StaticUnion(integral_constant<size_t, 0>, Args&&... args)
+		explicit constexpr StaticUnion(integral_constant<size_t, 0>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -112,7 +112,7 @@ export namespace util
 		// Recursively seek the index within Tail
 		template <size_t Index, typename... Args>
 			requires (Index != Place)
-		constexpr explicit StaticUnion(integral_constant<size_t, Index>, Args&&... _Args)
+		explicit constexpr StaticUnion(integral_constant<size_t, Index>, Args&&... _Args)
 			noexcept(nothrow_constructibles<node_type, integral_constant<size_t, Index - 1>, Args...>)
 			: _Tail(integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
 			, isExtended(true)
