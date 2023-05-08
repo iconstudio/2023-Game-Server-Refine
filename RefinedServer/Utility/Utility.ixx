@@ -5,7 +5,6 @@ module;
 #include <memory>
 #include <string>
 #include <string_view>
-
 export module Utility;
 
 export namespace util
