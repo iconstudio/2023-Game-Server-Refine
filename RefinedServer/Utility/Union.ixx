@@ -44,9 +44,9 @@ export namespace util
 		template <size_t Index>
 		using const_reference_type = add_lvalue_reference_t<value_type<Index>>;
 
-		template <size_t Index, template<typename> typename Predicate>
-		static inline constexpr bool nothrowGetter = (Index == myPlace && Predicate<Fty>)
-			|| (Index != myPlace && Predicate<element_type<Index>>);
+		template <size_t Index, template<typename> typename Predicate, template<size_t> typename Indexer>
+		static inline constexpr bool nothrowPursuer = (Index == myPlace && Predicate<Fty>)
+			|| (Index != myPlace && 1 < mySize && Predicate<Indexer<Index>>);
 
 		// no initialization (no active member)
 		constexpr StaticUnion() noexcept
