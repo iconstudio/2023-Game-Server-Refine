@@ -483,30 +483,30 @@ export namespace meta
 		{ fn(seq) } -> std::same_as<Seq>;
 	};
 
-	// enumerate sequence with a function
+	// enumerate sequence with a unary function
 	template <typename Fn, typename Seq, typename Indexer>
 		requires meta_invocables<Fn, Seq>
-	struct enumerate;
+	struct repeat;
 
 	template <typename Fn, typename Seq, typename Indexer = std::make_index_sequence<tsize_v<Seq>>>
 		requires meta_invocables<Fn, Seq>
-	using enumerate_t = typename enumerate<Fn, Seq, Indexer>::template type;
+	using repeat_t = typename repeat<Fn, Seq, Indexer>::template type;
 
 	template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t I, size_t... Indices>
 		requires meta_invocables<Fn, Seq<Ts...>>
-	struct enumerate<Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
-		: enumerate<Fn, invoke_r<bind<Fn, Seq<Ts...>>>, std::index_sequence<Indices...>>
+	struct repeat<Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
+		: repeat<Fn, invoke_r<bind<Fn, Seq<Ts...>>>, std::index_sequence<Indices...>>
 	{};
 
 	template <typename Fn, typename Seq>
-	struct enumerate<Fn, Seq, std::index_sequence<>>
+	struct repeat<Fn, Seq, std::index_sequence<>>
 	{
 		using type = Seq;
 	};
 
 	template <typename Fn, typename Seq, size_t Count>
 		requires meta_invocables<Fn, Seq>
-	using enumerate_n = typename enumerate<Fn, Seq, std::make_index_sequence<Count>>::template type;
+	using repeat_n = typename repeat<Fn, Seq, std::make_index_sequence<Count>>::template type;
 
 	// transform a list of lists of elements into a single list containing those elements
 	template <typename ListOfLists>
@@ -807,18 +807,18 @@ namespace meta
 		// ¿Ã∞≈ ∏«∂•ø° æ≤∏È ≈Õ¡¸
 		//invoke_r<wrap<pop>, test_rp_list>;
 
-		using en0 = enumerate<wrap<pop>, test_rp_list, test_range_0>;
+		using en0 = repeat<wrap<pop>, test_rp_list, test_range_0>;
 		using en0_t = en0::type;
 		using en0_top = front_t<en0_t>;
 		using en0_bot = back_t<en0_t>;
-		using en0_alt = enumerate_n<wrap<pop>, test_rp_list, 0>;
+		using en0_alt = repeat_n<wrap<pop>, test_rp_list, 0>;
 		using en0_alt_top = front_t<en0_alt>;
 		using en0_alt_bot = back_t<en0_alt>;
 
 		static_assert(std::is_same_v<en0_t, MetaList<int, float, double>>, "1");
 		static_assert(std::is_same_v<en0_alt, MetaList<int, float, double>>, "1");
 
-		using en1 = enumerate<wrap<pop>, test_rp_list, test_range_1>;
+		using en1 = repeat<wrap<pop>, test_rp_list, test_range_1>;
 		using en1_t = en1::type;
 		using raw_en1 = invoke_r<bind<wrap<pop>, test_rp_list>>;
 
@@ -826,7 +826,7 @@ namespace meta
 		using en1_top = front_t<en1_t>;
 		using en1_bot = back_t<en1_t>;
 
-		using en2 = enumerate<wrap<pop>, test_rp_list, test_range_2>;
+		using en2 = repeat<wrap<pop>, test_rp_list, test_range_2>;
 		using en2_t = en2::type;
 		using raw_en2 = invoke_r<bind<wrap<pop>, raw_en1>>;
 
@@ -834,14 +834,14 @@ namespace meta
 		using en2_top = front_t<en2_t>;
 		using en2_bot = back_t<en2_t>;
 
-		using en3 = enumerate<wrap<pop>, test_rp_list, test_range_3>;
+		using en3 = repeat<wrap<pop>, test_rp_list, test_range_3>;
 		using en3_t = en3::type;
 
 		static_assert(std::is_same_v<en3_t, MetaList<>>, "3");
 		//using en3_top = front_t<en3_t>;
 		//using en3_bot = back_t<en3_t>;
 
-		using en4_t = enumerate_t<wrap<pop>, test_rp_list>;
+		using en4_t = repeat_t<wrap<pop>, test_rp_list>;
 
 		static_assert(std::is_same_v<en4_t, MetaList<>>, "4");
 		//using en4_top = front_t<en4_t>;
