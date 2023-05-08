@@ -34,7 +34,7 @@ export namespace util
 		static inline constexpr size_t relativeIndex = Index - Place;
 
 		template <size_t Index>
-		using element_type = meta::at<meta::MetaList<Fty, Rty...>, Index>;
+		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
 		template <size_t Index>
 		using value_type = clean_t<element_type<Index>>;
 		template <size_t Index>
