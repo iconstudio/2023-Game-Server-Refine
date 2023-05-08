@@ -187,11 +187,11 @@ export namespace net
 		monad_t myState;
 	};
 
-	template<>
-	class Promise<void, void> final
+	template<typename T>
+	class Promise<T, void> final
 	{
 	public:
-		using succeed_t = io::success_t<void>;
+		using succeed_t = io::success_t<T>;
 		using failed_t = io::error_t<void>;
 		using defered_t = io::defer_t;
 		using monad_t = util::LooseMonad<succeed_t, failed_t, defered_t>;
@@ -220,8 +220,12 @@ export namespace net
 			: myState(static_cast<monad_t&&>(state))
 		{}
 
-		constexpr Promise(succeed_t) noexcept
-			: myState(util::in_place_type<succeed_t>, io::success)
+		constexpr Promise(const succeed_t& success) noexcept
+			: myState(util::in_place_type<succeed_t>, success)
+		{}
+
+		constexpr Promise(succeed_t&& success) noexcept
+			: myState(util::in_place_type<succeed_t>, util::move(success))
 		{}
 
 		constexpr Promise(failed_t) noexcept
@@ -442,6 +446,36 @@ export namespace net
 			{
 				return fwd_result_t{ util::nullopt };
 			}
+		}
+		
+		consteval void GetSuccess() const noexcept
+			requires (!util::notvoids<T>)
+		{
+			return;
+		}
+
+		constexpr auto GetSuccess() & noexcept
+			requires util::notvoids<T>
+		{
+			return myState.get<succeed_t>();
+		}
+
+		constexpr auto GetSuccess() const& noexcept
+			requires util::notvoids<T>
+		{
+			return myState.get<succeed_t>();
+		}
+
+		constexpr auto GetSuccess() && noexcept
+			requires util::notvoids<T>
+		{
+			return util::move(myState).get<succeed_t>();
+		}
+
+		constexpr auto GetSuccess() const&& noexcept
+			requires util::notvoids<T>
+		{
+			return util::move(myState).get<succeed_t>();
 		}
 
 		constexpr bool IsSuccess() const noexcept
