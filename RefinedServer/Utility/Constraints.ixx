@@ -7,7 +7,7 @@ export import Utility.Traits;
 export namespace util
 {
 	template<typename Derived>
-	concept crtp = std::is_class_v<Derived> && std::same_as<Derived, std::remove_cv_t<Derived>>;
+	concept crtp = std::is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>;
 
 	template<typename T>
 	concept notvoids = !std::same_as<std::decay_t<clean_t<T>>, void>;
@@ -29,6 +29,18 @@ export namespace util
 
 	template<typename T, typename Result, typename... Args>
 	concept r_invocables = !std::is_abstract_v<clean_t<T>> && std::invocable<T, Args...>&& std::is_invocable_r_v<Result, T, Args...>;
+
+	template<typename Fn, typename T>
+	concept lv_invocable = invocables<Fn, conditional_t<same_as<clean_t<T>, void>, void, add_lvalue_reference_t<remove_const_t<T>>>>;
+
+	template<typename Fn, typename T>
+	concept rv_invocable = invocables<Fn, conditional_t<same_as<clean_t<T>, void>, void, add_rvalue_reference_t<remove_const_t<T>>>>;
+
+	template<typename Fn, typename T>
+	concept cl_invocable = invocables<Fn, conditional_t<same_as<clean_t<T>, void>, void, add_lvalue_reference_t<add_const_t<T>>>>;
+
+	template<typename Fn, typename T>
+	concept cr_invocable = invocables<Fn, conditional_t<same_as<clean_t<T>, void>, void, add_rvalue_reference_t<add_const_t<T>>>>;
 
 	template<typename T>
 	concept aggregate_classes = classes<T> && std::is_aggregate_v<clean_t<T>>;
