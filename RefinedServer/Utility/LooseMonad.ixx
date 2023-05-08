@@ -242,6 +242,78 @@ export namespace util
 			}
 		}
 
+		template<typename T, invocables<T&> Fn>
+		inline constexpr
+			monad_result_t<Fn, T&>
+			and_then(Fn&& action) &
+			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, T&>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<T>())
+			{
+				return forward<Fn>(action)(myStorage.template get<T>());
+			}
+			else
+			{
+				return monad_result_t<Fn, T&>{ nullopt };
+			}
+		}
+
+		template<typename T, invocables<const T&> Fn>
+		inline constexpr
+			monad_result_t<Fn, const T&>
+			and_then(Fn&& action) const&
+			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, const T&>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<T>())
+			{
+				return forward<Fn>(action)(myStorage.template get<T>());
+			}
+			else
+			{
+				return monad_result_t<Fn, const T&>{ nullopt };
+			}
+		}
+
+		template<typename T, invocables<T&&> Fn>
+		inline constexpr
+			monad_result_t<Fn, T&&>
+			and_then(Fn&& action) &&
+			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, T&&>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<T>())
+			{
+				return forward<Fn>(action)(move(myStorage).template get<T>());
+			}
+			else
+			{
+				return monad_result_t<Fn, T&&>{ nullopt };
+			}
+		}
+
+		template<typename T, invocables<const T&&> Fn>
+		inline constexpr
+			monad_result_t<Fn, const T&&>
+			and_then(Fn&& action) const&&
+			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
+		{
+			static_assert(!same_as<monad_result_t<Fn, const T&&>, void>, "Monadic result cannot be void.");
+
+			if (myStorage.template has_value<T>())
+			{
+				return forward<Fn>(action)(move(myStorage).template get<T>());
+			}
+			else
+			{
+				return monad_result_t<Fn, const T&&>{ nullopt };
+			}
+		}
+
 		template<size_t Index, invocables Fn>
 		inline constexpr
 			LooseMonad&
