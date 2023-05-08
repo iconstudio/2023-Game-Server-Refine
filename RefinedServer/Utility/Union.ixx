@@ -166,7 +166,7 @@ export namespace util
 			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
-			get()&
+			get() &
 			noexcept(nothrowPursuer<Index, nothrow_copy_constructibles, value_type>)
 		{
 			if constexpr (Index == Place)
@@ -209,7 +209,7 @@ export namespace util
 			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
-			get()&&
+			get() &&
 			noexcept(nothrowPursuer<Index, nothrow_move_constructibles, value_type>)
 		{
 			if constexpr (Index == Place)
