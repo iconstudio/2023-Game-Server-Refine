@@ -120,8 +120,10 @@ namespace net
 		bb0 = bb1;
 		bb0.reset();
 
-		bb0.try_set<0>(0);
-		bb0.try_set<1>(0UL);
+		// PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float, double>
+		auto& rb0_tset_0 = bb0.try_set<0>(0);
+		// PlacedVariant<integral_constant<size_t, 1>, unsigned long, float, double>
+		auto& rb0_tset_1 = bb0.try_set<1>(0UL);
 
 		constexpr util::Union<int, int, int> cc{};
 		constexpr util::Union<bool, int, long> dd{};

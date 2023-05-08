@@ -7,20 +7,20 @@ import Utility.Traits;
 namespace meta::detail
 {
 	template <typename Ty, size_t>
-	using enumerator = Ty;
+	using item = Ty;
 
 	template <typename, typename, template <typename...> typename>
-	struct enumerate;
+	struct invoke_args;
 
 	template <typename T, size_t... Indices, template <typename...> class Predicate>
-	struct enumerate<T, std::index_sequence<Indices...>, Predicate>
+	struct invoke_args<T, std::index_sequence<Indices...>, Predicate>
 	{
-		using type = typename Predicate<enumerator<T, Indices>...>;
+		using type = typename Predicate<item<T, Indices>...>;
 	};
 
 	// construct a sequence consisting of repetitions of T
 	template <size_t Count, typename T, template <typename...> typename Predicate>
-	using create = typename enumerate<T, std::make_index_sequence<Count>, Predicate>::template type;
+	using create = typename invoke_args<T, std::make_index_sequence<Count>, Predicate>::template type;
 
 	template <size_t Index, typename Void, template <typename...> typename Seq, typename...>
 	struct __at_impl;
@@ -152,6 +152,43 @@ export namespace meta
 
 	template <typename Fn, class Seq>
 	using transform_t = typename transform<Fn, Seq>::type;
+
+	template <typename Ty, size_t>
+	using repeater = Ty;
+
+	template <typename Seq, typename Fn, typename Indexer>
+	struct repeat;
+
+	template <typename T, typename Fn, typename Indexer>
+	using repeat_t = typename repeat<T, Fn, Indexer>::type;
+
+	template <template <typename...> typename Seq, typename Fn, size_t... Indices, typename... Ts>
+	struct repeat<Seq<Ts...>, Fn, std::index_sequence<Indices...>>
+	{
+		using type = Seq<invoke_r<Fn, repeater<Ts, Indices>>...>;
+	};
+
+	template <template <typename...> typename Seq, typename Fn>
+	struct repeat<Seq, Fn, std::index_sequence<>>
+	{};
+
+	template <typename Fn, typename T, typename... Ts>
+	struct foldl;
+
+	template <typename Fn, typename T, typename... Ts>
+	using foldl_t = typename foldl<Fn, T, Ts...>::type;
+
+	template <typename Fn, typename T, typename U, typename... Rests>
+	struct foldl<Fn, T, U, Rests...>
+	{
+		using type = typename foldl<Fn, invoke_r<Fn, T, U>, Rests...>::type;
+	};
+
+	template <typename Fn, typename T>
+	struct foldl<Fn, T>
+	{
+		using type = T;
+	};
 
 	template <typename Seq>
 	struct front;
@@ -402,7 +439,7 @@ export namespace meta
 
 	// construct a sequence consisting of repetitions of T
 	template <size_t Count, typename T, template <typename...> typename Predicate>
-	using create = typename detail::enumerate<T, std::make_index_sequence<Count>, Predicate>::template type;
+	using create = typename detail::invoke_args<T, std::make_index_sequence<Count>, Predicate>::template type;
 
 	// get the type at Index in Sequence
 	template <typename Seq, size_t Index>
