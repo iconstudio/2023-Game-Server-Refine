@@ -183,11 +183,16 @@ export namespace util
 
 export namespace std
 {
-	template<typename T>
+	template<util::notvoids T>
 	constexpr void
 		swap(util::Identity<T>& lhs, util::Identity<T>& rhs)
 		noexcept(util::nothrow_swappables<T>)
 	{
 		return lhs.swap(rhs);
 	}
+
+	constexpr void
+		swap(util::Identity<void>& lhs, util::Identity<void>& rhs)
+		noexcept
+	{}
 }
