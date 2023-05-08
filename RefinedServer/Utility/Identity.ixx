@@ -232,6 +232,9 @@ export namespace util
 		constexpr void operator*() const noexcept
 		{}
 	};
+
+	template<typename T>
+	util::Identity(T) -> util::Identity<T>;
 }
 
 export namespace std
