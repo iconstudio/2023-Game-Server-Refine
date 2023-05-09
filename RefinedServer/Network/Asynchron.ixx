@@ -15,9 +15,6 @@ export namespace net
 		using crtp_type = T;
 		using id_type = ID;
 
-		Asynchron(Asynchron&& other) noexcept = default;
-		Asynchron& operator=(Asynchron&& other) noexcept = default;
-
 		explicit constexpr Asynchron(const ID& id) noexcept
 			: base(id), Context()
 		{}
@@ -26,6 +23,12 @@ export namespace net
 			: base(util::move(id)), Context()
 		{}
 
-		constexpr ~Asynchron() noexcept = default;
+		constexpr ~Asynchron() noexcept
+		{}
+
+		Asynchron(const Asynchron& other) noexcept = delete;
+		Asynchron& operator=(const Asynchron& other) noexcept = delete;
+		Asynchron(Asynchron&& other) noexcept = default;
+		Asynchron& operator=(Asynchron&& other) noexcept = default;
 	};
 }

@@ -8,10 +8,10 @@ export namespace net
 	class [[nodiscard]] alignas(unsigned long long) Address
 	{
 	public:
-		constexpr Address(const AddressFamily& family, const char(&ip)[16], const unsigned short& port) noexcept
-			: addressFamily(family), protocolType(IProtocolTypes::TCP)
+		explicit constexpr Address(const AddressFamily& family, const char(&ip)[16], const unsigned short& port) noexcept
+			: isStatic(true)
+			, addressFamily(family), protocolType(IProtocolTypes::TCP)
 			, myIP(), myPort(util::move(port))
-			, isStatic(false)
 		{
 			if (util::is_constant_evaluated())
 			{
@@ -23,10 +23,10 @@ export namespace net
 			}
 		}
 
-		constexpr Address(const AddressFamily& family, const IProtocolTypes& protocol, const unsigned short& port) noexcept
-			: addressFamily(family), protocolType(protocol)
+		explicit constexpr Address(const AddressFamily& family, const IProtocolTypes& protocol, const unsigned short& port) noexcept
+			: isStatic(true)
+			, addressFamily(family), protocolType(protocol)
 			, myIP(), myPort(port)
-			, isStatic(true)
 		{}
 
 		inline EndPoint Serialize() const noexcept
@@ -71,12 +71,17 @@ export namespace net
 			return isStatic;
 		}
 
+		constexpr Address(const Address& other) noexcept = default;
+		constexpr Address(Address&& other) noexcept = default;
+		constexpr Address& operator=(const Address& other) noexcept = default;
+		constexpr Address& operator=(Address&& other) noexcept = default;
+		constexpr ~Address() noexcept = default;
+
 	private:
-		const AddressFamily addressFamily;
-		const IProtocolTypes protocolType;
+		bool isStatic;
+		AddressFamily addressFamily;
+		IProtocolTypes protocolType;
 		char myIP[16];
 		unsigned short myPort;
-
-		const bool isStatic;
 	};
 }

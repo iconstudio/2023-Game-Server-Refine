@@ -29,10 +29,36 @@ export namespace util
 		using const_rvalue_type = const element_type<Index>&&;
 
 		constexpr LooseMonad() noexcept
+			: myStorage()
 		{}
 
 		constexpr LooseMonad(nullopt_t) noexcept
+			: myStorage()
 		{}
+
+		constexpr LooseMonad(const LooseMonad& other)
+			noexcept(nothrow_copy_constructibles<Ts...>) requires(copy_constructibles<Ts...>)
+			: myStorage(other.myStorage)
+		{}
+
+		constexpr LooseMonad(LooseMonad&& other)
+			noexcept(nothrow_move_constructibles<Ts...>) requires(move_constructibles<Ts...>)
+			: myStorage(static_cast<LooseMonad&&>(other).myStorage)
+		{}
+
+		constexpr LooseMonad& operator=(const LooseMonad& other)
+			noexcept(nothrow_copy_assignables<Ts...>)  requires(copy_assignables<Ts...>)
+		{
+			myStorage = other.myStorage;
+			return *this;
+		}
+
+		constexpr LooseMonad& operator=(LooseMonad&& other)
+			noexcept(nothrow_move_assignables<Ts...>)  requires(move_assignables<Ts...>)
+		{
+			myStorage = util::move(other.myStorage);
+			return *this;
+		}
 
 		template <typename T>
 			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !same_as<clean_t<T>, in_place_type_t> && !same_as<clean_t<T>, in_place_index_t>)
@@ -671,11 +697,6 @@ export namespace util
 			return myStorage.template is_valueless<Index>();
 		}
 
-		constexpr LooseMonad(LooseMonad&&) noexcept = default;
-		constexpr LooseMonad(const LooseMonad&) noexcept = default;
-		constexpr LooseMonad& operator=(LooseMonad&&) noexcept = default;
-		constexpr LooseMonad& operator=(const LooseMonad&) noexcept = default;
-
 	private:
 		base_type myStorage;
 	};
@@ -769,7 +790,7 @@ namespace util::test
 {
 	constexpr void do_something() noexcept {}
 
-	constexpr void test_loose() noexcept
+	void test_loose() noexcept
 	{
 		const LooseMonad<int, float> a0{};
 		const LooseMonad<int, float> b0{ std::in_place_index<0>, 1 };

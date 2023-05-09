@@ -146,7 +146,7 @@ export namespace util
 		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
 			requires (make_conjunction<std::is_trivially_destructible, Fty, Rty...>)
-		{}
+		= default;
 
 		constexpr PlacedVariant& operator=(nullopt_t) noexcept
 		{
@@ -747,7 +747,7 @@ export namespace std
 	}
 }
 
-#pragma warning(push, 1)
+#pragma warning(push, 0)
 namespace util::test
 {
 	void test_union() noexcept

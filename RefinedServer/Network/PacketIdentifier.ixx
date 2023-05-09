@@ -116,6 +116,18 @@ export namespace std
 			case net::packetid_t::SC_RESPOND_ROOMS:
 			return "RESPOND_ROOMS";
 
+			case net::packetid_t::SC_SIGNIN_SUCCESS:
+			return "SIGNIN_SUCCESS";
+
+			case net::packetid_t::SC_SIGNIN_FAILURE:
+			return "SIGNIN_FAILURE";
+
+			case net::packetid_t::SC_SIGNUP_SUCCESS:
+			return "SIGNUP_SUCCESS";
+
+			case net::packetid_t::SC_SIGNUP_FAILURE:
+			return "SIGNUP_FAILURE";
+
 			case net::packetid_t::SC_GAME_START:
 			return "START";
 

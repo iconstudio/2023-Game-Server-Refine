@@ -329,7 +329,8 @@ export namespace util
 	}
 }
 
-namespace util
+#pragma warning(push, 1)
+namespace util::test
 {
 	static void test_print()
 	{
@@ -356,6 +357,7 @@ namespace util
 		PrintSynced(L"Hello, World!\n");
 	}
 }
+#pragma warning(pop)
 
 extern "C++" template<bool, typename Char, typename ...Args>
 static FORCEIN void

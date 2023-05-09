@@ -34,7 +34,19 @@ export namespace net
 		{}
 
 	public:
-		constexpr CompletionPort() noexcept = default;
+		constexpr CompletionPort() noexcept
+			: rawHandle(INVALID_HANDLE_VALUE)
+		{}
+
+		constexpr CompletionPort(CompletionPort&& handle) noexcept
+			: rawHandle(static_cast<HANDLE&&>(handle.rawHandle))
+		{}
+
+		constexpr CompletionPort& operator=(CompletionPort&& handle) noexcept
+		{
+			rawHandle = static_cast<HANDLE&&>(handle.rawHandle);
+			return *this;
+		}
 
 		~CompletionPort()
 		{
@@ -48,7 +60,7 @@ export namespace net
 		{
 			const HANDLE handle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, concurrent_hint);
 
-			return static_cast<CompletionPort&&>(CompletionPort{ handle });
+			return CompletionPort{ handle };
 		}
 
 		inline bool Link(const SOCKET& target, const ullong& unique_id) noexcept
@@ -103,8 +115,6 @@ export namespace net
 
 		CompletionPort(const CompletionPort& handle) = delete;
 		CompletionPort& operator=(const CompletionPort& handle) = delete;
-		CompletionPort(CompletionPort&& handle) = default;
-		CompletionPort& operator=(CompletionPort&& handle) = default;
 
 	private:
 		HANDLE rawHandle;

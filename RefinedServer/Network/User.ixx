@@ -18,7 +18,12 @@ export namespace net
 			: BasicUser(id)
 		{}
 
-		constexpr ~User() noexcept = default;
+		constexpr ~User() noexcept
+		{}
 
+		User(const User& other) = delete;
+		User(User&& other) = delete;
+		User& operator=(const User& other) = delete;
+		User& operator=(User&& other) = delete;
 	};
 }

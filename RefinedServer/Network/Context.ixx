@@ -41,7 +41,8 @@ namespace net
 			return *this;
 		}
 
-		constexpr ~Context() noexcept = default;
+		constexpr ~Context() noexcept
+		{}
 
 		inline bool SetOperation(const Operation& prev_op, const Operation& op) & noexcept
 		{
@@ -274,9 +275,10 @@ export namespace std
 	};
 }
 
-namespace net
+#pragma warning(push, 1)
+namespace net::test
 {
-	static void test_basic_context()
+	void test_basic_context() noexcept
 	{
 		Context ctx1{ Operation::WELCOME };
 		const Context ctx2{ Operation::RECV };
@@ -304,4 +306,5 @@ namespace net
 		//constexpr Context ctx18{ util::move(ctx3) };
 	}
 }
+#pragma warning(pop)
 #pragma warning(pop)

@@ -7,15 +7,22 @@ import Utility.Identity;
 export namespace util
 {
 	template<typename T>
-	class [[nodiscard]] Monad
+	class [[nodiscard]] Monad;
+
+	template<notvoids T>
+	class [[nodiscard]] Monad<T>
 	{
 	public:
 		static_assert(!same_as<T, nullopt_t>, "T must not be nullopt_t.");
 
 		using base_type = Identity<T>;
 		using value_type = T;
+		template<typename U>
+		using rebind_base = Identity<U>;
+		template<typename U>
+		using rebind = Monad<U>;
 
-		constexpr Monad()
+		explicit constexpr Monad()
 			noexcept(nothrow_constructibles<T>)
 			: myStorage()
 		{}
@@ -24,6 +31,44 @@ export namespace util
 			noexcept(nothrow_constructibles<T>)
 			: myStorage()
 		{}
+
+		constexpr Monad(const Monad& other)
+			noexcept(nothrow_copy_constructibles<T>) requires(copy_constructibles<T>)
+			: myStorage(other.myStorage)
+		{}
+
+		constexpr Monad(Monad&& other)
+			noexcept(nothrow_move_constructibles<T>) requires(move_constructibles<T>)
+			: myStorage(static_cast<rebind_base<T>&&>(other.myStorage))
+		{}
+
+		constexpr Monad& operator=(const Monad& other) &
+			noexcept(nothrow_copy_assignables<T>) requires(copy_assignables<T>)
+		{
+			myStorage = other.myStorage;
+			return *this;
+		}
+
+		constexpr Monad&& operator=(const Monad& other) &&
+			noexcept(nothrow_copy_assignables<T>) requires(copy_assignables<T>)
+		{
+			myStorage = other.myStorage;
+			return static_cast<Monad&&>(*this);
+		}
+
+		constexpr Monad& operator=(Monad&& other) &
+			noexcept(nothrow_move_assignables<T>) requires(move_assignables<T>)
+		{
+			myStorage = static_cast<rebind_base<T>&&>(other.myStorage);
+			return *this;
+		}
+
+		constexpr Monad&& operator=(Monad&& other) &&
+			noexcept(nothrow_move_assignables<T>) requires(move_assignables<T>)
+		{
+			myStorage = static_cast<rebind_base<T>&&>(other.myStorage);
+			return static_cast<Monad&&>(*this);
+		}
 
 		constexpr Monad(const T& fwd)
 			noexcept(nothrow_copy_constructibles<T>)
@@ -704,11 +749,8 @@ export namespace util
 			return hasValue;
 		}
 
-		constexpr Monad(const Monad&) noexcept(nothrow_copy_constructibles<T>) = default;
-		constexpr Monad(Monad&&) noexcept(nothrow_move_constructibles<T>) = default;
-		constexpr Monad& operator=(const Monad&) noexcept(nothrow_copy_assignables<T>) = default;
-		constexpr Monad& operator=(Monad&&) noexcept(nothrow_move_assignables<T>) = default;
-		constexpr ~Monad() noexcept(nothrow_destructibles<T>) = default;
+		constexpr ~Monad()
+			noexcept(nothrow_destructibles<T>) = default;
 
 	private:
 		Identity<T> myStorage;

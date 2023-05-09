@@ -15,12 +15,22 @@ export namespace util
 			: myValue()
 		{}
 
-		constexpr Identity(const T& value)
+		constexpr Identity(const Identity& other)
+			noexcept(nothrow_copy_constructibles<T>) requires(copy_constructibles<T>)
+			: myValue(other.myValue)
+		{}
+
+		constexpr Identity(Identity&& other)
+			noexcept(nothrow_move_constructibles<T>) requires(move_constructibles<T>)
+			: myValue(static_cast<T&&>(other.myValue))
+		{}
+
+		explicit constexpr Identity(const T& value)
 			noexcept(nothrow_copy_constructibles<T>) requires(copy_constructibles<T>)
 			: myValue(value)
 		{}
 
-		constexpr Identity(T&& value)
+		explicit constexpr Identity(T&& value)
 			noexcept(nothrow_move_constructibles<T>) requires(move_constructibles<T>)
 			: myValue(static_cast<T&&>(value))
 		{}
@@ -137,8 +147,6 @@ export namespace util
 			return static_cast<const T&&>(myValue);
 		}
 
-		constexpr Identity(const Identity&) noexcept(nothrow_copy_constructibles<T>) = default;
-		constexpr Identity(Identity&&) noexcept(nothrow_move_constructibles<T>) = default;
 		constexpr ~Identity() noexcept(nothrow_destructibles<T>) = default;
 
 	private:

@@ -80,12 +80,12 @@ export namespace net
 	{
 	public:
 		constexpr Socket() noexcept
-			: myHandle(abi::InvalidSocket), isOut(false)
+			: isOut(false), myHandle(abi::InvalidSocket)
 			, myAddress(), myEndPoint()
 		{}
 
 		constexpr Socket(Socket&& other) noexcept
-			: myHandle(static_cast<::SOCKET&&>(other.myHandle)), isOut(false)
+			: isOut(false), myHandle(static_cast<::SOCKET&&>(other.myHandle))
 			, myAddress(), myEndPoint()
 		{
 			other.isOut = true;
@@ -100,11 +100,11 @@ export namespace net
 		}
 
 		explicit constexpr Socket(const SOCKET& handle) noexcept
-			: myHandle(handle), isOut(false)
+			: isOut(false), myHandle(handle)
 		{}
 
 		explicit constexpr Socket(SOCKET&& handle) noexcept
-			: myHandle(static_cast<SOCKET&&>(handle)), isOut(false)
+			: isOut(false), myHandle(static_cast<SOCKET&&>(handle))
 		{}
 
 		~Socket() noexcept
@@ -117,7 +117,7 @@ export namespace net
 
 		ioError BeginRecv(WSABUF& buffer, Context* context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
 		{
-			return io::Execute(::WSARecv, myHandle, &buffer, 1, bytes, &flags, context, nullptr);
+			return io::Execute(::WSARecv, myHandle, &buffer, 1UL, bytes, &flags, context, nullptr);
 		}
 
 		inline ioError Bind(const EndPoint& target) noexcept
@@ -149,17 +149,31 @@ export namespace net
 			return myHandle != INVALID_SOCKET;
 		}
 
+		inline constexpr bool IsValid() const volatile noexcept
+		{
+			return myHandle != INVALID_SOCKET;
+		}
+
 		inline constexpr bool IsOut() const noexcept
 		{
 			return isOut;
 		}
 
+		inline constexpr bool IsOut() const volatile noexcept
+		{
+			return isOut;
+		}
+
 		Socket(const Socket& other) = delete;
+		Socket(const volatile Socket& other) = delete;
 		Socket& operator=(const Socket& other) = delete;
+		Socket& operator=(const volatile Socket& other) = delete;
+		Socket& operator=(const Socket& other) volatile = delete;
+		Socket& operator=(const volatile Socket& other) volatile = delete;
 
 	private:
+		volatile bool isOut;
 		SOCKET myHandle;
 		EndPoint myAddress, myEndPoint;
-		volatile bool isOut;
 	};
 }

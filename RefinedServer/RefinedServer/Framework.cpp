@@ -7,6 +7,9 @@ using namespace net;
 
 Framework::Framework() noexcept
 	: Singleton(this)
+	, ioPort()
+	, nameSocket(), nameEndPoint()
+	, everySession(), everyUser()
 {}
 
 void Framework::Awake()
@@ -35,7 +38,7 @@ void Framework::UpdateOnce(const float& delta_time) noexcept
 
 Proxy Framework::BeginAccept()
 {
-	return {};
+	return Proxy{};
 }
 
 void Framework::EndAccept() noexcept
@@ -46,7 +49,7 @@ void Framework::EndFailedAccept() noexcept
 
 Proxy Framework::BeginWelcome()
 {
-	return {};
+	return Proxy{};
 }
 
 void Framework::EndWelcome() noexcept
@@ -57,7 +60,7 @@ void Framework::EndFailedWelcome() noexcept
 
 Proxy Framework::BeginDispose()
 {
-	return {};
+	return Proxy{};
 }
 
 void Framework::EndDispose() noexcept

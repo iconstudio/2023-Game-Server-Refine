@@ -38,13 +38,18 @@ public:
 	bool Poll() noexcept;
 	bool Post() noexcept;
 
+	Framework(Framework& other) = delete;
+	Framework& operator=(Framework& other) = delete;
+	Framework(Framework&& other) = delete;
+	Framework& operator=(Framework&& other) = delete;
+
 private:
-	net::Proxy Close(net::Socket& socket);
+	net::Proxy Close(net::Socket& socket) noexcept;
 
 	static inline constexpr size_t maxNPCs = 1000;
 	static inline constexpr size_t maxUsers = 1000;
 
-	net::CompletionPort ioService;
+	net::CompletionPort ioPort;
 	net::Socket nameSocket;
 	net::EndPoint nameEndPoint;
 

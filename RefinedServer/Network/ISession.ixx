@@ -70,29 +70,66 @@ export namespace net
 		using id_type = ID;
 
 		Session(Session&& other) noexcept
-			: myID(static_cast<Session&&>(other).MyID())
-			, isTaken(static_cast<Session&&>(other).IsTaken())
+			: isTaken(static_cast<Session&&>(other).IsTaken())
+			, myID(static_cast<Session&&>(other).MyID())
+		{}
+
+		Session(volatile Session&& other) noexcept
+			: isTaken(static_cast<volatile Session&&>(other).IsTaken())
+			, myID(static_cast<volatile Session&&>(other).MyID())
 		{}
 
 		explicit constexpr Session(const ID& id) noexcept
-			: myID(id)
-			, isTaken(false)
+			: isTaken(false)
+			, myID(id)
 		{}
 
 		explicit constexpr Session(ID&& id) noexcept
-			: myID(static_cast<ID&&>(id))
-			, isTaken(false)
+			: isTaken(false)
+			, myID(static_cast<ID&&>(id))
 		{}
 
 		inline Session& operator=(Session&& other) noexcept
 		{
 			myID = static_cast<Session&&>(other).MyID();
 			isTaken = static_cast<Session&&>(other).IsTaken();
+
+			return *this;
 		}
 
-		constexpr ~Session() noexcept = default;
+		inline volatile Session& operator=(Session&& other) volatile noexcept
+		{
+			myID = static_cast<Session&&>(other).MyID();
+			isTaken = static_cast<Session&&>(other).IsTaken();
+
+			return *this;
+		}
+
+		inline Session& operator=(volatile Session&& other) noexcept
+		{
+			myID = static_cast<volatile Session&&>(other).MyID();
+			isTaken = static_cast<volatile Session&&>(other).IsTaken();
+
+			return *this;
+		}
+
+		inline volatile Session& operator=(volatile Session&& other) volatile noexcept
+		{
+			myID = static_cast<volatile Session&&>(other).MyID();
+			isTaken = static_cast<volatile Session&&>(other).IsTaken();
+
+			return *this;
+		}
+
+		constexpr ~Session() noexcept
+		{}
 
 		inline bool Take() & noexcept
+		{
+			return util::CompareAndSet(isTaken, false, true);
+		}
+
+		inline bool Take() volatile& noexcept
 		{
 			return util::CompareAndSet(isTaken, false, true);
 		}
@@ -102,7 +139,17 @@ export namespace net
 			while (!util::CompareAndSet(isTaken, true, false));
 		}
 
+		inline void Return() volatile& noexcept
+		{
+			while (!util::CompareAndSet(isTaken, true, false));
+		}
+
 		inline bool IsTaken() const noexcept
+		{
+			return isTaken.load(util::memory_order_relaxed);
+		}
+
+		inline bool IsTaken() const volatile noexcept
 		{
 			return isTaken.load(util::memory_order_relaxed);
 		}
@@ -114,9 +161,21 @@ export namespace net
 		}
 
 		[[nodiscard]]
+		inline constexpr const ID MyID() const volatile& noexcept
+		{
+			return myID;
+		}
+
+		[[nodiscard]]
 		inline constexpr ID&& MyID() && noexcept
 		{
 			return static_cast<ID&&>(myID);
+		}
+
+		[[nodiscard]]
+		inline constexpr volatile ID&& MyID() volatile&& noexcept
+		{
+			return static_cast<volatile ID&&>(myID);
 		}
 
 		[[nodiscard]]
@@ -126,9 +185,21 @@ export namespace net
 		}
 
 		[[nodiscard]]
+		explicit inline constexpr operator ID() const volatile& noexcept
+		{
+			return myID;
+		}
+
+		[[nodiscard]]
 		explicit inline constexpr operator ID() && noexcept
 		{
 			return static_cast<ID&&>(myID);
+		}
+
+		[[nodiscard]]
+		explicit inline constexpr operator ID() volatile&& noexcept
+		{
+			return static_cast<volatile ID&&>(myID);
 		}
 
 		[[nodiscard]]
@@ -172,14 +243,17 @@ export namespace net
 			return util::to_underlying(myID) <=> util::to_underlying(other.myID);
 		}
 
-	protected:
-		ID myID;
+		Session(const Session& other) = delete;
+		Session& operator=(const Session& other) = delete;
 
-		volatile util::atomic_bool isTaken;
+	protected:
+		util::atomic_bool isTaken;
+		ID myID;
 	};
 }
 
-namespace net
+#pragma warning(push, 1)
+namespace net::test
 {
 	enum TestIDEN1
 	{
@@ -197,7 +271,7 @@ namespace net
 	class TestCL
 	{};
 
-	static void test_session() noexcept
+	void test_session() noexcept
 	{
 		//auto a = detail::declenum(bool{});
 		//auto b = detail::declenum(int{});
@@ -238,3 +312,4 @@ namespace net
 		//constexpr Session<TestIDEN3, float> id6{ 20.010523029f };
 	}
 }
+#pragma warning(pop)
