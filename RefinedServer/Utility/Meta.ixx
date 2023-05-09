@@ -384,7 +384,7 @@ export namespace meta
 	{};
 
 	// get typeparams' count of sequence
-	template <typename>
+	template <typename T>
 	struct tsize : public std::integral_constant<size_t, 0>
 	{};
 
@@ -397,14 +397,28 @@ export namespace meta
 	{};
 
 	template <typename T>
-	inline constexpr size_t tsize_v = tsize<T>::value;
+	struct empty;
+
+	template <template <typename...> typename Seq, typename... Ts>
+	struct empty<Seq<Ts...>> : public std::bool_constant<sizeof...(Ts) == 0>
+	{};
+
+	template <template <typename...> typename Seq>
+	struct empty<Seq<>> : public std::true_type
+	{};
+
+	template <typename T>
+	inline constexpr bool empty_v = empty<T>::template value;
+
+	template <typename T>
+	inline constexpr size_t tsize_v = tsize<T>::template value;
 
 	// get byte size of sequence
 	template <typename...>
 	struct byte_size;
 
 	template <typename... Ts>
-	inline constexpr size_t byte_size_v = byte_size<Ts...>::value;
+	inline constexpr size_t byte_size_v = byte_size<Ts...>::template value;
 
 	template <typename T>
 	struct byte_size<T> : public std::integral_constant<size_t, sizeof(T)>
@@ -433,10 +447,27 @@ export namespace meta
 		using type = List<Ts...>;
 	};
 
+	template <>
+	struct concat<void>
+	{};
+
 	template <template <typename...> typename List, typename... Ts0, typename... Ts1>
 	struct concat<List<Ts0...>, List<Ts1...>>
 	{
 		using type = List<Ts0..., Ts1...>;
+	};
+
+	template <template <typename...> typename List, typename... Ts>
+	struct concat<List<Ts...>, void>
+	{
+		using type = List<Ts...>;
+	};
+
+	template <template <typename...> typename List, typename... Ts>
+	struct concat<void, List<Ts...>>
+	{
+//#pragma message("void is not a valid type in template parameter list, so it will be ignored.")
+		using type = List<Ts...>;
 	};
 
 	template <template <typename...> typename List, typename... Ts0, typename... Ts1, typename... Ts2>
@@ -480,21 +511,29 @@ export namespace meta
 	using repeater = T;
 
 	template <typename Fn, typename Seq>
-	concept meta_enumerables = meta_invocables<Fn, Seq> &&requires(Fn fn, Seq seq)
+	concept meta_enumerables = meta_invocables<Fn, Seq>&& requires(Fn fn, Seq seq)
 	{
 		{ fn(seq) } -> std::same_as<Seq>;
 	};
 
 	namespace detail
 	{
-		template <typename Void, typename Fn, typename Seq, typename Indexer>
+		template <typename Void, typename Fn
+			, typename Seq
+			, typename Indexer>
 			requires meta_invocables<Fn, Seq>
 		struct repeat_impl;
 
-		template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t I, size_t... Indices>
+		template <typename Fn
+			, template<typename...> typename Seq, typename... Ts
+			, size_t I, size_t... Indices>
 			requires meta_invocables<Fn, Seq<Ts...>>
-		struct repeat_impl<std::void_t<Seq<Ts...>>, Fn, Seq<Ts...>, std::index_sequence<I, Indices...>>
-			: repeat_impl<void, Fn, typename invoke<bind<Fn, Seq<Ts...>>>::template type, std::index_sequence<Indices...>>
+		struct repeat_impl<std::void_t<Seq<Ts...>>, Fn
+			, Seq<Ts...>
+			, std::index_sequence<I, Indices...>>
+			: repeat_impl<void, Fn
+			, typename invoke<bind<Fn, Seq<Ts...>>>::template type
+			, std::index_sequence<Indices...>>
 		{};
 
 		template <typename Fn, typename Seq>
@@ -508,23 +547,75 @@ export namespace meta
 			, typename Seq
 			, typename Indexer>
 			requires meta_invocables<Fn, Seq>
-		struct enumerate_impl;
+		struct take_while_impl;
 
+		/// <summary>
+		/// Pick the first element of the sequence and invoke function with it, then append to the result sequence.
+		/// </summary>
+		/// <typeparam name="Fn">unary functor(T)</typeparam>
+		/// <typeparam name="Result">the result sequence</typeparam>
+		/// <typeparam name="Seq">type sequence(T)</typeparam>
+		/// <typeparam name="T">the current proceed type</typeparam>
+		/// <typeparam name="...Ts"> rest types</typeparam>
+		/// <typeparam name="I">the current index</typeparam>
+		/// <typeparam name="...Indices">rest indices</typeparam>
 		template <typename Fn
 			, typename Result
-			, template<typename...> typename Seq, typename Current, typename... Ts
+			, template<typename...> typename Seq, typename T, typename... Ts
 			, size_t I, size_t... Indices>
-			requires meta_invocables<Fn, Seq<Current, Ts...>>
-		struct enumerate_impl<void, Fn
+			requires meta_invocables<Fn, T>
+		struct take_while_impl<void, Fn
 			, Result
-			, Seq<Current, Ts...>
+			, Seq<T, Ts...>
 			, std::index_sequence<I, Indices...>>
-			: enumerate_impl<std::void_t<Seq<Ts...>>, Fn
-			, Result
-			, typename invoke<bind<Fn, Seq<Ts...>>>::template type
+			: take_while_impl<std::void_t<Seq<Ts...>>, Fn
+			, concat_t<Result, invoke_r<bind<Fn, T>>>
+			, Seq<Ts...>
 			, std::index_sequence<Indices...>>
 		{};
+
+		// end with empty index sequence
+		template <typename Fn, typename Result, typename Seq>
+		struct take_while_impl<void, Fn, Result, Seq, std::index_sequence<>>
+		{
+			using type = Result;
+		};
+
+		// end with empty type sequence
+		template <typename Fn, typename Result, template<typename...> typename Seq, size_t... Indices>
+		struct take_while_impl<void, Fn, Result, Seq<>, std::index_sequence<Indices...>>
+		{
+			using type = Result;
+		};
+
+		template <typename Fn, typename Seq, typename Indexer>
+		struct take_while_for_impl;
+
+		template <typename Fn, template<typename...> typename Seq, typename... Ts, size_t... Indices>
+		struct take_while_for_impl<Fn, Seq<Ts...>, std::index_sequence<Indices...>>
+			: take_while_impl<void, Fn, Seq<>, Seq<Ts...>, std::index_sequence<Indices...>>
+		{};
+
+		// immediately end with empty index sequence
+		template <typename Fn, template<typename...> typename Seq, typename... Ts>
+		struct take_while_for_impl<Fn, Seq<Ts...>, std::index_sequence<>>
+			: take_while_impl<void, Fn, Seq<>, Seq<Ts...>, std::index_sequence<>>
+		{};
+
+		// immediately end with empty type sequence
+		template <typename Fn, template<typename...> typename Seq, size_t... Indices>
+		struct take_while_for_impl<Fn, Seq<>, std::index_sequence<Indices...>>
+		{
+			using type = Seq<>;
+		};
 	}
+
+	// take items from sequence by unary function
+	template <typename Fn, typename Seq, size_t Count>
+	using take_while = detail::take_while_for_impl<Fn, Seq, std::make_index_sequence<Count>>;
+
+	template <typename Fn, typename Seq, size_t Count>
+	using take_while_t = typename take_while<Fn, Seq, Count>::template type;
 
 	// enumerate sequence with a unary function
 	template <typename Fn, typename Seq, size_t Count>
@@ -533,7 +624,7 @@ export namespace meta
 
 	template <typename Fn, typename Seq, size_t Count>
 		requires meta_invocables<Fn, Seq>
-	using repeat_n_t = typename repeat_n<Fn, Seq, Count>::type;
+	using repeat_n_t = typename repeat_n<Fn, Seq, Count>::template type;
 
 	// transform a list of lists of elements into a single list containing those elements
 	template <typename ListOfLists>
@@ -607,7 +698,8 @@ export namespace std
 	{};
 }
 
-namespace meta
+#pragma warning(push, 1)
+namespace meta::test
 {
 	void test_metafunctions() noexcept
 	{
@@ -881,4 +973,31 @@ namespace meta
 		//using en4_top = front_t<en4_t>;
 		//using en4_bot = back_t<en4_t>;
 	}
+
+	void test_enumerators() noexcept
+	{
+		using test_rp_list = MetaList<unsigned long long, void, float, int, bool, unsigned>;
+		using test_fullrange = std::make_index_sequence<tsize_v<test_rp_list>>;
+		using test_range_0 = std::make_index_sequence<0>;
+		using test_range_1 = std::make_index_sequence<1>;
+		using test_range_2 = std::make_index_sequence<2>;
+		using test_range_3 = std::make_index_sequence<3>;
+
+		using taken_fn1 = wrap<pop>;
+		using fn1_r = invoke_r<taken_fn1, test_rp_list>;
+
+		using taken_fn2 = bind<taken_fn1, test_rp_list>;
+		using fn2_r = invoke_r<taken_fn2>;
+
+		static_assert(std::is_same_v<fn1_r, fn2_r>, "functors");
+
+		//using takw_r0 = take_while<taken_fn2, test_rp_list, 0>;
+		//using takw_r0_t = take_while_t<taken_fn2, test_rp_list, 0>;
+		//takw_r0::type;
+
+		//using takw_r1 = take_while<taken_fn2, test_rp_list, 1>;
+		//using takw_r1_t = take_while_t<taken_fn2, test_rp_list, 1>;
+		//takw_r1::type;
+	}
 }
+#pragma warning(pop)
