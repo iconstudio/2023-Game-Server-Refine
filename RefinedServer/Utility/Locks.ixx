@@ -105,7 +105,8 @@ export namespace util
 	OwnedLock(Lockable&) -> OwnedLock<Lockable>;
 }
 
-namespace util
+#pragma warning(push, 1)
+namespace util::test
 {
 	void test_lockables() noexcept
 	{
@@ -142,3 +143,4 @@ namespace util
 		l.release();
 	}
 }
+#pragma warning(pop)

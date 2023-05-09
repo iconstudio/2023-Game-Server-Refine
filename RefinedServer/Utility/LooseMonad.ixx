@@ -764,9 +764,9 @@ export namespace std
 	}
 }
 
-namespace util
+#pragma warning(push, 1)
+namespace util::test
 {
-#if true
 	constexpr void do_something() noexcept {}
 
 	constexpr void test_loose() noexcept
@@ -828,5 +828,5 @@ namespace util
 			do_something();
 		});
 	}
-#endif
 }
+#pragma warning(pop)

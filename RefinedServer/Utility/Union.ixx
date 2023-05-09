@@ -411,14 +411,14 @@ export namespace util
 
 		template <size_t Index, typename Uty>
 			requires (Index == Place)
-		constexpr PlacedVariant& try_set(Uty&& value) &
+		constexpr PlacedVariant& try_set(Uty&& value)&
 		{
 			return set(forward<Uty>(value));
 		}
 
 		template <size_t Index, typename Uty>
 			requires (Index == Place)
-		constexpr PlacedVariant&& try_set(Uty&& value) &&
+		constexpr PlacedVariant&& try_set(Uty&& value)&&
 		{
 			return set(forward<Uty>(value));
 		}
@@ -747,14 +747,16 @@ export namespace std
 	}
 }
 
-namespace util
+#pragma warning(push, 1)
+namespace util::test
 {
-	static void test_union() noexcept
+	void test_union() noexcept
 	{
 		using aa_t = Union<int, unsigned long, float>;
+
 		constexpr aa_t aa{};
 		using aa_0_t = aa_t::element_type<0>;
-		static_assert(is_same_v<aa_0_t, int>, "int");
+		static_assert(util::is_same_v<aa_0_t, int>, "int");
 		using aa_1_t = aa_t::element_type<1>;
 		//static_assert(is_same_v<aa_1_t, int>, "unsigned long");
 		using aa_2_t = aa_t::element_type<2>;
@@ -796,3 +798,4 @@ namespace util
 		constexpr Union<double, unsigned char, short> ff{};
 	}
 }
+#pragma warning(pop)

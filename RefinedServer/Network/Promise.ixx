@@ -785,9 +785,10 @@ export namespace net
 	using PointerHandler = ErrorHandler<void*>;
 }
 
-namespace net
+#pragma warning(push, 1)
+namespace net::test
 {
-	static void test_promise() noexcept
+	void test_promise() noexcept
 	{
 		constexpr auto fnl0 = [](const int& v) -> int {
 			return 300;
@@ -814,3 +815,4 @@ namespace net
 		constexpr Promise<long long, void> cvpromise1{};
 	}
 }
+#pragma warning(pop)

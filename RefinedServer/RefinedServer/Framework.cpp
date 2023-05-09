@@ -26,7 +26,12 @@ void Framework::Update() noexcept
 }
 
 void Framework::UpdateOnce(const float& delta_time) noexcept
-{}
+{
+	if (delta_time <= 0)
+	{
+		return;
+	}
+}
 
 Proxy Framework::BeginAccept()
 {
