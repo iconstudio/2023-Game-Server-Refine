@@ -107,7 +107,7 @@ export namespace util
 
 namespace util
 {
-	static void test_lockables()
+	void test_lockables() noexcept
 	{
 		mutex m{};
 

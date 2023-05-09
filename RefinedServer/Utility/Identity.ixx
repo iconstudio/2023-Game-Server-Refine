@@ -202,7 +202,7 @@ export namespace std
 	}
 
 	constexpr void
-		swap(util::Identity<void>& lhs, util::Identity<void>& rhs)
+		swap([[maybe_unused]] util::Identity<void>&, [[maybe_unused]] util::Identity<void>&)
 		noexcept
 	{}
 }
