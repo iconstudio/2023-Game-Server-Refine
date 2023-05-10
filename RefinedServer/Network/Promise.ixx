@@ -409,6 +409,13 @@ export namespace net
 			: myState(util::nullopt)
 		{}
 
+		template<typename U>
+			requires util::notvoids<T>
+		constexpr Promise(U&& successor)
+			noexcept(util::nothrow_copy_constructibles<T>)
+			: myState(util::in_place_type<succeed_t>, io::make_success(util::forward<U>(successor)))
+		{}
+
 		constexpr Promise(const Promise& other) noexcept
 			: myState(other.myState)
 		{}
