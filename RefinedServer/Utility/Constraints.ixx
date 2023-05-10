@@ -10,7 +10,10 @@ export namespace util
 	concept crtp = std::is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>;
 
 	template<typename T>
-	concept notvoids = !std::same_as<std::decay_t<clean_t<T>>, void>;
+	using not_void = std::is_same<clean_t<T>, void>;
+
+	template<typename... Ts>
+	concept notvoids = make_conjunction<not_void, clean_t<Ts>...>;
 
 	template<typename... Ts>
 	concept integrals = make_conjunction<std::is_integral, clean_t<Ts>...>;
