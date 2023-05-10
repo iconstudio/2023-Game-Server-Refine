@@ -148,6 +148,12 @@ export namespace util
 	template<template<typename> typename MetaFn, typename... Ts>
 	inline constexpr bool make_disjunction = std::disjunction_v<MetaFn<Ts>...>;
 
+	template<typename T>
+	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, true_type, false_type> {};
+
+	template<typename T>
+	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::template value;
+
 	template<typename Fn, typename... Args>
 	using monad_result_t = clean_t<std::invoke_result_t<Fn, Args...>>;
 
