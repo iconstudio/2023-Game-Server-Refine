@@ -256,6 +256,7 @@ export namespace util
 			return *this;
 		}
 
+		// getter (not void)
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
@@ -265,6 +266,7 @@ export namespace util
 			return myValue;
 		}
 
+		// getter (not void)
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
@@ -274,6 +276,7 @@ export namespace util
 			return myValue;
 		}
 
+		// getter (not void)
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
@@ -283,6 +286,7 @@ export namespace util
 			return move(myValue);
 		}
 
+		// getter (not void)
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
@@ -292,12 +296,13 @@ export namespace util
 			return move(myValue);
 		}
 
+		// getter (void)
 		template<typename W = Fty>
 			requires (!notvoids<W>)
-		[[nodiscard]]
-		constexpr void get() const
-			noexcept
-		{}
+		constexpr void get() const noexcept
+		{
+			static_assert(always_false<W>, "Cannot get void type.");
+		}
 
 		template <size_t Index>
 			requires (Index <= 1 + Place + sizeof...(Rty))
@@ -390,8 +395,9 @@ export namespace util
 			}
 		}
 
+		// type getter (not void)
 		template <typename T>
-			requires meta::included_v<T, Fty, Rty...>
+			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&
@@ -410,8 +416,9 @@ export namespace util
 			}
 		}
 
+		// type getter (not void)
 		template <typename T>
-			requires meta::included_v<T, Fty, Rty...>
+			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
@@ -430,8 +437,9 @@ export namespace util
 			}
 		}
 
+		// type getter (not void)
 		template <typename T>
-			requires meta::included_v<T, Fty, Rty...>
+			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&&
@@ -450,8 +458,9 @@ export namespace util
 			}
 		}
 
+		// type getter (not void)
 		template <typename T>
-			requires meta::included_v<T, Fty, Rty...>
+			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
@@ -468,6 +477,99 @@ export namespace util
 			{
 				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
 			}
+		}
+
+		// type getter (included void)
+		template <typename T>
+			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get()&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return get();
+			}
+			else if constexpr (1 < mySize)
+			{
+				return _Tail.template get<T>();
+			}
+			else
+			{
+				static_assert(always_false<T>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// type getter (included void)
+		template <typename T>
+			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return get();
+			}
+			else if constexpr (1 < mySize)
+			{
+				return _Tail.template get<T>();
+			}
+			else
+			{
+				static_assert(always_false<T>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// type getter (included void)
+		template <typename T>
+			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get()&&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return move(*this).get();
+			}
+			else if constexpr (1 < mySize)
+			{
+				return move(_Tail).template get<T>();
+			}
+			else
+			{
+				static_assert(always_false<T>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// type getter (included void)
+		template <typename T>
+			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&&
+		{
+			if constexpr (same_as<T, Fty>)
+			{
+				return move(*this).get();
+			}
+			else if constexpr (1 < mySize)
+			{
+				return move(_Tail).template get<T>();
+			}
+			else
+			{
+				static_assert(always_false<T>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// type getter (not included void)
+		template <typename T>
+			requires (!notvoids<T>&& !meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr void get() const
+		{
+			static_assert(always_false<T>, "Cannot get the not included void type.");
 		}
 
 		template<typename W = Fty>
@@ -801,12 +903,14 @@ export namespace util
 	private:
 		friend class node_type;
 
+		struct void_guard{};
+
 		union
 		{
 			union
 			{
 				std::monostate voidData;
-				type myValue;
+				conditional_t<notvoids<type>, type, void_guard> myValue;
 			};
 			node_type _Tail;
 		};
