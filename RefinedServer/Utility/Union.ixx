@@ -11,12 +11,15 @@ namespace util
 	template <bool _TrivialDestruction, typename... Ts>
 	struct InternalVariant {};
 
-	template <typename... Ts>
+	template <size_t Place, typename... Ts>
 	struct VariantStorage {};
 
-	template <typename Fty, typename... Rty>
-	struct VariantStorage<Fty, Rty...>
+	template <size_t Place, typename Fty, typename... Rty>
+	struct VariantStorage<Place, Fty, Rty...>
 	{
+		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
+		static inline constexpr size_t myPlace = Place;
+
 		constexpr VariantStorage() noexcept {}
 
 		// ctor (not void)
@@ -49,7 +52,7 @@ namespace util
 				std::monostate voidData = {};
 				remove_const_t<Fty> _Head;
 			};
-			VariantStorage<Rty...> _Tail;
+			VariantStorage<Place + 1, Rty...> _Tail;
 		};
 	};
 
@@ -58,24 +61,19 @@ namespace util
 
 	// Storage for variant alternatives (trivially destructible case)
 	template <typename Fty, typename... Rty>
-	struct InternalVariant<true, Fty, Rty...> : VariantStorage<Fty, Rty...>
+	struct InternalVariant<true, Fty, Rty...> : VariantStorage<0, Fty, Rty...>
 	{
-		using base = VariantStorage<Fty, Rty...>;
+		using base = VariantStorage<0, Fty, Rty...>;
 
 		constexpr InternalVariant() noexcept {}
 		using base::base;
-
-		constexpr InternalVariant(const InternalVariant& other) = default;
-		constexpr InternalVariant(InternalVariant&& other) = default;
-		constexpr InternalVariant& operator=(const InternalVariant& other) = default;
-		constexpr InternalVariant& operator=(InternalVariant&& other) = default;
 	};
 
 	// Storage for variant alternatives (non-trivially destructible case)
 	template <class Fty, class... Rty>
-	struct InternalVariant<false, Fty, Rty...> : VariantStorage<Fty, Rty...>
+	struct InternalVariant<false, Fty, Rty...> : VariantStorage<0, Fty, Rty...>
 	{
-		using base = VariantStorage<Fty, Rty...>;
+		using base = VariantStorage<0, Fty, Rty...>;
 
 		using base::base;
 
@@ -738,8 +736,11 @@ export namespace util
 
 		union
 		{
-			//PlacedVariant<std::monostate, type> myValue;
-			type myValue;
+			union
+			{
+				std::monostate voidData;
+				type myValue;
+			};
 			node_type _Tail;
 		};
 
