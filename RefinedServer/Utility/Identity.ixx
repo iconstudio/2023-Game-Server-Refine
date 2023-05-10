@@ -147,7 +147,15 @@ export namespace util
 			return static_cast<const T&&>(myValue);
 		}
 
-		constexpr ~Identity() noexcept(nothrow_destructibles<T>) = default;
+		constexpr ~Identity()
+			noexcept(nothrow_destructibles<T>)
+			requires(trivially_destructibles<T>)
+		= default;
+
+		constexpr ~Identity()
+			noexcept(nothrow_destructibles<T>)
+			requires(!trivially_destructibles<T>)
+		{}
 
 	private:
 		T myValue;
@@ -159,11 +167,6 @@ export namespace util
 	{
 	public:
 		using value_type = void;
-
-		constexpr Identity() noexcept = default;
-		constexpr Identity(const Identity&) noexcept = default;
-		constexpr Identity(Identity&&) noexcept = default;
-		constexpr ~Identity() noexcept = default;
 
 		constexpr Identity& operator=([[maybe_unused]] Identity) & noexcept
 		{
