@@ -11,54 +11,6 @@ export namespace net
 
 	export namespace io
 	{
-		inline constexpr ioError CheckBOOL(const int& boolean) noexcept
-		{
-			if (1 == boolean)
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ debug::WSAGetLastError() };
-			}
-		}
-
-		inline constexpr ioError CheckBOOL(int&& boolean) noexcept
-		{
-			if (1 == static_cast<int&&>(boolean))
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ debug::WSAGetLastError() };
-			}
-		}
-
-		inline constexpr ioError CheckBOOL(const bool& boolean) noexcept
-		{
-			if (boolean)
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ debug::WSAGetLastError() };
-			}
-		}
-
-		inline constexpr ioError CheckBOOL(bool&& boolean) noexcept
-		{
-			if (static_cast<bool&&>(boolean))
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ debug::WSAGetLastError() };
-			}
-		}
-
 		inline ioError CheckPending() noexcept
 		{
 			int error = debug::WSAGetLastError();

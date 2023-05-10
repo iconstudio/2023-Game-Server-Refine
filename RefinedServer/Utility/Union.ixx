@@ -64,16 +64,18 @@ export namespace util
 		constexpr PlacedVariant(nullopt_t) noexcept
 		{}
 
-		// Initialize my value with Args
+		// Initialize my value with Args (not void)
 		template <typename... Args>
+			requires (notvoids<Fty>)
 		constexpr PlacedVariant(in_place_t, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
 		{}
 
-		// Initialize my value with Args
+		// Initialize my value with Args (not void)
 		template <typename... Args>
+			requires (notvoids<Fty>)
 		constexpr PlacedVariant(in_place_index_t<Place>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
@@ -106,9 +108,9 @@ export namespace util
 			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
 
-		// Initialize my value with Args
+		// Initialize my value with Args (not void)
 		template <typename T, size_t Hint, typename... Args>
-			requires (same_as<clean_t<T>, Fty>)
+			requires (same_as<clean_t<T>, Fty> && notvoids<Fty>)
 		explicit(is_explicit_constructible_v<T>)
 			constexpr
 			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
@@ -127,9 +129,12 @@ export namespace util
 			, isExtended(true)
 		{}
 
-		// Initialize my value with Args
+		// Initialize my value with Args (not void)
 		template <typename... Args>
-		explicit constexpr PlacedVariant(integral_constant<size_t, 0>, Args&&... args)
+			requires (notvoids<Fty>)
+		explicit(is_explicit_constructible_v<Fty>)
+			constexpr
+			PlacedVariant(integral_constant<size_t, 0>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: myValue(static_cast<Args&&>(args)...)
 			, hasValue(true)
@@ -447,7 +452,6 @@ export namespace util
 				}
 			}
 
-			//myData = Data{};
 			hasValue = false;
 			isExtended = false;
 		}
@@ -649,6 +653,7 @@ export namespace util
 
 		union
 		{
+			//PlacedVariant<std::monostate, type> myValue;
 			type myValue;
 			node_type _Tail;
 		};
