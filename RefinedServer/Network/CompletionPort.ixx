@@ -4,7 +4,6 @@ module;
 
 export module Net.CompletionPort;
 import Utility.Monad;
-import Net.Intrinsics;
 import Net.Promise;
 
 using ulong = unsigned long;
@@ -12,14 +11,20 @@ using ullong = unsigned long long;
 
 export namespace net
 {
+	using registerPromise = Promise<void, int>;
+	using portPromise = Proxy;
+
 	namespace abi
 	{
 		[[nodiscard]]
-		FORCEINLINE HANDLE RegisterIoPort(const HANDLE& io_port, const HANDLE& handle, const ullong& key) noexcept;
+		FORCEINLINE registerPromise
+			RegisterIoPort(const HANDLE& io_port, const HANDLE& handle, const ullong& key) noexcept;
 		[[nodiscard]]
-		FORCEINLINE bool PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept;
+		FORCEINLINE portPromise
+			PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept;
 		[[nodiscard]]
-		FORCEINLINE bool GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time = INFINITE) noexcept;
+		FORCEINLINE portPromise
+			GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time = INFINITE) noexcept;
 	}
 
 	class [[nodiscard]] alignas(ullong) CompletionPort
@@ -48,7 +53,7 @@ export namespace net
 			return *this;
 		}
 
-		~CompletionPort()
+		~CompletionPort() noexcept
 		{
 #if !_DEBUG
 			::CloseHandle(rawHandle);
@@ -56,56 +61,65 @@ export namespace net
 		}
 
 		[[nodiscard]]
-		static inline util::Monad<CompletionPort> Create(const ulong& concurrent_hint) noexcept
+		static inline
+			Promise<CompletionPort, int>
+			Create(const ulong& concurrent_hint) noexcept
 		{
 			const HANDLE handle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, concurrent_hint);
 
-			return CompletionPort{ handle };
+			if (NULL == handle)
+			{
+				return ::WSAGetLastError();
+			}
+			else
+			{
+				return CompletionPort{ handle };
+			}
 		}
 
-		inline bool Link(const SOCKET& target, const ullong& unique_id) noexcept
+		inline registerPromise Link(const SOCKET& target, const ullong& unique_id) noexcept
 		{
 			return Link(reinterpret_cast<HANDLE>(target), unique_id);
 		}
 
-		inline bool Link(const SOCKET& target, ullong&& unique_id) noexcept
+		inline registerPromise Link(const SOCKET& target, ullong&& unique_id) noexcept
 		{
 			return Link(reinterpret_cast<HANDLE>(target), static_cast<ullong&&>(unique_id));
 		}
 
-		inline bool Link(const HANDLE& handle, const ullong& unique_id) noexcept
+		inline registerPromise Link(const HANDLE& handle, const ullong& unique_id) noexcept
 		{
-			return nullptr != abi::RegisterIoPort(rawHandle, handle, unique_id);
+			return abi::RegisterIoPort(rawHandle, handle, unique_id);
 		}
 
-		inline bool Link(const HANDLE& handle, ullong&& unique_id) noexcept
+		inline registerPromise Link(const HANDLE& handle, ullong&& unique_id) noexcept
 		{
-			return nullptr != abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
+			return abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
 		}
 
-		inline bool Poll(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = INFINITE)
+		inline portPromise Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = INFINITE)
 		{
 			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, overlapped_handle, await_time);
 		}
 
-		inline bool Post(OVERLAPPED* overlapped_handle, const ullong& key, const ulong& bytes)
+		inline portPromise Post(OVERLAPPED* context, const ullong& key, const ulong& bytes)
 		{
-			return abi::PostIoPort(rawHandle, key, bytes, overlapped_handle);
+			return abi::PostIoPort(rawHandle, key, bytes, context);
 		}
 
-		inline bool Post(OVERLAPPED* overlapped_handle, ullong&& key, const ulong& bytes)
+		inline portPromise Post(OVERLAPPED* context, ullong&& key, const ulong& bytes)
 		{
-			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), bytes, overlapped_handle);
+			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), bytes, context);
 		}
 
-		inline bool Post(OVERLAPPED* overlapped_handle, const ullong& key, ulong&& bytes)
+		inline portPromise Post(OVERLAPPED* context, const ullong& key, ulong&& bytes)
 		{
-			return abi::PostIoPort(rawHandle, key, static_cast<ulong&&>(bytes), overlapped_handle);
+			return abi::PostIoPort(rawHandle, key, static_cast<ulong&&>(bytes), context);
 		}
 
-		inline bool Post(OVERLAPPED* overlapped_handle, ullong&& key, ulong&& bytes)
+		inline portPromise Post(OVERLAPPED* context, ullong&& key, ulong&& bytes)
 		{
-			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), overlapped_handle);
+			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), context);
 		}
 
 		inline bool IsValid() const noexcept
@@ -120,18 +134,43 @@ export namespace net
 		HANDLE rawHandle;
 	};
 
-	HANDLE abi::RegisterIoPort(const HANDLE& io_port, const HANDLE& handle, const ullong& key) noexcept
+	registerPromise
+		abi::RegisterIoPort(const HANDLE& io_port, const HANDLE& handle, const ullong& key)
+		noexcept
 	{
-		return ::CreateIoCompletionPort(handle, io_port, key, 0);
+		const HANDLE result = ::CreateIoCompletionPort(handle, io_port, key, 0);
+
+		if (NULL == result)
+		{
+			return ::WSAGetLastError();
+		}
+		else
+		{
+			return io::success;
+		}
 	}
 
-	bool abi::PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept
+	portPromise abi::PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept
 	{
-		return 0 != ::PostQueuedCompletionStatus(io_port, bytes, key, overlapped);
+		if (0 != ::PostQueuedCompletionStatus(io_port, bytes, key, overlapped))
+		{
+			return io::success;
+		}
+		else
+		{
+			return io::failure;
+		}
 	}
 
-	bool abi::GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time) noexcept
+	portPromise abi::GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time) noexcept
 	{
-		return 0 != ::GetQueuedCompletionStatus(io_port, bytes_handle, key_handle, overlapped_handle, await_time);
+		if (0 != ::GetQueuedCompletionStatus(io_port, bytes_handle, key_handle, overlapped_handle, await_time))
+		{
+			return io::success;
+		}
+		else
+		{
+			return io::failure;
+		}
 	}
 }
