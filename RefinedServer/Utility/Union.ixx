@@ -15,10 +15,10 @@ export namespace util
 	class PlacedVariant<integral_constant<size_t, Place>>
 	{};
 
-	template<typename T, typename... Args>
-	struct is_explicit_constructible : conditional_t<is_trivially_constructible_v<T, Args...>, true_type, false_type> {};
+	template<typename T>
+	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, true_type, false_type> {};
 
-	template<typename T, typename... Args>
+	template<typename T>
 	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::template value;
 
 	template <size_t Place, notvoids Fty, notvoids... Rty>
