@@ -6,6 +6,83 @@ import Utility;
 import Utility.Constraints;
 import Utility.Meta;
 
+namespace util
+{
+	template <bool _TrivialDestruction, class... Ts>
+	class VariantStorage {};
+
+	template <class... Ts>
+	using RouteVariant = VariantStorage<make_conjunction<std::is_trivially_destructible, Ts...>, Ts...>;
+
+	// Storage for variant alternatives (trivially destructible case)
+	template <class _First, class... _Rest>
+	class VariantStorage<true, _First, _Rest...>
+	{
+	public:
+		constexpr VariantStorage() noexcept {}
+
+		template <class... Ts>
+		constexpr explicit
+			VariantStorage(integral_constant<size_t, 0>, Ts&&... _Args)
+			noexcept(nothrow_constructibles<_First, Ts...>)
+			: _Head(static_cast<Ts&&>(_Args)...)
+		{}
+
+		template <size_t _Idx, class... Ts>
+			requires (0 < _Idx)
+		constexpr explicit
+			VariantStorage(integral_constant<size_t, _Idx>, Ts&&... _Args)
+			noexcept(nothrow_constructibles<RouteVariant<_Rest...>, integral_constant<size_t, _Idx - 1>, Ts...>)
+			: _Tail(integral_constant<size_t, _Idx - 1>{}, static_cast<Ts&&>(_Args)...)
+		{}
+
+		union
+		{
+			remove_const_t<_First> _Head;
+			RouteVariant<_Rest...> _Tail;
+		};
+	};
+
+	// Storage for variant alternatives (non-trivially destructible case)
+	template <class _First, class... _Rest>
+	class VariantStorage<false, _First, _Rest...>
+	{
+	public:
+		constexpr VariantStorage() noexcept {}
+
+		// explicitly non-trivial destructor (which would otherwise be defined as deleted
+		// since the class has a variant member with a non-trivial destructor)
+		constexpr ~VariantStorage() noexcept
+		{}
+
+		template <class... Ts>
+		constexpr explicit
+			VariantStorage(integral_constant<size_t, 0>, Ts&&... _Args)
+			noexcept(nothrow_constructibles<_First, Ts...>)
+			: _Head(static_cast<Ts&&>(_Args)...)
+		{}
+
+		template <size_t _Idx, class... Ts>
+			requires (0 < _Idx)
+		constexpr explicit
+			VariantStorage(integral_constant<size_t, _Idx>, Ts&&... _Args)
+			noexcept(nothrow_constructibles<RouteVariant<_Rest...>, integral_constant<size_t, _Idx - 1>, Ts...>)
+			: _Tail(integral_constant<size_t, _Idx - 1>{}, static_cast<Ts&&>(_Args)...)
+		{}
+
+		VariantStorage(VariantStorage&&) = default;
+		VariantStorage(const VariantStorage&) = default;
+		VariantStorage& operator=(VariantStorage&&) = default;
+		VariantStorage& operator=(const VariantStorage&) = default;
+
+		union
+		{
+			remove_const_t<_First> _Head;
+			RouteVariant<_Rest...> _Tail;
+		};
+	};
+}
+
 export namespace util
 {
 	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
@@ -110,7 +187,7 @@ export namespace util
 
 		// Initialize my value with Args (not void)
 		template <typename T, size_t Hint, typename... Args>
-			requires (same_as<clean_t<T>, Fty> && notvoids<Fty>)
+			requires (same_as<clean_t<T>, Fty>&& notvoids<Fty>)
 		explicit(is_explicit_constructible_v<T>)
 			constexpr
 			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
