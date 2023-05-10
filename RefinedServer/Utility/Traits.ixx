@@ -34,6 +34,8 @@ export namespace util
 	using ::std::remove_cvref;
 	using ::std::remove_cvref_t;
 
+	using ::std::negation;
+	using ::std::negation_v;
 	using ::std::conditional;
 	using ::std::conditional_t;
 	using ::std::enable_if;
