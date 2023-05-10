@@ -125,6 +125,12 @@ export namespace net
 			return *this;
 		}
 
+		constexpr ~Promise()
+			noexcept(util::nothrow_destructibles<T, E>) requires(util::notvoids<T>) = default;
+
+		constexpr ~Promise()
+			noexcept(util::nothrow_destructibles<E>) requires(!util::notvoids<T>) = default;
+
 		template<util::lv_invocable<T> Fn>
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_lvalue_t<T>>
@@ -453,6 +459,12 @@ export namespace net
 			myState = static_cast<monad_t&&>(other.myState);
 			return *this;
 		}
+
+		constexpr ~Promise()
+			noexcept(util::nothrow_destructibles<T>) requires(util::notvoids<T>) = default;
+
+		constexpr ~Promise()
+			noexcept requires(!util::notvoids<T>) = default;
 
 		template<util::lv_invocable<T> Fn>
 		inline friend constexpr
