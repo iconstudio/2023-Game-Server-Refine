@@ -62,13 +62,16 @@ export namespace util
 
 		template <typename T>
 			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !same_as<clean_t<T>, in_place_type_t> && !same_as<clean_t<T>, in_place_index_t>)
-		explicit constexpr LooseMonad(T&& object) noexcept
+		explicit(util::is_explicit_constructible_v<T>)
+			constexpr
+			LooseMonad(T&& object) noexcept
 			: myStorage(in_place_type<clean_t<T>>, static_cast<T&&>(object))
 		{}
 
 		template <size_t Index, typename... Args>
 			requires (Index < sizeof...(Ts))
-		explicit constexpr
+		explicit
+			constexpr
 			LooseMonad(in_place_index_t<Index>, Args&&... args)
 			noexcept(nothrow_constructibles<base_type, in_place_index_t<Index>, Args...>)
 			: myStorage(in_place_index<Index>, static_cast<Args&&>(args)...)
@@ -76,7 +79,8 @@ export namespace util
 
 		template <typename T, typename... Args>
 			requires (meta::included_v<T, Ts...>)
-		explicit constexpr
+		explicit(util::is_explicit_constructible_v<T>)
+			constexpr
 			LooseMonad(in_place_type_t<T>, Args&&... args)
 			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
 			: myStorage(in_place_type<T>, std::integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
