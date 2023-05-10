@@ -10,7 +10,7 @@ export namespace util
 	concept crtp = std::is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>;
 
 	template<typename T>
-	using not_void = std::is_same<clean_t<T>, void>;
+	using not_void = std::negation<std::is_same<clean_t<T>, void>>;
 
 	template<typename... Ts>
 	concept notvoids = make_conjunction<not_void, clean_t<Ts>...>;
