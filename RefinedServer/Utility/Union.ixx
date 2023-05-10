@@ -566,11 +566,25 @@ export namespace util
 
 		template <size_t Index, typename Uty>
 			requires (Index != Place && Index <= 1 + Place + sizeof...(Rty))
-		constexpr decltype(auto) try_set(Uty&& value)
+		constexpr decltype(auto) try_set(Uty&& value)&
 		{
 			if constexpr (1 < mySize)
 			{
 				return _Tail.template try_set<Index>(forward<Uty>(value));
+			}
+			else
+			{
+				static_assert(always_false<Uty>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		template <size_t Index, typename Uty>
+			requires (Index != Place && Index <= 1 + Place + sizeof...(Rty))
+		constexpr decltype(auto) try_set(Uty&& value)&&
+		{
+			if constexpr (1 < mySize)
+			{
+				return move(_Tail).template try_set<Index>(forward<Uty>(value));
 			}
 			else
 			{
