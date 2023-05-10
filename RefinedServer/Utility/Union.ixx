@@ -234,6 +234,12 @@ export namespace util
 
 		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
+			requires(!trivially_destructibles<Fty, Rty...>)
+		{}
+
+		constexpr ~PlacedVariant()
+			noexcept(nothrow_destructibles<Fty, Rty...>)
+			requires(trivially_destructibles<Fty, Rty...>)
 		{}
 
 		constexpr PlacedVariant& operator=(nullopt_t) noexcept
