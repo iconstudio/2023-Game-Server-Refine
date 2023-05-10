@@ -106,7 +106,8 @@ export namespace util
 		template <typename T, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>)
 		explicit(is_explicit_constructible_v<T>)
-		constexpr PlacedVariant(in_place_type_t<T>, Args&&... args)
+			constexpr
+			PlacedVariant(in_place_type_t<T>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
@@ -115,7 +116,8 @@ export namespace util
 		template <typename T, size_t Hint, typename... Args>
 			requires (same_as<clean_t<T>, Fty>)
 		explicit(is_explicit_constructible_v<T>)
-		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+			constexpr
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
@@ -124,7 +126,8 @@ export namespace util
 		template <typename T, size_t Guard, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
 		explicit(is_explicit_constructible_v<T>)
-		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
+			constexpr
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: _Tail(in_place_type<T>, integral_constant<size_t, Guard + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
@@ -149,7 +152,7 @@ export namespace util
 
 		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
-			requires (!make_disjunction<std::is_trivially_destructible, Fty, Rty...>)
+			requires (!make_disjunction<std::negation<std::is_trivially_destructible>, Fty, Rty...>)
 		{}
 
 		constexpr ~PlacedVariant()
