@@ -101,6 +101,20 @@ export namespace net
 			: myState()
 		{}
 
+		template<typename U>
+			requires (util::notvoids<T>&& util::same_as<util::clean_t<U>, T>)
+		constexpr Promise(U&& pass)
+			noexcept(util::nothrow_copy_constructibles<T>)
+			: myState(util::in_place_type<succeed_t>, io::make_success(util::forward<U>(pass)))
+		{}
+
+		template<typename U>
+			requires (util::same_as<util::clean_t<U>, E>)
+		constexpr Promise(U&& fail)
+			noexcept(util::nothrow_copy_constructibles<E>)
+			: myState(util::in_place_type<failed_t>, io::make_failure(util::forward<U>(fail)))
+		{}
+
 		constexpr Promise(util::nullopt_t) noexcept
 			: myState(util::nullopt)
 		{}
