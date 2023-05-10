@@ -76,6 +76,8 @@ export namespace util
 	using ::std::is_trivially_copy_assignable_v;
 	using ::std::is_trivially_move_assignable;
 	using ::std::is_trivially_move_assignable_v;
+	using ::std::is_trivially_destructible;
+	using ::std::is_trivially_destructible_v;
 
 	// models
 	using ::std::same_as;
