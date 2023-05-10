@@ -86,7 +86,8 @@ export namespace util
 			: myStorage(in_place_type<T>, std::integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
 
-		constexpr ~LooseMonad() noexcept(nothrow_destructibles<Ts...>) = default;
+		constexpr ~LooseMonad()
+			noexcept(nothrow_destructibles<Ts...>) = default;
 
 		template<size_t Index, invocables<reference_type<Index>> Fn>
 		inline constexpr
