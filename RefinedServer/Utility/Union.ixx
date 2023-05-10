@@ -537,17 +537,31 @@ export namespace util
 		}
 
 		template <size_t Index, typename Uty>
-			requires (Index == Place)
+			requires (notvoids<Fty>&& Index == Place)
 		constexpr PlacedVariant& try_set(Uty&& value)&
 		{
 			return set(forward<Uty>(value));
 		}
 
 		template <size_t Index, typename Uty>
-			requires (Index == Place)
+			requires (notvoids<Fty>&& Index == Place)
 		constexpr PlacedVariant&& try_set(Uty&& value)&&
 		{
 			return set(forward<Uty>(value));
+		}
+
+		template <size_t Index, typename Uty>
+			requires (!notvoids<Fty>&& Index == Place)
+		constexpr void try_set(Uty&& value) const
+		{
+			static_assert(always_false<Uty>, "Cannot set the value of a void type.");
+		}
+
+		template <size_t Index>
+			requires (!notvoids<Fty>&& Index == Place)
+		constexpr void try_set() const
+		{
+			static_assert(always_false<integral_constant<size_t, Index>>, "Cannot set the value of a void type.");
 		}
 
 		template <size_t Index, typename Uty>
