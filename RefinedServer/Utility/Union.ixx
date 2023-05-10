@@ -152,13 +152,7 @@ export namespace util
 
 		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
-			requires (!make_disjunction<std::negation<std::is_trivially_destructible>, Fty, Rty...>)
 		{}
-
-		constexpr ~PlacedVariant()
-			noexcept(nothrow_destructibles<Fty, Rty...>)
-			requires (make_conjunction<std::is_trivially_destructible, Fty, Rty...>)
-		= default;
 
 		constexpr PlacedVariant& operator=(nullopt_t) noexcept
 		{
