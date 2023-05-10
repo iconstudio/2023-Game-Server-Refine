@@ -87,7 +87,14 @@ export namespace util
 		{}
 
 		constexpr ~LooseMonad()
-			noexcept(nothrow_destructibles<Ts...>) = default;
+			noexcept(nothrow_destructibles<Ts...>)
+			requires(trivially_destructibles<Ts...>)
+		= default;
+
+		constexpr ~LooseMonad()
+			noexcept(nothrow_destructibles<Ts...>)
+			requires(!trivially_destructibles<Ts...>)
+		{}
 
 		template<size_t Index, invocables<reference_type<Index>> Fn>
 		inline constexpr
