@@ -619,7 +619,7 @@ export namespace util
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr reference_type<Index>
 			get()&
 		{
 			return myStorage.template get<Index>();
@@ -628,7 +628,7 @@ export namespace util
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr const_reference_type<Index>
 			get() const&
 		{
 			return myStorage.template get<Index>();
@@ -637,7 +637,7 @@ export namespace util
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr rvalue_type<Index>
 			get()&&
 		{
 			return move(myStorage).template get<Index>();
@@ -646,7 +646,7 @@ export namespace util
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr const_rvalue_type<Index>
 			get() const&&
 		{
 			return move(myStorage).template get<Index>();
