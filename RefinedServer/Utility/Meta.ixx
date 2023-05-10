@@ -333,7 +333,7 @@ export namespace meta
 	template <typename T>
 	struct find<T>
 	{
-		static_assert(util::always_false<T>, "Cannot find the type in the sequence.");
+		//static_assert(util::always_false<T>, "Cannot find the type in the sequence.");
 	};
 
 	// determine if a type is in sequence
