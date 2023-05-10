@@ -16,8 +16,6 @@ export namespace net
 	class Address;
 	class EndPoint;
 	class Socket;
-	template<typename T = void, typename E = void>
-	class Promise;
 	class Context;
 	class SendContext;
 	class BasicSession;

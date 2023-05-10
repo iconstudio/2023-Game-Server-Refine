@@ -48,7 +48,7 @@ export namespace net
 		inline constexpr defer_t<T>   make_defered{ };
 	}
 
-	template<typename T, typename E>
+	template<typename T, typename E = void>
 	class Promise;
 
 	template<typename T, util::copyable E>
@@ -803,6 +803,12 @@ export namespace net
 	template<util::copyable T>
 	using ErrorHandler = Promise<T, int>;
 	using PointerHandler = ErrorHandler<void*>;
+
+	template<typename T>
+	Promise(T) -> Promise<T, void>;
+
+	template<typename T, util::copyable E>
+	Promise(T, E) -> Promise<T, E>;
 }
 
 #pragma warning(push, 1)
