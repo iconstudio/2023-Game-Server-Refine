@@ -16,13 +16,12 @@ export namespace net
 			enum class io_defered {};
 		}
 
-		template<typename T>
+		template<typename T> // T: Success Handle
 		using success_t = util::Identity<T, tags::io_success>;
-
-		template<typename T>
+		template<typename T> // T: Error
 		using error_t = util::Identity<T, tags::io_failure>;
-
-		using defer_t = util::Identity<void, tags::io_defered>;
+		template<typename T> // T: Cause of Defer
+		using defer_t = util::Identity<T, tags::io_defered>;
 
 		constexpr error_t<int> error(const int& error_code) noexcept
 		{
@@ -33,15 +32,20 @@ export namespace net
 			return error_t<int>{ static_cast<int&&>(error_code) };
 		}
 
-		constexpr success_t<void> success{ };
-		constexpr error_t<void> fail{ };
-		constexpr defer_t defer{ };
+		using just_success_t = success_t<void>;
+		using just_failure_t = error_t<void>;
+		using just_defered_t = defer_t<void>;
 
-		template<typename T>
-		constexpr success_t<T> succeed_io{ };
-		constexpr defer_t      defered_io{ };
-		template<typename T>
-		constexpr error_t<T>   failed_io{ };
+		inline constexpr just_success_t success{ };
+		inline constexpr just_failure_t failure{ };
+		inline constexpr just_defered_t defered{ };
+
+		template<typename T = void>
+		inline constexpr success_t<T> make_success{ };
+		template<typename T = void>
+		inline constexpr error_t<T>   make_failure{ };
+		template<typename T = void>
+		inline constexpr defer_t<T>   make_defered{ };
 	}
 
 	template<typename T, typename E>
@@ -53,7 +57,7 @@ export namespace net
 	public:
 		using succeed_t = io::success_t<T>;
 		using failed_t = io::error_t<E>;
-		using defered_t = io::defer_t;
+		using defered_t = io::just_defered_t;
 		using monad_t = util::LooseMonad<succeed_t, failed_t, defered_t>;
 
 		constexpr Promise() noexcept
@@ -80,24 +84,33 @@ export namespace net
 			: myState(static_cast<monad_t&&>(state))
 		{}
 
-		constexpr Promise(const succeed_t& success) noexcept
+		constexpr Promise(const succeed_t& success)
+			noexcept(util::nothrow_copy_constructibles<succeed_t>) requires util::notvoids<T>
 			: myState(util::in_place_type<succeed_t>, success)
 		{}
 
-		constexpr Promise(succeed_t&& success) noexcept
+		constexpr Promise(succeed_t&& success)
+			noexcept(util::nothrow_move_constructibles<succeed_t>) requires util::notvoids<T>
 			: myState(util::in_place_type<succeed_t>, static_cast<succeed_t&&>(success))
 		{}
 
-		constexpr Promise(const failed_t& error) noexcept
+		constexpr Promise(succeed_t)
+			noexcept requires (!util::notvoids<T>)
+			: myState(util::in_place_type<succeed_t>, succeed_t{})
+		{}
+
+		constexpr Promise(const failed_t& error)
+			noexcept(util::nothrow_copy_constructibles<failed_t>)
 			: myState(util::in_place_type<failed_t>, error)
 		{}
 
-		constexpr Promise(failed_t&& error) noexcept
+		constexpr Promise(failed_t&& error)
+			noexcept(util::nothrow_move_constructibles<failed_t>)
 			: myState(util::in_place_type<failed_t>, static_cast<failed_t&&>(error))
 		{}
 
 		constexpr Promise(defered_t) noexcept
-			: myState(util::in_place_type<defered_t>, io::defer)
+			: myState(util::in_place_type<defered_t>, defered_t{})
 		{}
 
 		constexpr Promise& operator=(const Promise& other) noexcept
@@ -378,8 +391,8 @@ export namespace net
 	{
 	public:
 		using succeed_t = io::success_t<T>;
-		using failed_t = io::error_t<void>;
-		using defered_t = io::defer_t;
+		using failed_t = io::just_failure_t;
+		using defered_t = io::just_defered_t;
 		using monad_t = util::LooseMonad<succeed_t, failed_t, defered_t>;
 
 		constexpr Promise() noexcept
@@ -406,20 +419,27 @@ export namespace net
 			: myState(static_cast<monad_t&&>(state))
 		{}
 
-		constexpr Promise(const succeed_t& success) noexcept
+		constexpr Promise(const succeed_t& success)
+			noexcept(util::nothrow_copy_constructibles<succeed_t>) requires util::notvoids<T>
 			: myState(util::in_place_type<succeed_t>, success)
 		{}
 
-		constexpr Promise(succeed_t&& success) noexcept
+		constexpr Promise(succeed_t&& success)
+			noexcept(util::nothrow_move_constructibles<succeed_t>) requires util::notvoids<T>
 			: myState(util::in_place_type<succeed_t>, util::move(success))
 		{}
 
+		constexpr Promise(succeed_t)
+			noexcept requires (!util::notvoids<T>)
+			: myState(util::in_place_type<succeed_t>, succeed_t{})
+		{}
+
 		constexpr Promise(failed_t) noexcept
-			: myState(util::in_place_type<failed_t>, io::fail)
+			: myState(util::in_place_type<failed_t>, failed_t{})
 		{}
 
 		constexpr Promise(defered_t) noexcept
-			: myState(util::in_place_type<defered_t>, io::defer)
+			: myState(util::in_place_type<defered_t>, defered_t{})
 		{}
 
 		constexpr Promise& operator=(const Promise& other) noexcept
@@ -813,6 +833,8 @@ namespace net::test
 		});
 
 		constexpr Promise<long long, void> cvpromise1{};
+
+		constexpr Proxy proxy0{};
 	}
 }
 #pragma warning(pop)
