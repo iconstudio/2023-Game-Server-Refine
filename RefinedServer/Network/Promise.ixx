@@ -688,7 +688,7 @@ export namespace net
 			else_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (myState.template has_value<failed_t>())
+			if (!myState.template has_value<succeed_t>())
 			{
 				util::forward<Fn>(action)();
 			}
@@ -702,7 +702,7 @@ export namespace net
 			else_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (myState.template has_value<failed_t>())
+			if (!myState.template has_value<succeed_t>())
 			{
 				util::forward<Fn>(action)();
 			}
