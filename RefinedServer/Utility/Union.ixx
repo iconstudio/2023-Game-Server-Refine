@@ -98,7 +98,7 @@ export namespace util
 	class PlacedVariant<integral_constant<size_t, Place>>
 	{};
 
-	template <size_t Place, notvoids Fty, notvoids... Rty>
+	template <size_t Place, typename Fty, typename... Rty>
 	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
 	{
 	public:
@@ -156,12 +156,50 @@ export namespace util
 			, hasValue(true)
 		{}
 
-		// Initialize my value with Args (not void)
+		// Initialize my value with Args (void)
+		template <typename... Args>
+			requires (!notvoids<Fty>)
+		constexpr PlacedVariant(in_place_t, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: voidData()
+			, hasValue(true)
+		{}
+
+		// Initialize my value with Args by a Index (not void)
 		template <typename... Args>
 			requires (notvoids<Fty>)
 		constexpr PlacedVariant(in_place_index_t<Place>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
+		{}
+
+		// Initialize my value with Args by a Index (void)
+		template <typename... Args>
+			requires (!notvoids<Fty>)
+		constexpr PlacedVariant(in_place_index_t<Place>, Args&&... args)
+			noexcept
+			: PlacedVariant(in_place, nullopt)
+		{}
+
+		// Initialize my value with Args by a Type (not void)
+		template <typename T, size_t Hint, typename... Args>
+			requires (same_as<clean_t<T>, Fty>&& notvoids<Fty>)
+		explicit(is_explicit_constructible_v<T>)
+			constexpr
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
+		{}
+
+		// Initialize my value with Args by a Type (void)
+		// T = void
+		template <typename T, size_t Hint, typename... Args>
+			requires (same_as<clean_t<T>, Fty>&& !notvoids<Fty>)
+		explicit
+			constexpr
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+			noexcept
+			: PlacedVariant(in_place, nullopt)
 		{}
 
 		// Recursively find the place onto Tail
@@ -173,7 +211,7 @@ export namespace util
 			, isExtended(true)
 		{}
 
-		// Can't find the place onto Tail
+		// When cannot find the place onto Tail
 		template <size_t Target, typename... Args>
 			requires (Place + 1 + sizeof...(Rty) <= Target)
 		explicit constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
@@ -191,16 +229,6 @@ export namespace util
 			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
 
-		// Initialize my value with Args (not void)
-		template <typename T, size_t Hint, typename... Args>
-			requires (same_as<clean_t<T>, Fty>&& notvoids<Fty>)
-		explicit(is_explicit_constructible_v<T>)
-			constexpr
-			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
-			noexcept(nothrow_constructibles<Fty, Args...>)
-			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
-		{}
-
 		// Place the specified type from hint
 		template <typename T, size_t Guard, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
@@ -209,26 +237,6 @@ export namespace util
 			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: _Tail(in_place_type<T>, integral_constant<size_t, Guard + 1>{}, static_cast<Args&&>(args)...)
-			, isExtended(true)
-		{}
-
-		// Initialize my value with Args (not void)
-		template <typename... Args>
-			requires (notvoids<Fty>)
-		explicit(is_explicit_constructible_v<Fty>)
-			constexpr
-			PlacedVariant(integral_constant<size_t, 0>, Args&&... args)
-			noexcept(nothrow_constructibles<Fty, Args...>)
-			: myValue(static_cast<Args&&>(args)...)
-			, hasValue(true)
-		{}
-
-		// Recursively seek the index within Tail
-		template <size_t Index, typename... Args>
-			requires (Index != Place)
-		explicit constexpr PlacedVariant(integral_constant<size_t, Index>, Args&&... _Args)
-			noexcept(nothrow_constructibles<node_type, integral_constant<size_t, Index - 1>, Args...>)
-			: _Tail(integral_constant<size_t, Index - 1>{}, static_cast<Args&&>(_Args)...)
 			, isExtended(true)
 		{}
 
@@ -849,7 +857,7 @@ namespace util::test
 {
 	void test_union() noexcept
 	{
-		using aa_t = Union<int, unsigned long, float>;
+		using aa_t = Union<int, void, unsigned long, float>;
 
 		constexpr aa_t aa{};
 		using aa_0_t = aa_t::element_type<0>;
