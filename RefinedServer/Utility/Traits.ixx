@@ -4,6 +4,7 @@ export module Utility.Traits;
 
 export namespace util
 {
+	// type properties
 	using ::std::add_const;
 	using ::std::add_const_t;
 	using ::std::add_volatile;
@@ -34,6 +35,7 @@ export namespace util
 	using ::std::remove_cvref;
 	using ::std::remove_cvref_t;
 
+	// logical meta functors
 	using ::std::negation;
 	using ::std::negation_v;
 	using ::std::conditional;
@@ -52,6 +54,7 @@ export namespace util
 	using ::std::same_as;
 	using ::std::copyable;
 	using ::std::movable;
+
 	using ::std::default_initializable;
 	using ::std::copy_constructible;
 	using ::std::move_constructible;
@@ -60,15 +63,13 @@ export namespace util
 	using ::std::constructible_from;
 	using ::std::convertible_to;
 
+	// placeholders
 	using ::std::in_place_t;
 	using ::std::in_place;
 	using ::std::in_place_type_t;
 	using ::std::in_place_type;
 	using ::std::in_place_index_t;
 	using ::std::in_place_index;
-
-	template<typename T>
-	inline constexpr bool always_false = false;
 
 	template <size_t... Indices>
 	struct in_place_indices_t
@@ -83,6 +84,11 @@ export namespace util
 	template <size_t... Indices>
 	inline constexpr in_place_indices_t<Indices...> in_place_indices{};
 
+	// Always
+	template<typename T>
+	inline constexpr bool always_false = false;
+
+	// cleaner
 	template<typename T>
 	using clean_t = std::remove_cvref_t<std::remove_all_extents_t<T>>;
 
