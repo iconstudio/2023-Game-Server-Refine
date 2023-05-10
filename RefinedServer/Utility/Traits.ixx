@@ -51,6 +51,33 @@ export namespace util
 	using ::std::is_same;
 	using ::std::is_same_v;
 
+	// ctor flags
+	using ::std::is_copy_constructible;
+	using ::std::is_move_constructible;
+	using ::std::is_copy_constructible_v;
+	using ::std::is_move_constructible_v;
+	using ::std::is_copy_assignable;
+	using ::std::is_move_assignable;
+	using ::std::is_copy_assignable_v;
+	using ::std::is_move_assignable_v;
+
+	// trivals
+	using ::std::is_trivial;
+	using ::std::is_trivial_v;
+	using ::std::is_trivially_constructible;
+	using ::std::is_trivially_constructible_v;
+	using ::std::is_trivially_default_constructible;
+	using ::std::is_trivially_default_constructible_v;
+	using ::std::is_trivially_copy_constructible;
+	using ::std::is_trivially_copy_constructible_v;
+	using ::std::is_trivially_move_constructible;
+	using ::std::is_trivially_move_constructible_v;
+	using ::std::is_trivially_copy_assignable;
+	using ::std::is_trivially_copy_assignable_v;
+	using ::std::is_trivially_move_assignable;
+	using ::std::is_trivially_move_assignable_v;
+
+	// models
 	using ::std::same_as;
 	using ::std::copyable;
 	using ::std::movable;
@@ -58,8 +85,6 @@ export namespace util
 	using ::std::default_initializable;
 	using ::std::copy_constructible;
 	using ::std::move_constructible;
-	using ::std::is_copy_assignable_v;
-	using ::std::is_move_assignable_v;
 	using ::std::constructible_from;
 	using ::std::convertible_to;
 
