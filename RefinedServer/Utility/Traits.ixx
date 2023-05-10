@@ -84,7 +84,7 @@ export namespace util
 	inline constexpr in_place_indices_t<Indices...> in_place_indices{};
 
 	template<typename T>
-	using clean_t = std::remove_cvref_t<T>;
+	using clean_t = std::remove_cvref_t<std::remove_all_extents_t<T>>;
 
 	template <typename T>
 	inline constexpr bool is_actual_integral_v = std::_Is_any_of_v<std::remove_cvref_t<T>, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long>;
