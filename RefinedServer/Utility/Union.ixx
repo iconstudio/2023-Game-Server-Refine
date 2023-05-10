@@ -119,7 +119,7 @@ export namespace util
 		template <size_t Index>
 		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
 		template <size_t Index>
-		using value_type = clean_t<element_type<Index>>;
+		using value_type = element_type<Index>;
 		template <size_t Index>
 		using const_value_type = add_const_t<value_type<Index>>;
 		template <size_t Index>
@@ -194,7 +194,7 @@ export namespace util
 		// Initialize my value with Args by a Type (void)
 		// T = void
 		template <typename T, size_t Hint, typename... Args>
-			requires (same_as<clean_t<T>, Fty>&& !notvoids<Fty>)
+			requires (same_as<clean_t<T>, Fty> && !notvoids<Fty>)
 		explicit
 			constexpr
 			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
@@ -256,33 +256,48 @@ export namespace util
 			return *this;
 		}
 
+		template<typename W = Fty>
+			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr Fty& get() &
-			noexcept(nothrow_copy_constructibles<Fty>)
+		constexpr W& get() &
+			noexcept(nothrow_copy_constructibles<W>)
 		{
 			return myValue;
 		}
 
+		template<typename W = Fty>
+			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr const Fty& get() const&
-			noexcept(nothrow_copy_constructibles<const Fty>)
+		constexpr const W& get() const&
+			noexcept(nothrow_copy_constructibles<const W>)
 		{
 			return myValue;
 		}
 
+		template<typename W = Fty>
+			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr Fty&& get() &&
-			noexcept(nothrow_move_constructibles<Fty>)
+		constexpr W&& get() &&
+			noexcept(nothrow_move_constructibles<W>)
 		{
 			return move(myValue);
 		}
 
+		template<typename W = Fty>
+			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr const Fty&& get() const&&
-			noexcept(nothrow_move_constructibles<const Fty>)
+		constexpr const W&& get() const&&
+			noexcept(nothrow_move_constructibles<const W>)
 		{
 			return move(myValue);
 		}
+
+		template<typename W = Fty>
+			requires (!notvoids<W>)
+		[[nodiscard]]
+		constexpr void get() const
+			noexcept
+		{}
 
 		template <size_t Index>
 			requires (Index <= 1 + Place + sizeof...(Rty))
@@ -455,8 +470,10 @@ export namespace util
 			}
 		}
 
-		constexpr PlacedVariant& set(const Fty& value) &
-			noexcept(nothrow_copy_constructibles<Fty>)
+		template<typename W = Fty>
+			requires (notvoids<W>)
+		constexpr PlacedVariant& set(const W& value) &
+			noexcept(nothrow_copy_constructibles<W>)
 		{
 			myValue = value;
 			hasValue = true;
@@ -464,8 +481,10 @@ export namespace util
 			return *this;
 		}
 
-		constexpr PlacedVariant& set(Fty&& value) &
-			noexcept(nothrow_move_constructibles<Fty>)
+		template<typename W = Fty>
+			requires (notvoids<W>)
+		constexpr PlacedVariant& set(W&& value) &
+			noexcept(nothrow_move_constructibles<W>)
 		{
 			myValue = move(value);
 			hasValue = true;
@@ -473,8 +492,10 @@ export namespace util
 			return *this;
 		}
 
-		constexpr PlacedVariant&& set(const Fty& value) &&
-			noexcept(nothrow_copy_constructibles<Fty>)
+		template<typename W = Fty>
+			requires (notvoids<W>)
+		constexpr PlacedVariant&& set(const W& value) &&
+			noexcept(nothrow_copy_constructibles<W>)
 		{
 			myValue = value;
 			hasValue = true;
@@ -482,8 +503,10 @@ export namespace util
 			return move(*this);
 		}
 
-		constexpr PlacedVariant&& set(Fty&& value) &&
-			noexcept(nothrow_move_constructibles<Fty>)
+		template<typename W = Fty>
+			requires (notvoids<W>)
+		constexpr PlacedVariant&& set(W&& value) &&
+			noexcept(nothrow_move_constructibles<W>)
 		{
 			myValue = move(value);
 			hasValue = true;
@@ -869,7 +892,7 @@ namespace util::test
 		//using aa_3_t = aa_t::element_type<3>;
 
 		constexpr aa_0_t aa_ty_0_v = 0;
-		constexpr aa_1_t aa_ty_1_v = 0;
+		constexpr aa_1_t aa_ty_1_v;
 		constexpr aa_2_t aa_ty_2_v = 0;
 
 		aa.myPlace;
