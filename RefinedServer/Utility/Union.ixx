@@ -8,23 +8,23 @@ import Utility.Meta;
 
 namespace util
 {
-	template <bool _TrivialDestruction, class... Ts>
-	class VariantStorage {};
+	template <bool _TrivialDestruction, typename... Ts>
+	struct InternalVariant {};
 
-	template <class... Ts>
-	using RouteVariant = VariantStorage<make_conjunction<std::is_trivially_destructible, Ts...>, Ts...>;
+	template <typename... Ts>
+	struct VariantStorage {};
 
-	// Storage for variant alternatives (trivially destructible case)
-	template <class _First, class... _Rest>
-	class VariantStorage<true, _First, _Rest...>
+	template <typename Fty, typename... Rty>
+	struct VariantStorage<Fty, Rty...>
 	{
-	public:
 		constexpr VariantStorage() noexcept {}
 
+		// ctor (not void)
 		template <class... Ts>
+			requires (notvoids<Fty>)
 		constexpr explicit
 			VariantStorage(integral_constant<size_t, 0>, Ts&&... _Args)
-			noexcept(nothrow_constructibles<_First, Ts...>)
+			noexcept(nothrow_constructibles<Fty, Ts...>)
 			: _Head(static_cast<Ts&&>(_Args)...)
 		{}
 
@@ -32,54 +32,62 @@ namespace util
 			requires (0 < _Idx)
 		constexpr explicit
 			VariantStorage(integral_constant<size_t, _Idx>, Ts&&... _Args)
-			noexcept(nothrow_constructibles<RouteVariant<_Rest...>, integral_constant<size_t, _Idx - 1>, Ts...>)
+			noexcept(nothrow_constructibles<VariantStorage<Rty...>, integral_constant<size_t, _Idx - 1>, Ts...>)
 			: _Tail(integral_constant<size_t, _Idx - 1>{}, static_cast<Ts&&>(_Args)...)
 		{}
 
+		constexpr VariantStorage(const VariantStorage& other) = default;
+		constexpr VariantStorage(VariantStorage&& other) = default;
+		constexpr VariantStorage& operator=(const VariantStorage& other) = default;
+		constexpr VariantStorage& operator=(VariantStorage&& other) = default;
+
+	protected:
 		union
 		{
-			remove_const_t<_First> _Head;
-			RouteVariant<_Rest...> _Tail;
+			union
+			{
+				std::monostate voidData = {};
+				remove_const_t<Fty> _Head;
+			};
+			VariantStorage<Rty...> _Tail;
 		};
 	};
 
-	// Storage for variant alternatives (non-trivially destructible case)
-	template <class _First, class... _Rest>
-	class VariantStorage<false, _First, _Rest...>
+	template <typename... Ts>
+	using RouteVariant = InternalVariant<make_conjunction<std::is_trivially_destructible, Ts...>, Ts...>;
+
+	// Storage for variant alternatives (trivially destructible case)
+	template <typename Fty, typename... Rty>
+	struct InternalVariant<true, Fty, Rty...> : VariantStorage<Fty, Rty...>
 	{
-	public:
-		constexpr VariantStorage() noexcept {}
+		using base = VariantStorage<Fty, Rty...>;
+
+		constexpr InternalVariant() noexcept {}
+		using base::base;
+
+		constexpr InternalVariant(const InternalVariant& other) = default;
+		constexpr InternalVariant(InternalVariant&& other) = default;
+		constexpr InternalVariant& operator=(const InternalVariant& other) = default;
+		constexpr InternalVariant& operator=(InternalVariant&& other) = default;
+	};
+
+	// Storage for variant alternatives (non-trivially destructible case)
+	template <class Fty, class... Rty>
+	struct InternalVariant<false, Fty, Rty...> : VariantStorage<Fty, Rty...>
+	{
+		using base = VariantStorage<Fty, Rty...>;
+
+		using base::base;
 
 		// explicitly non-trivial destructor (which would otherwise be defined as deleted
 		// since the class has a variant member with a non-trivial destructor)
-		constexpr ~VariantStorage() noexcept
+		constexpr ~InternalVariant() noexcept
 		{}
 
-		template <class... Ts>
-		constexpr explicit
-			VariantStorage(integral_constant<size_t, 0>, Ts&&... _Args)
-			noexcept(nothrow_constructibles<_First, Ts...>)
-			: _Head(static_cast<Ts&&>(_Args)...)
-		{}
-
-		template <size_t _Idx, class... Ts>
-			requires (0 < _Idx)
-		constexpr explicit
-			VariantStorage(integral_constant<size_t, _Idx>, Ts&&... _Args)
-			noexcept(nothrow_constructibles<RouteVariant<_Rest...>, integral_constant<size_t, _Idx - 1>, Ts...>)
-			: _Tail(integral_constant<size_t, _Idx - 1>{}, static_cast<Ts&&>(_Args)...)
-		{}
-
-		VariantStorage(VariantStorage&&) = default;
-		VariantStorage(const VariantStorage&) = default;
-		VariantStorage& operator=(VariantStorage&&) = default;
-		VariantStorage& operator=(const VariantStorage&) = default;
-
-		union
-		{
-			remove_const_t<_First> _Head;
-			RouteVariant<_Rest...> _Tail;
-		};
+		constexpr InternalVariant(const InternalVariant& other) = default;
+		constexpr InternalVariant(InternalVariant&& other) = default;
+		constexpr InternalVariant& operator=(const InternalVariant& other) = default;
+		constexpr InternalVariant& operator=(InternalVariant&& other) = default;
 	};
 }
 
