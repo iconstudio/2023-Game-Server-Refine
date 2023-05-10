@@ -15,6 +15,12 @@ export namespace util
 	class PlacedVariant<integral_constant<size_t, Place>>
 	{};
 
+	template<typename T, typename... Args>
+	struct is_explicit_constructible : conditional_t<is_trivially_constructible_v<T, Args...>, true_type, false_type> {};
+
+	template<typename T, typename... Args>
+	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::template value;
+
 	template <size_t Place, notvoids Fty, notvoids... Rty>
 	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
 	{
@@ -99,6 +105,7 @@ export namespace util
 		// Place the specified type
 		template <typename T, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>)
+		explicit(is_explicit_constructible_v<T>)
 		constexpr PlacedVariant(in_place_type_t<T>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
@@ -107,7 +114,8 @@ export namespace util
 		// Initialize my value with Args
 		template <typename T, size_t Hint, typename... Args>
 			requires (same_as<clean_t<T>, Fty>)
-		explicit constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+		explicit(is_explicit_constructible_v<T>)
+		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
@@ -115,7 +123,8 @@ export namespace util
 		// Place the specified type from hint
 		template <typename T, size_t Guard, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
-		explicit constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
+		explicit(is_explicit_constructible_v<T>)
+		constexpr PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
 			: _Tail(in_place_type<T>, integral_constant<size_t, Guard + 1>{}, static_cast<Args&&>(args)...)
 			, isExtended(true)
