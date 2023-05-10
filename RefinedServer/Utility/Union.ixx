@@ -514,21 +514,23 @@ export namespace util
 			return move(*this);
 		}
 
-		template <typename... Args>
-		constexpr Fty& emplace(Args&&... args) &
-			noexcept(nothrow_constructibles<Fty, Args&&...>)
+		template <typename W = Fty, typename... Args>
+			requires (notvoids<W>)
+		constexpr W& emplace(Args&&... args) &
+			noexcept(nothrow_constructibles<W, Args&&...>)
 		{
-			myValue = Fty{ forward<Args>(args)... };
+			myValue = W{ forward<Args>(args)... };
 			hasValue = true;
 
 			return myValue;
 		}
 
-		template <typename... Args>
-		constexpr Fty&& emplace(Args&&... args) &&
-			noexcept(nothrow_constructibles<Fty, Args&&...>)
+		template <typename W = Fty, typename... Args>
+			requires (notvoids<W>)
+		constexpr W&& emplace(Args&&... args) &&
+			noexcept(nothrow_constructibles<W, Args&&...>)
 		{
-			myValue = Fty{ forward<Args>(args)... };
+			myValue = W{ forward<Args>(args)... };
 			hasValue = true;
 
 			return move(myValue);
@@ -892,7 +894,7 @@ namespace util::test
 		//using aa_3_t = aa_t::element_type<3>;
 
 		constexpr aa_0_t aa_ty_0_v = 0;
-		constexpr aa_1_t aa_ty_1_v;
+		//constexpr aa_1_t aa_ty_1_v;
 		constexpr aa_2_t aa_ty_2_v = 0;
 
 		aa.myPlace;
