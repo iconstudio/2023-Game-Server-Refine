@@ -3,7 +3,6 @@ module;
 #include <winsock2.h>
 
 export module Net.CompletionPort;
-import Utility.Monad;
 import Net.Promise;
 
 using ulong = unsigned long;
@@ -11,7 +10,7 @@ using ullong = unsigned long long;
 
 export namespace net
 {
-	using registerPromise = Promise<void, int>;
+	using registerPromise = ErrorHandler<void>;
 
 	namespace abi
 	{
