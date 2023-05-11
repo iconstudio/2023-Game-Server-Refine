@@ -62,10 +62,10 @@ export namespace net
 	export namespace io
 	{
 		template<typename Fn, typename... Args>
-		concept io_invocables = util::r_invocables<Fn, int, SOCKET, Args...>;
+		concept so_invocables = util::r_invocables<Fn, int, SOCKET, Args...>;
 
 		template<typename Fn, typename... Args>
-			requires io_invocables<Fn, Args...>
+			requires so_invocables<Fn, Args...>
 		inline
 			ioError
 			Execute(Fn&& fn, SOCKET socket, Args&&... args)
@@ -75,7 +75,7 @@ export namespace net
 		}
 
 		template<typename Class, typename Method, typename... Args>
-			requires io_invocables<Method, Args...>
+			requires so_invocables<Method, Args...>
 		inline
 			ioError
 			Delegate(Method Class::* (&& action), Class& obj, SOCKET socket, Args&&... args)
@@ -87,7 +87,7 @@ export namespace net
 		}
 
 		template<typename Class, typename Method, typename... Args>
-			requires io_invocables<Method, Args...>
+			requires so_invocables<Method, Args...>
 		inline
 			ioError
 			Delegate(Method Class::* (&& action), const Class& obj, SOCKET socket, Args&&... args)
