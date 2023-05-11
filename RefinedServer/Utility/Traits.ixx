@@ -1,5 +1,6 @@
 module;
 #include <utility>
+
 export module Utility.Traits;
 
 export namespace util
@@ -141,6 +142,9 @@ export namespace util
 	struct is_indexed<Template<Indices...>, typename Template> : std::true_type
 	{};
 
+	template<typename Special, template<size_t...> typename Template>
+	inline constexpr bool is_indexed_v = is_indexed<Special, Template>::value;
+
 	template<typename... Ts>
 	struct avoid_void;
 
@@ -148,12 +152,6 @@ export namespace util
 	template<typename Void, typename... Rests>
 		requires (is_same_v<Void, void>)
 	struct avoid_void<Void, Rests...> : avoid_void<Rests...>
-	{};
-
-	// remove the secondary void
-	template<typename T, typename Void, typename... Rests>
-		requires (is_same_v<Void, void>)
-	struct avoid_void<T, Void, Rests...> : avoid_void<T, Rests...>
 	{};
 
 	// get the first
@@ -164,36 +162,47 @@ export namespace util
 		using type = Fty;
 	};
 
+	// remove the secondary void
+	template<typename T, typename Void, typename... Rests>
+		requires (is_same_v<Void, void>)
+	struct avoid_void<T, Void, Rests...> : avoid_void<T, Rests...>
+	{};
+
 	template<typename Void>
 		requires (is_same_v<Void, void>)
 	struct avoid_void<Void>
-	{
-		static_assert(always_false<Void>, "error");
-	};
+	{};
 
 	template<>
 	struct avoid_void<>
-	{
-		//static_assert(always_false<avoid_void<std::integral_constant<int, 0>>>, "error");
-	};
+	{};
 
 	template<typename... Ts>
 	using avoid_void_t = typename avoid_void<Ts...>::type;
 
-	template<typename Special, template<size_t...> typename Template>
-	inline constexpr bool is_indexed_v = is_indexed<Special, Template>::value;
+	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
+	struct logical_product
+	{
+		using result = Wrapper<MetaFn<Ts>...>;
+		static inline constexpr bool value = result::value;
+	};
+
+	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Rests>
+	struct logical_product<MetaFn, Wrapper, void, Rests...> : logical_product<MetaFn, Wrapper, Rests...>
+	{};
+
+	template<template<typename> typename MetaFn, template<typename> typename Wrapper>
+	struct logical_product<MetaFn, Wrapper> : false_type
+	{};
 
 	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
-	inline constexpr bool meta_invoke = Wrapper<MetaFn<Ts>...>::value;
+	inline constexpr auto logical_product_v = logical_product<MetaFn, Wrapper, Ts...>::value;
 
 	template<template<typename> typename MetaFn, typename... Ts>
-	inline constexpr bool make_conjunction = meta_invoke<MetaFn, std::conjunction, Ts...>;
+	inline constexpr bool make_conjunction = logical_product_v<MetaFn, std::conjunction, Ts...>;
 
 	template<template<typename> typename MetaFn, typename... Ts>
-	inline constexpr bool make_disjunction = meta_invoke<MetaFn, std::disjunction, Ts...>;
-
-	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
-	inline constexpr bool make_avoid_voids = meta_invoke<MetaFn, Wrapper, avoid_void_t<Ts>...>;
+	inline constexpr bool make_disjunction = logical_product_v<MetaFn, std::disjunction, Ts...>;
 
 	template<typename T>
 	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, false_type, true_type> {};
@@ -230,9 +239,9 @@ namespace util::test
 		test_noncopy_asin& operator=(const test_noncopy_asin& other) = delete;
 	};
 
-	constexpr bool av0 = make_avoid_voids<is_copy_assignable, std::conjunction, int, long, float, short>;
-	constexpr bool av1 = make_avoid_voids<is_copy_assignable, std::conjunction, int, test_noncopy_ctor>;
-	constexpr bool av2 = make_avoid_voids<is_copy_assignable, std::conjunction, int, test_noncopy_asin>;
-	constexpr bool av3 = make_avoid_voids<is_copy_assignable, std::conjunction, void>;
+	constexpr bool av0 = logical_product_v<is_copy_assignable, std::conjunction, int, long, float, short>;
+	constexpr bool av1 = logical_product_v<is_copy_assignable, std::conjunction, int, test_noncopy_ctor>;
+	constexpr bool av2 = logical_product_v<is_copy_assignable, std::conjunction, int, test_noncopy_asin>;
+	constexpr bool av3 = logical_product_v<is_copy_assignable, std::conjunction, void, bool>;
 }
 #pragma warning(pop)
