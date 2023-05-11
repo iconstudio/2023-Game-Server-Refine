@@ -1020,13 +1020,13 @@ namespace meta::test
 		//using en4_top = front_t<en4_t>;
 		//using en4_bot = back_t<en4_t>;
 
-		constexpr size_t seek_int = meta::seek_range<int, test_rp_list>;
-		constexpr size_t seek_float = meta::seek_range<float, test_rp_list>;
-		constexpr size_t seek_double = meta::seek_range<double, test_rp_list>;
-		//constexpr size_t seek_char = meta::seek_range<char, test_rp_list>;
+		constexpr size_t seek_int = seek_range<int, test_rp_list>;
+		constexpr size_t seek_float = seek_range<float, test_rp_list>;
+		constexpr size_t seek_double = seek_range<double, test_rp_list>;
+		//constexpr size_t seek_char = seek_range<char, test_rp_list>;
 
 		using local_fn = wrap<pop>;
-		using local_rp_pop = repeat_n<local_fn, test_rp_list, seek_int + 1>;
+		using local_rp_pop = repeat_n<wrap<pop>, test_rp_list, seek_range<int, test_rp_list> + 1>;
 		using local_rp_pop_t = typename local_rp_pop::template type;
 	}
 

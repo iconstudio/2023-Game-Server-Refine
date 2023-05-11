@@ -4,6 +4,7 @@ import Utility.Monad;
 import Utility.Constraints;
 import Utility.Traits;
 import Net;
+import Net.Promise;
 
 export namespace net
 {

@@ -653,9 +653,15 @@ export namespace util
 		}
 
 		template <typename T>
+		static inline constexpr size_t seek = meta::seek_range<T, base_type>;
+
+		template <typename T>
+		using pop = meta::repeat_n_t<meta::wrap<meta::pop>, base_type, seek<T>>::type;
+
+		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr meta::front_t<pop<T>>&
 			get()&
 		{
 			return myStorage.template get<T>();
@@ -664,7 +670,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr const meta::front_t<pop<T>>&
 			get() const&
 		{
 			return myStorage.template get<T>();
@@ -673,7 +679,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr meta::front_t<pop<T>>&&
 			get()&&
 		{
 			return move(myStorage).template get<T>();
@@ -682,7 +688,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr decltype(auto)
+		constexpr const meta::front_t<pop<T>>&&
 			get() const&&
 		{
 			return move(myStorage).template get<T>();
@@ -822,6 +828,10 @@ namespace util::test
 		const LooseMonad<int, float, int> e2{ std::in_place_index<2>, 500 };
 		const LooseMonad<int, float, float> f2{ std::in_place_type<float>, 500.0f };
 		const LooseMonad<int, float, int> g2{ std::in_place_type<float>, 500.0f };
+
+		//LooseMonad<int, float, int>::storage_pop;
+		//constexpr size_t seek = LooseMonad<int, float, int>::seek<int>;
+		//LooseMonad<int, float, int>::pop<int>;
 
 		constexpr LooseMonad<int, float, float> d3{ std::in_place_index<1>, 500.0f };
 		constexpr bool has_d3_0 = d3.has_value<0>();
