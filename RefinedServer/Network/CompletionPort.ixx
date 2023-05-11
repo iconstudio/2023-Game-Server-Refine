@@ -122,6 +122,7 @@ export namespace net
 			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), context);
 		}
 
+		[[nodiscard]]
 		inline bool IsValid() const noexcept
 		{
 			return nullptr != rawHandle && 0 < reinterpret_cast<long long>(rawHandle);
