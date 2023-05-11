@@ -336,6 +336,53 @@ export namespace meta
 		//static_assert(util::always_false<T>, "Cannot find the type in the sequence.");
 	};
 
+	namespace detail
+	{
+		// find the index of type T in loosen sequence
+		template <typename Indexer, typename T, typename...>
+		struct seek_impl;
+
+		template <typename T, typename... Ts>
+		inline constexpr size_t seek_impl_v = seek_impl<std::integral_constant<size_t, 0>, T, Ts...>::value;
+
+		template <size_t I, typename T, typename... Rests>
+		struct seek_impl<std::integral_constant<size_t, I>, T, T, Rests...>
+		{
+			static inline constexpr size_t value = I;
+		};
+
+		template <size_t I, typename T, typename First, typename... Rests>
+		struct seek_impl<std::integral_constant<size_t, I>, T, First, Rests...> : public seek_impl<std::integral_constant<size_t, I + 1>, T, Rests...>
+		{};
+
+		// find the index of type T in sequence
+		template <typename Indexer, typename T, typename Seq>
+		struct seek_range_impl;
+
+		template <typename Indexer, typename T, typename Seq>
+		inline constexpr size_t seek_range_impl_v = seek_range_impl<Indexer, T, Seq>::value;
+
+		template <size_t I, template <typename...> typename Seq, typename T, typename... Rests>
+		struct seek_range_impl<std::integral_constant<size_t, I>, T, Seq<T, Rests...>>
+		{
+			static inline constexpr size_t value = I;
+		};
+
+		template <size_t I, template <typename...> typename Seq, typename T, typename First, typename... Rests>
+		struct seek_range_impl<std::integral_constant<size_t, I>, T, Seq<First, Rests...>> : public seek_range_impl<std::integral_constant<size_t, I + 1>, T, Seq<Rests...>>
+		{};
+
+		template <typename Indexer, typename T, template <typename...> typename Seq>
+		struct seek_range_impl<Indexer, T, Seq<>>
+		{};
+	}
+
+	template <typename T, typename... Ts>
+	inline constexpr size_t seek = detail::seek_impl_v<std::integral_constant<size_t, 0>, T, Ts...>;
+
+	template <typename T, typename Seq>
+	inline constexpr size_t seek_range = detail::seek_range_impl_v<std::integral_constant<size_t, 0>, T, Seq>;
+
 	// determine if a type is in sequence
 	template <typename T, typename...>
 	struct included;
@@ -972,6 +1019,15 @@ namespace meta::test
 		static_assert(std::is_same_v<en4_t, MetaList<>>, "4");
 		//using en4_top = front_t<en4_t>;
 		//using en4_bot = back_t<en4_t>;
+
+		constexpr size_t seek_int = meta::seek_range<int, test_rp_list>;
+		constexpr size_t seek_float = meta::seek_range<float, test_rp_list>;
+		constexpr size_t seek_double = meta::seek_range<double, test_rp_list>;
+		//constexpr size_t seek_char = meta::seek_range<char, test_rp_list>;
+
+		using local_fn = wrap<pop>;
+		using local_rp_pop = repeat_n<local_fn, test_rp_list, seek_int + 1>;
+		using local_rp_pop_t = typename local_rp_pop::template type;
 	}
 
 	void test_enumerators() noexcept
