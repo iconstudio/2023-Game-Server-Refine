@@ -467,8 +467,14 @@ export namespace net
 			: myState(util::in_place_type<succeed_t>, io::make_success(util::forward<U>(successor)))
 		{}
 
-		constexpr Promise(const Promise& other) noexcept
+		constexpr Promise(const Promise& other)
+			noexcept requires (util::copyable<T>)
 			: myState(other.myState)
+		{}
+
+		constexpr Promise(const Promise& other)
+			noexcept requires (!util::copyable<T>)
+			: myState(static_cast<monad_t&&>(other.myState))
 		{}
 
 		constexpr Promise(Promise&& other) noexcept
@@ -870,7 +876,7 @@ export namespace net
 	};
 
 	using Proxy = Promise<void, void>;
-	template<util::copyable T>
+	template<typename T>
 	using ErrorHandler = Promise<T, int>;
 	using PointerHandler = ErrorHandler<void*>;
 
