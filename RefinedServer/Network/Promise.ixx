@@ -622,6 +622,198 @@ export namespace net
 			return util::move(*this);
 		}
 
+		/// <summary>
+		/// or_else, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			util::monad_result_t<Fn>
+			or_else(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (!IsSuccess())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			util::monad_result_t<Fn>
+			or_else(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (!IsSuccess())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			util::monad_result_t<Fn>
+			or_else(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (!IsSuccess())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			util::monad_result_t<Fn>
+			or_else(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (!IsSuccess())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<E&> Fn>
+		constexpr
+			util::monad_result_t<Fn, E&>
+			or_else(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&>())))
+		{
+			using fwd_result_t = util::monad_result_t<Fn, E&>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (IsFailed())
+			{
+				return util::forward<Fn>(action)(GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<const E&> Fn>
+		constexpr
+			util::monad_result_t<Fn, const E&>
+			or_else(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&>())))
+		{
+			using fwd_result_t = util::monad_result_t<Fn, const E&>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (IsFailed())
+			{
+				return util::forward<Fn>(action)(GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<E&&> Fn>
+		constexpr
+			util::monad_result_t<Fn, E&&>
+			or_else(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&&>())))
+		{
+			using fwd_result_t = util::monad_result_t<Fn, E&&>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (IsFailed())
+			{
+				return util::forward<Fn>(action)(util::move(*this).GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<const E&&> Fn>
+		constexpr
+			util::monad_result_t<Fn, const E&&>
+			or_else(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&&>())))
+		{
+			using fwd_result_t = util::monad_result_t<Fn, const E&&>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+
+			if (IsFailed())
+			{
+				return util::forward<Fn>(action)(util::move(*this).GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
 		constexpr succeed_t& GetResult() & noexcept
 			requires util::notvoids<T>
 		{

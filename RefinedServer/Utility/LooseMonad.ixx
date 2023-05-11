@@ -43,7 +43,7 @@ export namespace util
 
 		constexpr LooseMonad(LooseMonad&& other)
 			noexcept(nothrow_move_constructibles<Ts...>) requires(move_constructibles<Ts...>)
-			: myStorage(static_cast<LooseMonad&&>(other).myStorage)
+			: myStorage(move(other.myStorage))
 		{}
 
 		constexpr LooseMonad& operator=(const LooseMonad& other)
