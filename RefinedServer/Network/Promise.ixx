@@ -1076,7 +1076,7 @@ export namespace net
 			if_then(Fn&& action) &
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(GetResult());
 			}
@@ -1090,7 +1090,7 @@ export namespace net
 			if_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(GetResult());
 			}
@@ -1104,7 +1104,7 @@ export namespace net
 			if_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(GetResult());
 			}
@@ -1118,7 +1118,7 @@ export namespace net
 			if_then(Fn&& action) const&&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(GetResult());
 			}
@@ -1134,7 +1134,7 @@ export namespace net
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
 
-			if (myState.has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				return util::forward<Fn>(action)(GetResult());
 			}
@@ -1152,7 +1152,7 @@ export namespace net
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
 
-			if (myState.has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				return util::forward<Fn>(action)(GetResult());
 			}
@@ -1170,7 +1170,7 @@ export namespace net
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
 
-			if (myState.has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				return util::forward<Fn>(action)(GetResult());
 			}
@@ -1188,7 +1188,7 @@ export namespace net
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
 
-			if (myState.has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				return util::forward<Fn>(action)(GetResult());
 			}
@@ -1204,7 +1204,7 @@ export namespace net
 			else_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (!myState.template has_value<succeed_t>())
+			if (!IsSuccess())
 			{
 				util::forward<Fn>(action)();
 			}
@@ -1218,7 +1218,7 @@ export namespace net
 			else_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (!myState.template has_value<succeed_t>())
+			if (!IsSuccess())
 			{
 				util::forward<Fn>(action)();
 			}
@@ -1236,13 +1236,13 @@ export namespace net
 
 			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
 
-			if (!myState.template has_value<succeed_t>())
+			if (!IsSuccess())
 			{
 				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return fwd_result_t{ util::nullopt };
+				return fwd_result_t{};
 			}
 		}
 
@@ -1256,13 +1256,13 @@ export namespace net
 
 			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
 
-			if (!myState.template has_value<succeed_t>())
+			if (!IsSuccess())
 			{
 				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return fwd_result_t{ util::nullopt };
+				return fwd_result_t{};
 			}
 		}
 
