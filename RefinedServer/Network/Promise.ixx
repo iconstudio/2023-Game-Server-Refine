@@ -318,6 +318,10 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// if_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::lv_invocable<T> Fn>
 		constexpr
 			const Promise&
@@ -332,6 +336,10 @@ export namespace net
 			return *this;
 		}
 
+		/// <summary>
+		/// if_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::cl_invocable<T> Fn>
 		constexpr
 			const Promise&
@@ -346,6 +354,10 @@ export namespace net
 			return *this;
 		}
 
+		/// <summary>
+		/// if_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::rv_invocable<T> Fn>
 		constexpr
 			Promise&&
@@ -360,6 +372,10 @@ export namespace net
 			return util::move(*this);
 		}
 
+		/// <summary>
+		/// if_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::cr_invocable<T> Fn>
 		constexpr
 			const Promise&&
@@ -374,6 +390,10 @@ export namespace net
 			return util::move(*this);
 		}
 
+		/// <summary>
+		/// and_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::lv_invocable<T> Fn>
 		constexpr
 			util::monad_result_t<Fn, util::make_lvalue_t<T>>
@@ -392,6 +412,10 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// and_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::cl_invocable<T> Fn>
 		constexpr
 			util::monad_result_t<Fn, util::make_clvalue_t<T>>
@@ -410,6 +434,10 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// and_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::rv_invocable<T> Fn>
 		constexpr
 			util::monad_result_t<Fn, util::make_rvalue_t<T>>
@@ -428,6 +456,10 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// and_then (on succeed)
+		/// </summary>
+		/// <param name="action"></param>
 		template<util::cr_invocable<T> Fn>
 		constexpr
 			util::monad_result_t<Fn, util::make_crvalue_t<T>>
@@ -444,6 +476,39 @@ export namespace net
 			{
 				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
 			}
+		}
+
+		/// <summary>
+		/// else_then, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			Promise&
+			else_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsSuccess())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		// else_then, parameter E (on failed)
+		template<util::invocables<E> Fn>
+		constexpr
+			Promise&
+			else_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E>())))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
 		}
 
 		constexpr succeed_t& GetResult() & noexcept
