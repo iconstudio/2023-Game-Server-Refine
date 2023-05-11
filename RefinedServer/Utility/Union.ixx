@@ -829,8 +829,15 @@ export namespace util
 			}
 		}
 
-		constexpr PlacedVariant(const PlacedVariant&) noexcept = default;
-		constexpr PlacedVariant(PlacedVariant&&) noexcept = default;
+		constexpr PlacedVariant(const PlacedVariant& other) noexcept
+		{
+			(*this).operator=(other);
+		}
+
+		constexpr PlacedVariant(PlacedVariant&& other) noexcept
+		{
+			(*this).operator=(move(other));
+		}
 
 		constexpr PlacedVariant& operator=(const PlacedVariant& other) & noexcept
 		{
