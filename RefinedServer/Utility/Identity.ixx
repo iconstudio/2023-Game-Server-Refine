@@ -5,7 +5,10 @@ import Utility.Constraints;
 export namespace util
 {
 	template<typename T, typename Tag = void>
-	class Identity
+	class Identity;
+
+	template<notvoids T, typename Tag>
+	class Identity<T, Tag>
 	{
 	public:
 		using value_type = T;
@@ -35,7 +38,7 @@ export namespace util
 			: myValue(static_cast<T&&>(value))
 		{}
 
-		constexpr Identity& operator=(const Identity& other)
+		constexpr Identity& operator=(const Identity& other) &
 			noexcept(nothrow_copy_assignables<T>)
 			requires(copy_assignables<T>)
 		{
@@ -43,7 +46,15 @@ export namespace util
 			return *this;
 		}
 
-		constexpr Identity& operator=(Identity&& other)
+		constexpr Identity&& operator=(const Identity& other) &&
+			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>)
+		{
+			myValue = other.myValue;
+			return move(*this);
+		}
+
+		constexpr Identity& operator=(Identity&& other) &
 			noexcept(nothrow_move_assignables<T>)
 			requires(move_assignables<T>)
 		{
@@ -51,11 +62,44 @@ export namespace util
 			return *this;
 		}
 
-		constexpr void swap(Identity& other) noexcept(nothrow_swappables<T>)
+		constexpr Identity&& operator=(Identity&& other) &&
+			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
+		{
+			myValue = static_cast<T&&>(other.myValue);
+			return move(*this);
+		}
+
+		constexpr void swap(Identity& other) &
+			noexcept(nothrow_swappables<T>)
 		{
 			T temp = static_cast<T&&>(myValue);
 			myValue = static_cast<T&&>(other.myValue);
 			other.myValue = static_cast<T&&>(temp);
+		}
+
+		constexpr void swap(const Identity& other) &
+			noexcept(nothrow_swappables<const T>) requires (move_assignables<const T>)
+		{
+			T temp = static_cast<T&&>(myValue);
+			myValue = static_cast<const T&&>(other.myValue);
+			other.myValue = static_cast<T&&>(temp);
+		}
+
+		constexpr void swap(Identity& other) const&
+			noexcept(nothrow_swappables<const T>) requires (move_assignables<const T>)
+		{
+			const T temp = static_cast<const T&&>(myValue);
+			myValue = static_cast<T&&>(other.myValue);
+			other.myValue = static_cast<const T&&>(temp);
+		}
+
+		constexpr void swap(const Identity& other) const&
+			noexcept(nothrow_swappables<const T>) requires (move_assignables<const T>)
+		{
+			const T temp = static_cast<const T&&>(myValue);
+			myValue = static_cast<const T&&>(other.myValue);
+			other.myValue = static_cast<const T&&>(temp);
 		}
 
 		[[nodiscard]]
