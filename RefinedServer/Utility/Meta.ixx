@@ -22,7 +22,7 @@ namespace meta::detail
 
 	// construct a sequence consisting of repetitions of T
 	template <size_t Count, typename T, template <typename...> typename Predicate>
-	using create = typename invoke_args<T, std::make_index_sequence<Count>, Predicate>::template type;
+	using create = typename invoke_args<T, std::make_index_sequence<Count>, Predicate>::type;
 
 	template <size_t Index, typename Void, template <typename...> typename Seq, typename...>
 	struct __at_impl;
@@ -75,7 +75,7 @@ namespace meta::detail
 		requires (Index < sizeof...(Ts))
 	struct __at<Seq<Ts...>, Index>
 	{
-		using type = typename decltype(create<Index, void*, enumerate_ptrs>::template _Eval(AsPointer<Ts>()...));
+		using type = typename decltype(create<Index, void*, enumerate_ptrs>::_Eval(AsPointer<Ts>()...));
 	};*/
 #endif // __clang__
 }
@@ -112,14 +112,14 @@ export namespace meta
 
 	template <typename Fn, typename... Args>
 		requires meta_invocables<Fn, Args...>
-	using invoke_r = typename invoke<Fn, Args...>::template type;
+	using invoke_r = typename invoke<Fn, Args...>::type;
 
 	// encapsulate a template into a meta-callable type
 	template <template <typename...> typename Fn>
 	struct wrap
 	{
 		template <typename... Args>
-		using result = typename wrapper<void, Fn, Args...>::template type;
+		using result = typename wrapper<void, Fn, Args...>::type;
 	};
 
 	// construct a meta-callable that passes its arguments and Args to Functor
@@ -137,7 +137,7 @@ export namespace meta
 	{
 		// this is callable
 		template<size_t I>
-		using result = typename detail::template __at<Seq, I>;
+		using result = typename detail::__at<Seq, I>;
 	};
 
 	// unpack List into the parameters of meta-callable Functor
@@ -146,7 +146,7 @@ export namespace meta
 
 	template <class Fn, class Seq>
 		requires meta_invocables<Fn, Seq>
-	using apply_t = typename apply<Fn, Seq>::template type;
+	using apply_t = typename apply<Fn, Seq>::type;
 
 	// invoke meta-callable Functor with the parameters of a template specialization
 	template <typename Fn, template <typename...> typename Seq, typename... Ts>
@@ -186,7 +186,7 @@ export namespace meta
 	template <typename Fn, typename T, typename U, typename... Rests>
 	struct foldl<Fn, T, U, Rests...>
 	{
-		using type = typename foldl<Fn, invoke_r<Fn, T, U>, Rests...>::template type;
+		using type = typename foldl<Fn, invoke_r<Fn, T, U>, Rests...>::type;
 	};
 
 	template <typename Fn, typename T>
@@ -199,7 +199,7 @@ export namespace meta
 	struct front;
 
 	template <typename Seq>
-	using front_t = typename front<Seq>::template type;
+	using front_t = typename front<Seq>::type;
 
 	template <template <typename...> typename Seq, typename First, typename... Rests>
 	struct front<Seq<First, Rests...>>
@@ -217,7 +217,7 @@ export namespace meta
 	struct back;
 
 	template <typename Seq>
-	using back_t = typename back<Seq>::template type;
+	using back_t = typename back<Seq>::type;
 
 	template <template <typename...> typename Seq, typename Fty, typename Nty, typename... Rests>
 	struct back<Seq<Fty, Nty, Rests...>> : public back<Seq<Nty, Rests...>>
@@ -239,7 +239,7 @@ export namespace meta
 	struct push;
 
 	template <typename LTy, typename RTy>
-	using push_t = typename push<LTy, RTy>::template type;
+	using push_t = typename push<LTy, RTy>::type;
 
 	template <template <typename...> typename Seq, typename T, typename... Fronts>
 	struct push<Seq<Fronts...>, T>
@@ -257,7 +257,7 @@ export namespace meta
 	struct push_back;
 
 	template <typename LTy, typename RTy>
-	using push_back_t = typename push_back<LTy, RTy>::template type;
+	using push_back_t = typename push_back<LTy, RTy>::type;
 
 	template <template <typename...> typename Seq, typename T, typename... Backs>
 	struct push_back<Seq<Backs...>, T>
@@ -275,7 +275,7 @@ export namespace meta
 	struct pop;
 
 	template <typename Seq>
-	using pop_t = typename pop<Seq>::template type;
+	using pop_t = typename pop<Seq>::type;
 
 	template <template <typename...> typename Seq, typename First, typename... Rests>
 	struct pop<Seq<First, Rests...>>
@@ -293,7 +293,7 @@ export namespace meta
 	struct pop_back;
 
 	template <typename Seq>
-	using pop_back_t = typename pop_back<Seq>::template type;
+	using pop_back_t = typename pop_back<Seq>::type;
 
 	template <template <typename...> typename Seq, typename First, typename Next, typename... Rests>
 	struct pop_back<Seq<First, Next, Rests...>> : public push_back<First, pop_back_t<Seq<Next, Rests...>>>
@@ -455,17 +455,17 @@ export namespace meta
 	{};
 
 	template <typename T>
-	inline constexpr bool empty_v = empty<T>::template value;
+	inline constexpr bool empty_v = empty<T>::value;
 
 	template <typename T>
-	inline constexpr size_t tsize_v = tsize<T>::template value;
+	inline constexpr size_t tsize_v = tsize<T>::value;
 
 	// get byte size of sequence
 	template <typename...>
 	struct byte_size;
 
 	template <typename... Ts>
-	inline constexpr size_t byte_size_v = byte_size<Ts...>::template value;
+	inline constexpr size_t byte_size_v = byte_size<Ts...>::value;
 
 	template <typename T>
 	struct byte_size<T> : public std::integral_constant<size_t, sizeof(T)>
@@ -531,11 +531,11 @@ export namespace meta
 
 	// construct a sequence consisting of repetitions of T
 	template <size_t Count, typename T, template <typename...> typename Predicate>
-	using create = typename detail::invoke_args<T, std::make_index_sequence<Count>, Predicate>::template type;
+	using create = typename detail::invoke_args<T, std::make_index_sequence<Count>, Predicate>::type;
 
 	// get the type at Index in Sequence
 	template <typename Seq, size_t Index>
-	using at = typename detail::__at<Seq, Index>::template type;
+	using at = typename detail::__at<Seq, Index>::type;
 
 	// get an index from index sequence
 	template <typename Indexer>
@@ -579,7 +579,7 @@ export namespace meta
 			, Seq<Ts...>
 			, std::index_sequence<I, Indices...>>
 			: repeat_impl<void, Fn
-			, typename invoke<bind<Fn, Seq<Ts...>>>::template type
+			, typename invoke<bind<Fn, Seq<Ts...>>>::type
 			, std::index_sequence<Indices...>>
 		{};
 
@@ -662,7 +662,7 @@ export namespace meta
 	using take_while = detail::take_while_for_impl<Fn, Seq, std::make_index_sequence<Count>>;
 
 	template <typename Fn, typename Seq, size_t Count>
-	using take_while_t = typename take_while<Fn, Seq, Count>::template type;
+	using take_while_t = typename take_while<Fn, Seq, Count>::type;
 
 	// enumerate sequence with a unary function
 	template <typename Fn, typename Seq, size_t Count>
@@ -671,21 +671,21 @@ export namespace meta
 
 	template <typename Fn, typename Seq, size_t Count>
 		requires meta_invocables<Fn, Seq>
-	using repeat_n_t = typename repeat_n<Fn, Seq, Count>::template type;
+	using repeat_n_t = typename repeat_n<Fn, Seq, Count>::type;
 
 	// transform a list of lists of elements into a single list containing those elements
 	template <typename ListOfLists>
 	using unzip = apply<wrap<concat>, ListOfLists>;
 
 	template <typename ListOfLists>
-	using unzip_t = typename unzip<ListOfLists>::template type;
+	using unzip_t = typename unzip<ListOfLists>::type;
 
 	template <typename>
 	struct _Meta_cartesian_product_;
 
 	// find the n-ary Cartesian Product of the lists in the input list
 	template <typename ListOfLists>
-	using cartesian_product = typename _Meta_cartesian_product_<ListOfLists>::template type;
+	using cartesian_product = typename _Meta_cartesian_product_<ListOfLists>::type;
 
 	template <template <typename...> typename Seq>
 	struct _Meta_cartesian_product_<Seq<>>
@@ -710,7 +710,7 @@ export namespace meta
 		using Next = cartesian_product<Seq0<Rests...>>;
 		using Merged = Seq0<transform_t<bind<Adder, Ts>, Next>...>;
 
-		using type = typename unzip<Merged>::template type;
+		using type = typename unzip<Merged>::type;
 	};
 }
 
@@ -822,7 +822,7 @@ namespace meta::test
 		using NewTransform = transform<NewBinder, test_seq>;
 		constexpr NewTransform transform_test{};
 
-		using NewTransformT = typename transform<NewBinder, test_seq>::template type;
+		using NewTransformT = typename transform<NewBinder, test_seq>::type;
 		constexpr NewTransformT transform_t_test{};
 
 		using NewTransformT_0 = typename at<NewTransformT, 0>;
@@ -841,21 +841,21 @@ namespace meta::test
 		//using NewTransformT_3_Int = typename at<NewTransformT, 3>::MetaList;
 		//constexpr NewTransformT_3_Int transform_t3_test{};
 
-		using NewSeq = typename transform<NewBinder, test_seq>::template type;
+		using NewSeq = typename transform<NewBinder, test_seq>::type;
 		constexpr NewSeq a050{};
 
 		//constexpr pop_back<NewSeq> a051{};
-		//using t_a051_t = typename pop_back<NewSeq>::template type;
+		//using t_a051_t = typename pop_back<NewSeq>::type;
 		//constexpr t_a051_t t_a051{};
 
 		//constexpr front<NewSeq> a052{};
-		//using t_a052_t_0 = typename front<NewSeq>::template type;
+		//using t_a052_t_0 = typename front<NewSeq>::type;
 		//constexpr t_a052_t_0 t_a052_0{};
-		//using t_a052_t_0_0 = typename front<front<NewSeq>>::template type;
+		//using t_a052_t_0_0 = typename front<front<NewSeq>>::type;
 		//constexpr t_a052_t_0_0 t_a052_0_0{};
-		//using t_a052_t_0_0_0 = typename front<front<front<NewSeq>>>::template type;
+		//using t_a052_t_0_0_0 = typename front<front<front<NewSeq>>>::type;
 		//constexpr t_a052_t_0_0_0 t_a052_0_0_0{};
-		//using t_a052_t_0_0_0_0 = typename front<front<front<front<NewSeq>>>>::template type;
+		//using t_a052_t_0_0_0_0 = typename front<front<front<front<NewSeq>>>>::type;
 		//constexpr t_a052_t_0_0_0_0 t_a052_0_0_0_0{};
 
 		//static_assert(std::is_same_v<int, t_a052_t>, "t_a052 is not int");
@@ -987,10 +987,10 @@ namespace meta::test
 		static_assert(std::is_same_v<en0_alt, MetaList<int, float, double>>, "1");
 
 		using en1 = repeat_n<wrap<pop>, test_rp_list, 1>;
-		using en1_t = typename repeat_n<wrap<pop>, test_rp_list, 1>::template type;
+		using en1_t = typename repeat_n<wrap<pop>, test_rp_list, 1>::type;
 
 		using en1_alt = detail::repeat_impl<void, wrap<pop>, test_rp_list, test_range_1>;
-		using en1_alt_t = typename en1_alt::template type;
+		using en1_alt_t = typename en1_alt::type;
 
 		using raw_en1 = invoke_r<bind<wrap<pop>, test_rp_list>>;
 
@@ -999,7 +999,7 @@ namespace meta::test
 		using en1_bot = back_t<en1_t>;
 
 		using en2 = detail::repeat_impl<void, wrap<pop>, test_rp_list, test_range_2>;
-		using en2_t_alt = typename en2::template type;
+		using en2_t_alt = typename en2::type;
 		using en2_t = detail::repeat_impl<void, wrap<pop>, test_rp_list, test_range_2>::type;
 		using raw_en2 = invoke_r<bind<wrap<pop>, raw_en1>>;
 
@@ -1027,7 +1027,7 @@ namespace meta::test
 
 		using local_fn = wrap<pop>;
 		using local_rp_pop = repeat_n<wrap<pop>, test_rp_list, seek_range<int, test_rp_list> + 1>;
-		using local_rp_pop_t = typename local_rp_pop::template type;
+		using local_rp_pop_t = typename local_rp_pop::type;
 	}
 
 	void test_enumerators() noexcept
