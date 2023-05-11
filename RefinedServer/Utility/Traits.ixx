@@ -151,7 +151,7 @@ export namespace util
 	inline constexpr bool make_disjunction = std::disjunction_v<MetaFn<Ts>...>;
 
 	template<typename T>
-	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, true_type, false_type> {};
+	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, false_type, true_type> {};
 
 	template<typename T>
 	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::template value;
