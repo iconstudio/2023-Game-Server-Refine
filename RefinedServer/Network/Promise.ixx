@@ -374,10 +374,10 @@ export namespace net
 			return util::move(*this);
 		}
 
-		consteval void GetResult() const noexcept
-			requires (!util::notvoids<T>)
+		template<util::lv_invocable<T> Fn>
+		constexpr
 		{
-			return;
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
 		}
 
 		constexpr succeed_t& GetResult() & noexcept
@@ -440,6 +440,12 @@ export namespace net
 		}
 
 	private:
+		consteval void GetResult() const noexcept
+			requires (!util::notvoids<T>)
+		{
+			return;
+		}
+
 		monad_t myState;
 	};
 
@@ -826,12 +832,6 @@ export namespace net
 			}
 		}
 
-		consteval void GetResult() const noexcept
-			requires (!util::notvoids<T>)
-		{
-			return;
-		}
-
 		constexpr auto GetResult() & noexcept
 			requires util::notvoids<T>
 		{
@@ -872,6 +872,12 @@ export namespace net
 		}
 
 	private:
+		consteval void GetResult() const noexcept
+			requires (!util::notvoids<T>)
+		{
+			return;
+		}
+
 		monad_t myState;
 	};
 
