@@ -141,14 +141,59 @@ export namespace util
 	struct is_indexed<Template<Indices...>, typename Template> : std::true_type
 	{};
 
+	template<typename... Ts>
+	struct avoid_void;
+
+	// skip the first void
+	template<typename Void, typename... Rests>
+		requires (is_same_v<Void, void>)
+	struct avoid_void<Void, Rests...> : avoid_void<Rests...>
+	{};
+
+	// remove the secondary void
+	template<typename T, typename Void, typename... Rests>
+		requires (is_same_v<Void, void>)
+	struct avoid_void<T, Void, Rests...> : avoid_void<T, Rests...>
+	{};
+
+	// get the first
+	template<typename Fty, typename... Rty>
+		requires (!is_same_v<Fty, void>)
+	struct avoid_void<Fty, Rty...>
+	{
+		using type = Fty;
+	};
+
+	template<typename Void>
+		requires (is_same_v<Void, void>)
+	struct avoid_void<Void>
+	{
+		static_assert(always_false<Void>, "error");
+	};
+
+	template<>
+	struct avoid_void<>
+	{
+		//static_assert(always_false<avoid_void<std::integral_constant<int, 0>>>, "error");
+	};
+
+	template<typename... Ts>
+	using avoid_void_t = typename avoid_void<Ts...>::type;
+
 	template<typename Special, template<size_t...> typename Template>
 	inline constexpr bool is_indexed_v = is_indexed<Special, Template>::value;
 
-	template<template<typename> typename MetaFn, typename... Ts>
-	inline constexpr bool make_conjunction = std::conjunction_v<MetaFn<Ts>...>;
+	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
+	inline constexpr bool meta_invoke = Wrapper<MetaFn<Ts>...>::value;
 
 	template<template<typename> typename MetaFn, typename... Ts>
-	inline constexpr bool make_disjunction = std::disjunction_v<MetaFn<Ts>...>;
+	inline constexpr bool make_conjunction = meta_invoke<MetaFn, std::conjunction, Ts...>;
+
+	template<template<typename> typename MetaFn, typename... Ts>
+	inline constexpr bool make_disjunction = meta_invoke<MetaFn, std::disjunction, Ts...>;
+
+	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
+	inline constexpr bool make_avoid_voids = meta_invoke<MetaFn, Wrapper, avoid_void_t<Ts>...>;
 
 	template<typename T>
 	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, false_type, true_type> {};
@@ -171,3 +216,23 @@ export namespace util
 	template<typename T>
 	using make_crvalue_t = conditional_t<same_as<clean_t<T>, void>, void, add_rvalue_reference_t<add_const_t<T>>>;
 }
+
+#pragma warning(push, 1)
+namespace util::test
+{
+	struct test_noncopy_ctor
+	{
+		test_noncopy_ctor(const test_noncopy_ctor& other) = delete;
+	};
+
+	struct test_noncopy_asin
+	{
+		test_noncopy_asin& operator=(const test_noncopy_asin& other) = delete;
+	};
+
+	constexpr bool av0 = make_avoid_voids<is_copy_assignable, std::conjunction, int, long, float, short>;
+	constexpr bool av1 = make_avoid_voids<is_copy_assignable, std::conjunction, int, test_noncopy_ctor>;
+	constexpr bool av2 = make_avoid_voids<is_copy_assignable, std::conjunction, int, test_noncopy_asin>;
+	constexpr bool av3 = make_avoid_voids<is_copy_assignable, std::conjunction, void>;
+}
+#pragma warning(pop)

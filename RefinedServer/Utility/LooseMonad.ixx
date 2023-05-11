@@ -661,7 +661,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr meta::front_t<pop<T>>&
+		constexpr auto&
 			get()&
 		{
 			return myStorage.template get<T>();
@@ -670,7 +670,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr const meta::front_t<pop<T>>&
+		constexpr const auto&
 			get() const&
 		{
 			return myStorage.template get<T>();
@@ -679,7 +679,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr meta::front_t<pop<T>>&&
+		constexpr auto&&
 			get()&&
 		{
 			return move(myStorage).template get<T>();
@@ -688,7 +688,7 @@ export namespace util
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr const meta::front_t<pop<T>>&&
+		constexpr const auto&&
 			get() const&&
 		{
 			return move(myStorage).template get<T>();
