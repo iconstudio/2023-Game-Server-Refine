@@ -560,7 +560,7 @@ export namespace net
 			else_then(Fn&& action) &
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&>())))
 		{
-			if (!IsFailed())
+			if (IsFailed())
 			{
 				util::forward<Fn>(action)(GetError());
 			}
@@ -578,7 +578,7 @@ export namespace net
 			else_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&>())))
 		{
-			if (!IsFailed())
+			if (IsFailed())
 			{
 				util::forward<Fn>(action)(GetError());
 			}
@@ -596,7 +596,7 @@ export namespace net
 			else_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&&>())))
 		{
-			if (!IsFailed())
+			if (IsFailed())
 			{
 				util::forward<Fn>(action)(GetError());
 			}
@@ -614,7 +614,7 @@ export namespace net
 			else_then(Fn&& action) const&&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&&>())))
 		{
-			if (!IsFailed())
+			if (IsFailed())
 			{
 				util::forward<Fn>(action)(GetError());
 			}
