@@ -324,7 +324,7 @@ export namespace net
 			if_then(Fn&& action) &
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(myState.template get_value<succeed_t>());
 			}
@@ -338,7 +338,7 @@ export namespace net
 			if_then(Fn&& action) const&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(myState.template get_value<succeed_t>());
 			}
@@ -352,7 +352,7 @@ export namespace net
 			if_then(Fn&& action) &&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&&>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(util::move(myState).template get_value<succeed_t>());
 			}
@@ -366,7 +366,7 @@ export namespace net
 			if_then(Fn&& action) const&&
 			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&&>())))
 		{
-			if (myState.template has_value<succeed_t>())
+			if (IsSuccess())
 			{
 				util::forward<Fn>(action)(util::move(myState).template get_value<succeed_t>());
 			}
