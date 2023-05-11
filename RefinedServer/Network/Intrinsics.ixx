@@ -1,6 +1,5 @@
 export module Net.Intrinsics;
 import Utility;
-import Utility.Monad;
 import Utility.Constraints;
 import Utility.Traits;
 import Net;
@@ -8,84 +7,60 @@ import Net.Promise;
 
 export namespace net
 {
-	using ioError = util::Monad<int>;
+	using ioError = ErrorHandler<void>;
+
+	inline ioError CheckPending() noexcept
+	{
+		int error = debug::WSAGetLastError();
+		if (debug::CheckPending(error))
+		{
+			return io::success;
+		}
+		else
+		{
+			return static_cast<int&&>(error);
+		}
+	}
+
+	inline ioError CheckIncomplete() noexcept
+	{
+		int error = debug::WSAGetLastError();
+		if (debug::CheckIncomplete(error))
+		{
+			return io::success;
+		}
+		else
+		{
+			return static_cast<int&&>(error);
+		}
+	}
+
+	inline ioError CheckIO(const int& socket_fn_result) noexcept
+	{
+		if (debug::CheckError(socket_fn_result))
+		{
+			return CheckPending();
+		}
+		else
+		{
+			return io::success;
+		}
+	}
+
+	inline ioError CheckIO(int&& socket_fn_result) noexcept
+	{
+		if (debug::CheckError(static_cast<int&&>(socket_fn_result)))
+		{
+			return CheckPending();
+		}
+		else
+		{
+			return io::success;
+		}
+	}
 
 	export namespace io
 	{
-		inline ioError CheckPending() noexcept
-		{
-			int error = debug::WSAGetLastError();
-			if (debug::CheckPending(error))
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ static_cast<int&&>(error) };
-			}
-		}
-
-		inline constexpr ioError CheckHandle(const void* const& handle) noexcept
-		{
-			if (nullptr == handle)
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ debug::WSAGetLastError() };
-			}
-		}
-
-		inline constexpr ioError CheckHandle(void*&& handle) noexcept
-		{
-			if (nullptr == static_cast<void*&&>(handle))
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ debug::WSAGetLastError() };
-			}
-		}
-
-		inline ioError CheckIncomplete() noexcept
-		{
-			int error = debug::WSAGetLastError();
-			if (debug::CheckIncomplete(error))
-			{
-				return util::nullopt;
-			}
-			else
-			{
-				return ioError{ static_cast<int&&>(error) };
-			}
-		}
-
-		inline ioError CheckIO(const int& socket_fn_result) noexcept
-		{
-			if (debug::CheckError(socket_fn_result))
-			{
-				return CheckPending();
-			}
-			else
-			{
-				return util::nullopt;
-			}
-		}
-
-		inline ioError CheckIO(int&& socket_fn_result) noexcept
-		{
-			if (debug::CheckError(static_cast<int&&>(socket_fn_result)))
-			{
-				return CheckPending();
-			}
-			else
-			{
-				return util::nullopt;
-			}
-		}
-
 		template<typename Fn, typename... Args>
 		concept io_invocables = util::r_invocables<Fn, int, SOCKET, Args...>;
 
