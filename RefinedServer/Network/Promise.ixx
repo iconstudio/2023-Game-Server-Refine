@@ -448,7 +448,7 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				return util::forward<Fn>(action)(util::move(*this).GetResult());
 			}
 			else
 			{
@@ -470,7 +470,7 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				return util::forward<Fn>(action)(util::move(*this).GetResult());
 			}
 			else
 			{
@@ -598,7 +598,7 @@ export namespace net
 		{
 			if (IsFailed())
 			{
-				util::forward<Fn>(action)(GetError());
+				util::forward<Fn>(action)(util::move(*this).GetError());
 			}
 
 			return util::move(*this);
@@ -616,7 +616,7 @@ export namespace net
 		{
 			if (IsFailed())
 			{
-				util::forward<Fn>(action)(GetError());
+				util::forward<Fn>(action)(util::move(*this).GetError());
 			}
 
 			return util::move(*this);
