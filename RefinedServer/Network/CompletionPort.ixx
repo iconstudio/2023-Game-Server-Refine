@@ -12,18 +12,19 @@ using ullong = unsigned long long;
 export namespace net
 {
 	using registerPromise = Promise<void, int>;
-	using portPromise = Proxy;
 
 	namespace abi
 	{
 		[[nodiscard]]
-		FORCEINLINE registerPromise
+		inline registerPromise
 			RegisterIoPort(const HANDLE& io_port, const HANDLE& handle, const ullong& key) noexcept;
+
 		[[nodiscard]]
-		FORCEINLINE portPromise
+		inline Proxy
 			PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept;
+
 		[[nodiscard]]
-		FORCEINLINE portPromise
+		inline Proxy
 			GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time = INFINITE) noexcept;
 	}
 
@@ -97,27 +98,27 @@ export namespace net
 			return abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
 		}
 
-		inline portPromise Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = INFINITE)
+		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = INFINITE)
 		{
 			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, overlapped_handle, await_time);
 		}
 
-		inline portPromise Post(OVERLAPPED* context, const ullong& key, const ulong& bytes)
+		inline Proxy Post(OVERLAPPED* context, const ullong& key, const ulong& bytes)
 		{
 			return abi::PostIoPort(rawHandle, key, bytes, context);
 		}
 
-		inline portPromise Post(OVERLAPPED* context, ullong&& key, const ulong& bytes)
+		inline Proxy Post(OVERLAPPED* context, ullong&& key, const ulong& bytes)
 		{
 			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), bytes, context);
 		}
 
-		inline portPromise Post(OVERLAPPED* context, const ullong& key, ulong&& bytes)
+		inline Proxy Post(OVERLAPPED* context, const ullong& key, ulong&& bytes)
 		{
 			return abi::PostIoPort(rawHandle, key, static_cast<ulong&&>(bytes), context);
 		}
 
-		inline portPromise Post(OVERLAPPED* context, ullong&& key, ulong&& bytes)
+		inline Proxy Post(OVERLAPPED* context, ullong&& key, ulong&& bytes)
 		{
 			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), context);
 		}
@@ -150,7 +151,8 @@ export namespace net
 		}
 	}
 
-	portPromise abi::PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept
+	Proxy
+		abi::PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept
 	{
 		if (0 != ::PostQueuedCompletionStatus(io_port, bytes, key, overlapped))
 		{
@@ -162,7 +164,8 @@ export namespace net
 		}
 	}
 
-	portPromise abi::GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time) noexcept
+	Proxy
+		abi::GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time) noexcept
 	{
 		if (0 != ::GetQueuedCompletionStatus(io_port, bytes_handle, key_handle, overlapped_handle, await_time))
 		{
