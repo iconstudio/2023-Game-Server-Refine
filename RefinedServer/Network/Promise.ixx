@@ -434,7 +434,7 @@ export namespace net
 			return myState.has_value<failed_t>();
 		}
 
-		constexpr bool IsDeferec() const noexcept
+		constexpr bool IsDefered() const noexcept
 		{
 			return myState.has_value<defered_t>();
 		}
@@ -866,7 +866,7 @@ export namespace net
 			return myState.has_value<failed_t>();
 		}
 
-		constexpr bool IsDeferec() const noexcept
+		constexpr bool IsDefered() const noexcept
 		{
 			return myState.has_value<defered_t>();
 		}
