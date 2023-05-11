@@ -82,6 +82,16 @@ export namespace util
 			, hasValue(true)
 		{}
 
+		constexpr ~Monad()
+			noexcept(nothrow_destructibles<T>)
+			requires(trivially_destructibles<T>)
+		= default;
+
+		constexpr ~Monad()
+			noexcept(nothrow_destructibles<T>)
+			requires(!trivially_destructibles<T>)
+		{}
+
 		template<invocables<T&> Fn>
 		inline constexpr
 			Monad&
