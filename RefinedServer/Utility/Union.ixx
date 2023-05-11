@@ -260,7 +260,7 @@ export namespace util
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr W& get() &
+		constexpr W& value() &
 			noexcept(nothrow_copy_constructibles<W>)
 		{
 			return myValue;
@@ -270,7 +270,7 @@ export namespace util
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr const W& get() const&
+		constexpr const W& value() const&
 			noexcept(nothrow_copy_constructibles<const W>)
 		{
 			return myValue;
@@ -280,7 +280,7 @@ export namespace util
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr W&& get() &&
+		constexpr W&& value() &&
 			noexcept(nothrow_move_constructibles<W>)
 		{
 			return move(myValue);
@@ -290,7 +290,7 @@ export namespace util
 		template<typename W = Fty>
 			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr const W&& get() const&&
+		constexpr const W&& value() const&&
 			noexcept(nothrow_move_constructibles<const W>)
 		{
 			return move(myValue);
@@ -299,11 +299,12 @@ export namespace util
 		// getter (void)
 		template<typename W = Fty>
 			requires (!notvoids<W>)
-		constexpr void get() const noexcept
+		constexpr void value() const noexcept
 		{
 			static_assert(always_false<W>, "Cannot get void type.");
 		}
 
+		// index getter
 		template <size_t Index>
 			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
@@ -313,7 +314,7 @@ export namespace util
 		{
 			if constexpr (Index == Place)
 			{
-				return get();
+				return value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -332,6 +333,7 @@ export namespace util
 			}
 		}
 
+		// index getter
 		template <size_t Index>
 			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
@@ -341,7 +343,7 @@ export namespace util
 		{
 			if constexpr (Index == Place)
 			{
-				return get();
+				return value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -353,6 +355,7 @@ export namespace util
 			}
 		}
 
+		// index getter
 		template <size_t Index>
 			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
@@ -362,7 +365,7 @@ export namespace util
 		{
 			if constexpr (Index == Place)
 			{
-				return move(get());
+				return move(*this).value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -374,6 +377,7 @@ export namespace util
 			}
 		}
 
+		// index getter
 		template <size_t Index>
 			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
@@ -383,7 +387,7 @@ export namespace util
 		{
 			if constexpr (Index == Place)
 			{
-				return move(get());
+				return move(*this).value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -404,7 +408,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return get();
+				return value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -425,7 +429,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return get();
+				return value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -446,7 +450,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return move(*this).get();
+				return move(*this).value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -467,7 +471,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return move(*this).get();
+				return move(*this).value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -488,7 +492,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return get();
+				return value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -509,7 +513,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return get();
+				return value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -530,7 +534,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return move(*this).get();
+				return move(*this).value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -551,7 +555,7 @@ export namespace util
 		{
 			if constexpr (same_as<T, Fty>)
 			{
-				return move(*this).get();
+				return move(*this).value();
 			}
 			else if constexpr (1 < mySize)
 			{
@@ -565,7 +569,7 @@ export namespace util
 
 		// type getter (not included void)
 		template <typename T>
-			requires (!notvoids<T>&& !meta::included_v<T, Fty, Rty...>)
+			requires (!notvoids<T> && !meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr void get() const
 		{
@@ -903,7 +907,7 @@ export namespace util
 	private:
 		friend class node_type;
 
-		struct void_guard{};
+		struct void_guard {};
 
 		union
 		{
