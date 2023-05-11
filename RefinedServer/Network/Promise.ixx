@@ -496,19 +496,130 @@ export namespace net
 			return *this;
 		}
 
-		// else_then, parameter E (on failed)
-		template<util::invocables<E> Fn>
+		/// <summary>
+		/// else_then, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
 		constexpr
-			Promise&
-			else_then(Fn&& action) &
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E>())))
+			const Promise&
+			else_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			if (!IsFailed())
+			if (!IsSuccess())
 			{
 				util::forward<Fn>(action)();
 			}
 
 			return *this;
+		}
+
+		/// <summary>
+		/// else_then, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			Promise&&
+			else_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsSuccess())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return util::move(*this);
+		}
+
+		/// <summary>
+		/// else_then, no parameter (on not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			const Promise&&
+			else_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsSuccess())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return util::move(*this);
+		}
+
+		/// <summary>
+		/// else_then, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<E&> Fn>
+		constexpr
+			Promise&
+			else_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&>())))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)(GetError());
+			}
+
+			return *this;
+		}
+
+		/// <summary>
+		/// else_then, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<const E&> Fn>
+		constexpr
+			const Promise&
+			else_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&>())))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)(GetError());
+			}
+
+			return *this;
+		}
+
+		/// <summary>
+		/// else_then, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<E&&> Fn>
+		constexpr
+			Promise&&
+			else_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<E&&>())))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)(GetError());
+			}
+
+			return util::move(*this);
+		}
+
+		/// <summary>
+		/// else_then, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables<const E&&> Fn>
+		constexpr
+			const Promise&&
+			else_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const E&&>())))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)(GetError());
+			}
+
+			return util::move(*this);
 		}
 
 		constexpr succeed_t& GetResult() & noexcept
