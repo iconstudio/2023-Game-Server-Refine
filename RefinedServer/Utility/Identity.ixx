@@ -205,7 +205,6 @@ export namespace util
 		T myValue;
 	};
 
-
 	template<typename Tag>
 	class Identity<void, Tag>
 	{
