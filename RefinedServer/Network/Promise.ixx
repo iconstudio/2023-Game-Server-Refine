@@ -376,8 +376,74 @@ export namespace net
 
 		template<util::lv_invocable<T> Fn>
 		constexpr
+			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			and_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (IsSuccess())
+			{
+				return util::forward<Fn>(action)(GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
+			}
+		}
+
+		template<util::cl_invocable<T> Fn>
+		constexpr
+			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			and_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (IsSuccess())
+			{
+				return util::forward<Fn>(action)(GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+			}
+		}
+
+		template<util::rv_invocable<T> Fn>
+		constexpr
+			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			and_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (IsSuccess())
+			{
+				return util::forward<Fn>(action)(GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+			}
+		}
+
+		template<util::cr_invocable<T> Fn>
+		constexpr
+			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			and_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
+
+			if (IsSuccess())
+			{
+				return util::forward<Fn>(action)(GetResult());
+			}
+			else
+			{
+				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+			}
 		}
 
 		constexpr succeed_t& GetResult() & noexcept
