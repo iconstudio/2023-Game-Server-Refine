@@ -15,24 +15,24 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Array.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Atomic.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Constraints.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Expected.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Identity.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Locks.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)LooseMonad.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Memory.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Meta.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Monad.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Print.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Singleton.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Thread.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Traits.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Union.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Utility.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Array.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Atomic.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Constraints.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Expected.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Identity.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Locks.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\LooseMonad.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Meta.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Monad.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Print.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Singleton.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Thread.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Traits.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Union.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Utility.ixx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Testbed.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Testbed.h" />
   </ItemGroup>
 </Project>
