@@ -252,7 +252,7 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(myState.template get_value<succeed_t>());
+				util::forward<Fn>(action)(GetResult());
 			}
 
 			return *this;
@@ -270,7 +270,7 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(myState.template get_value<succeed_t>());
+				util::forward<Fn>(action)(GetResult());
 			}
 
 			return *this;
@@ -288,7 +288,7 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(util::move(myState).template get_value<succeed_t>());
+				util::forward<Fn>(action)(util::move(*this).GetResult());
 			}
 
 			return util::move(*this);
@@ -306,7 +306,7 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(util::move(myState).template get_value<succeed_t>());
+				util::forward<Fn>(action)(util::move(*this).GetResult());
 			}
 
 			return util::move(*this);
