@@ -90,6 +90,7 @@ export namespace util
 	using ::std::move_constructible;
 	using ::std::constructible_from;
 	using ::std::convertible_to;
+	using ::std::assignable_from;
 
 	// placeholders
 	using ::std::in_place_t;
