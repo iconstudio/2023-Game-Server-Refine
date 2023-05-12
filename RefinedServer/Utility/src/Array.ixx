@@ -1,4 +1,5 @@
 module;
+#include <system_error>
 #include <utility>
 #include <type_traits>
 #include <initializer_list>
@@ -38,8 +39,8 @@ export namespace util
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-		static inline constexpr bool NothrowInitializable = false = std::is_nothrow_default_constructible_v<Elem>;
-		static inline constexpr bool NothrowDestructible = false = std::is_nothrow_destructible_v<Elem>;
+		static inline constexpr bool NothrowInitializable = std::is_nothrow_default_constructible_v<Elem>;
+		static inline constexpr bool NothrowDestructible = std::is_nothrow_destructible_v<Elem>;
 
 		constexpr Array() noexcept(NothrowInitializable) = default;
 		constexpr ~Array() noexcept(NothrowDestructible) = default;
