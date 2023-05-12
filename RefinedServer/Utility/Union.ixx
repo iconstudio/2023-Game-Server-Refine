@@ -783,81 +783,76 @@ export namespace util
 
 export namespace std
 {
-	template<size_t Index, size_t Place, typename... Ts>
-	struct variant_alternative<Index, util::PlacedVariant<integral_constant<size_t, Place>, Ts...>>
+	template<size_t Index, typename... Ts>
+	struct variant_alternative<Index, util::Union<Ts...>>
 	{
-		using type = meta::at<meta::MetaList<Ts...>, Index>;
+		using type = meta::at<util::Union<Ts...>, Index>;
 	};
 
-	template<size_t Place>
-	struct variant_size<util::PlacedVariant<integral_constant<size_t, Place>>>
-		: integral_constant<size_t, 1>
+	template<typename... Ts>
+	struct variant_size<util::Union<Ts...>>
+		: integral_constant<size_t, sizeof...(Ts)>
 	{};
 
-	template<size_t Place, typename... Ts>
-	struct variant_size<util::PlacedVariant<integral_constant<size_t, Place>, Ts...>>
-		: integral_constant<size_t, 1 + sizeof...(Ts)>
-	{};
-
-	template<size_t Index, size_t Place, typename... Ts>
+	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<Index>()))
 	{
 		return _Val.template get<Index>();
 	}
 
-	template<size_t Index, size_t Place, typename... Ts>
+	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(const util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<Index>()))
 	{
 		return _Val.template get<Index>();
 	}
 
-	template<size_t Index, size_t Place, typename... Ts>
+	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<Index>()))
 	{
 		return move(_Val).template get<Index>();
 	}
 
-	template<size_t Index, size_t Place, typename... Ts>
+	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(const util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<Index>()))
 	{
 		return move(_Val).template get<Index>();
 	}
 
-	template<typename T, size_t Place, typename... Ts>
+	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<T>()))
 	{
 		return _Val.template get<T>();
 	}
 
-	template<typename T, size_t Place, typename... Ts>
+	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>& _Val)
+		get(const util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<T>()))
 	{
 		return _Val.template get<T>();
 	}
 
-	template<typename T, size_t Place, typename... Ts>
+	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
 	}
 
-	template<typename T, size_t Place, typename... Ts>
+	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::PlacedVariant<integral_constant<size_t, Place>, Ts...>&& _Val)
+		get(const util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
