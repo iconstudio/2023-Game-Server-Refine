@@ -1,744 +1,810 @@
 #pragma once
 #include <variant>
+
 import Utility;
 import Utility.Constraints;
 import Utility.Meta;
-import Utility.Union;
 
-namespace util
+namespace util::detail
 {
-	template<typename... Ts>
-	class [[nodiscard]] LooseMonad
+	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
+	class PlacedVariant;
+
+	template <size_t Place>
+	class PlacedVariant<integral_constant<size_t, Place>>
+	{};
+
+	struct void_guard {};
+
+	template <typename Variant>
+	struct get_next;
+
+	template <size_t Place, typename T, typename... Ts>
+	struct get_next<PlacedVariant<integral_constant<size_t, Place>, T, Ts...>>
+	{
+		using type = PlacedVariant<integral_constant<size_t, Place + 1>, Ts...>;
+	};
+
+	template <size_t End>
+	struct get_next<PlacedVariant<integral_constant<size_t, End>>>
+	{};
+
+	template <size_t Index, typename Variant>
+	struct get_node_at;
+
+	template <size_t Index, size_t Place, typename T, typename... Ts>
+	struct get_node_at<Index, PlacedVariant<integral_constant<size_t, Place>, T, Ts...>>
+	{
+		using type = typename get_node_at<Index - 1, PlacedVariant<integral_constant<size_t, Place + 1>, Ts...>>::type;
+	};
+
+	template <size_t Place, typename T, typename... Ts>
+	struct get_node_at<0, PlacedVariant<integral_constant<size_t, Place>, T, Ts...>>
+	{
+		using type = PlacedVariant<integral_constant<size_t, Place>, T, Ts...>;
+	};
+
+	template <size_t Place, typename Fty, typename... Rty>
+	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
 	{
 	public:
-		using base_type = Union<Ts...>;
+		static_assert(!same_as<Fty, nullopt_t>, "Fty must not be nullopt_t.");
+		static_assert(!same_as<Fty, in_place_t>, "Fty must not be in_place_t.");
+		static_assert(!is_specialization_v<Fty, in_place_type_t>, "Fty must not be in_place_type_t.");
+		static_assert(!is_indexed_v<Fty, in_place_index_t>, "Fty must not be in_place_index_t.");
 
-		template<size_t Index>
-		using element_type = std::tuple_element_t<Index, std::tuple<Ts...>>;
-		template<size_t Index>
-		using const_element_type = const element_type<Index>;
-		template<size_t Index>
-		using reference_type = element_type<Index>&;
-		template<size_t Index>
-		using const_reference_type = const element_type<Index>&;
-		template<size_t Index>
-		using rvalue_type = element_type<Index>&&;
-		template<size_t Index>
-		using const_rvalue_type = const element_type<Index>&&;
+		using impl_type = conditional_t<notvoids<Fty>, remove_const_t<Fty>, void_guard>;
+		using node_type = PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>;
+		using next_type = typename get_next<node_type>::type;
 
-		constexpr LooseMonad() noexcept
-			: myStorage()
+		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
+		static inline constexpr size_t myPlace = Place;
+
+		template <size_t Index>
+		static inline constexpr size_t relativeIndex = Index - Place;
+
+		template <size_t Index>
+		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
+		template <size_t Index>
+		using value_type = element_type<Index>;
+		template <size_t Index>
+		using const_value_type = add_const_t<value_type<Index>>;
+		template <size_t Index>
+		using reference_type = add_lvalue_reference_t<value_type<Index>>;
+		template <size_t Index>
+		using const_reference_type = add_lvalue_reference_t<value_type<Index>>;
+		template <size_t Index>
+		using rvalue_type = add_rvalue_reference_t<value_type<Index>>;
+		template <size_t Index>
+		using const_rvalue_type = add_rvalue_reference_t<value_type<Index>>;
+
+		template <size_t Index, template<size_t> typename Indexer>
+		static inline constexpr bool nothrowCopyPursuer = (Index == myPlace && nothrow_copy_constructibles<Fty>)
+			|| (Index != myPlace && 1 < mySize && nothrow_copy_constructibles<Indexer<Index>>);
+
+		template <size_t Index, template<size_t> typename Indexer>
+		static inline constexpr bool nothrowMovePursuer = (Index == myPlace && nothrow_move_constructibles<Fty>)
+			|| (Index != myPlace && 1 < mySize && nothrow_move_constructibles<Indexer<Index>>);
+
+		// no initialization (no active member)
+		constexpr PlacedVariant() noexcept
 		{}
 
-		constexpr LooseMonad(nullopt_t) noexcept
-			: myStorage()
+		// no initialization (no active member)
+		constexpr PlacedVariant(nullopt_t) noexcept
 		{}
 
-		constexpr LooseMonad(const LooseMonad& other)
-			noexcept(nothrow_copy_constructibles<Ts...>) requires(copy_constructibles<Ts...>)
-			: myStorage(other.myStorage)
+		// Initialize my value with Args (not void)
+		template <typename... Args>
+			requires (notvoids<Fty>)
+		constexpr PlacedVariant(in_place_t, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: myValue(static_cast<Args&&>(args)...)
+			, hasValue(true)
 		{}
 
-		constexpr LooseMonad(LooseMonad&& other)
-			noexcept(nothrow_move_constructibles<Ts...>) requires(move_constructibles<Ts...>)
-			: myStorage(move(other.myStorage))
+		// Initialize my value with Args (void)
+		template <typename... Args>
+			requires (!notvoids<Fty>)
+		constexpr PlacedVariant(in_place_t, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: voidData()
+			, hasValue(true)
 		{}
 
-		constexpr LooseMonad& operator=(const LooseMonad& other)
-			noexcept(nothrow_copy_assignables<Ts...>)  requires(copy_assignables<Ts...>)
-		{
-			myStorage = other.myStorage;
-			return *this;
-		}
+		// Initialize my value with Args by a Index (not void)
+		template <typename... Args>
+			requires (notvoids<Fty>)
+		constexpr PlacedVariant(in_place_index_t<Place>, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
+		{}
 
-		constexpr LooseMonad& operator=(LooseMonad&& other)
-			noexcept(nothrow_move_assignables<Ts...>)  requires(move_assignables<Ts...>)
-		{
-			myStorage = util::move(other.myStorage);
-			return *this;
-		}
+		// Initialize my value with Args by a Index (void)
+		template <typename... Args>
+			requires (!notvoids<Fty>)
+		constexpr PlacedVariant(in_place_index_t<Place>, Args&&... args)
+			noexcept
+			: PlacedVariant(in_place, nullopt)
+		{}
 
-		template <typename T>
-			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !same_as<clean_t<T>, in_place_type_t> && !same_as<clean_t<T>, in_place_index_t>)
-		explicit(util::is_explicit_constructible_v<T>)
+		// Initialize my value with Args by a Type (not void)
+		template <typename T, size_t Hint, typename... Args>
+			requires (same_as<clean_t<T>, Fty>&& notvoids<Fty>)
+		explicit(is_explicit_constructible_v<T>)
 			constexpr
-			LooseMonad(T&& object) noexcept
-			: myStorage(in_place_type<clean_t<T>>, static_cast<T&&>(object))
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args...>)
+			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
 
-		template <size_t Index, typename... Args>
-			requires (Index < sizeof...(Ts))
+		// Initialize my value with Args by a Type (void)
+		// T = void
+		template <typename T, size_t Hint, typename... Args>
+			requires (same_as<clean_t<T>, Fty> && !notvoids<Fty>)
 		explicit
 			constexpr
-			LooseMonad(in_place_index_t<Index>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, in_place_index_t<Index>, Args...>)
-			: myStorage(in_place_index<Index>, static_cast<Args&&>(args)...)
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+			noexcept
+			: PlacedVariant(in_place, nullopt)
 		{}
 
+		// Recursively find the place onto Tail
+		template <size_t Target, typename... Args>
+			requires (Place < Target&& Target < Place + 1 + sizeof...(Rty))
+		constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
+			noexcept(nothrow_constructibles<next_type, in_place_index_t<Target>, Args...>)
+			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
+			, isExtended(true)
+		{}
+
+		// When cannot find the place onto Tail
+		template <size_t Target, typename... Args>
+			requires (Place + 1 + sizeof...(Rty) <= Target)
+		explicit constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
+		{
+			static_assert(always_false<in_place_index_t<Target>>, "Target index is out of range.");
+		}
+
+		// Place the specified type
 		template <typename T, typename... Args>
-			requires (meta::included_v<T, Ts...>)
-		explicit(util::is_explicit_constructible_v<T>)
+			requires (!same_as<clean_t<T>, Fty>)
+		explicit(is_explicit_constructible_v<T>)
 			constexpr
-			LooseMonad(in_place_type_t<T>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
-			: myStorage(in_place_type<T>, std::integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
+			PlacedVariant(in_place_type_t<T>, Args&&... args)
+			noexcept(nothrow_constructibles<T, Args...>)
+			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
 		{}
 
-		constexpr ~LooseMonad()
-			noexcept(nothrow_destructibles<Ts...>)
-			requires(trivially_destructibles<Ts...>)
+		// Place the specified type from hint
+		template <typename T, size_t Guard, typename... Args>
+			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
+		explicit(is_explicit_constructible_v<T>)
+			constexpr
+			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
+			noexcept(nothrow_constructibles<T, Args...>)
+			: _Tail(in_place_type<T>, integral_constant<size_t, Guard + 1>{}, static_cast<Args&&>(args)...)
+			, isExtended(true)
+		{}
+
+		constexpr ~PlacedVariant()
+			noexcept(nothrow_destructibles<Fty, Rty...>)
+			requires(!trivially_destructibles<Fty, Rty...>)
+		{}
+
+		constexpr ~PlacedVariant()
+			noexcept(nothrow_destructibles<Fty, Rty...>)
+			requires(trivially_destructibles<Fty, Rty...>)
 		= default;
 
-		constexpr ~LooseMonad()
-			noexcept(nothrow_destructibles<Ts...>)
-			requires(!trivially_destructibles<Ts...>)
-		{}
-
-		template<size_t Index, invocables<reference_type<Index>> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
+		constexpr PlacedVariant& operator=(nullopt_t) noexcept
 		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(myStorage.template get<Index>());
-			}
-
+			hasValue = false;
 			return *this;
 		}
 
-		template<size_t Index, invocables<const_reference_type<Index>> Fn>
-		inline constexpr
-			const LooseMonad&
-			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
-		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(myStorage.template get<Index>());
-			}
-
-			return *this;
-		}
-
-		template<size_t Index, invocables<rvalue_type<Index>> Fn>
-		inline constexpr
-			LooseMonad&&
-			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
-		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
-		inline constexpr
-			const LooseMonad&&
-			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
-		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables<T&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(myStorage.template get<T>());
-			}
-
-			return *this;
-		}
-
-		template<typename T, invocables<const T&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(myStorage.template get<T>());
-			}
-
-			return *this;
-		}
-
-		template<typename T, invocables<T&&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables<const T&&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables<reference_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, reference_type<Index>>
-			and_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, reference_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(myStorage.template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, reference_type<Index>>{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables<const_reference_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, const_reference_type<Index>>
-			and_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, const_reference_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(myStorage.template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const_reference_type<Index>>{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables<rvalue_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, rvalue_type<Index>>
-			and_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, rvalue_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, rvalue_type<Index>>{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, const_rvalue_type<Index>>
-			and_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, const_rvalue_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const_rvalue_type<Index>>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables<T&> Fn>
-		inline constexpr
-			monad_result_t<Fn, T&>
-			and_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, T&>, void>, "Monadic result cannot be void.");
-
-			if (has_value<T>())
-			{
-				return forward<Fn>(action)(myStorage.template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, T&>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables<const T&> Fn>
-		inline constexpr
-			monad_result_t<Fn, const T&>
-			and_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, const T&>, void>, "Monadic result cannot be void.");
-
-			if (has_value<T>())
-			{
-				return forward<Fn>(action)(myStorage.template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const T&>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables<T&&> Fn>
-		inline constexpr
-			monad_result_t<Fn, T&&>
-			and_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, T&&>, void>, "Monadic result cannot be void.");
-
-			if (has_value<T>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, T&&>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables<const T&&> Fn>
-		inline constexpr
-			monad_result_t<Fn, const T&&>
-			and_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, const T&&>, void>, "Monadic result cannot be void.");
-
-			if (myStorage.template has_value<T>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const T&&>{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			LooseMonad&
-			else_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<Index>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			const LooseMonad&
-			else_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<Index>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			LooseMonad&&
-			else_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<Index>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			const LooseMonad&&
-			else_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<Index>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			LooseMonad&
-			else_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			const LooseMonad&
-			else_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			LooseMonad&&
-			else_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			const LooseMonad&&
-			else_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
+		// getter (not void)
 		[[nodiscard]]
-		constexpr reference_type<Index>
+		constexpr make_lvalue_t<Fty> value() &
+			noexcept(nothrow_copy_constructibles<Fty>)
+		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
+			return myValue;
+		}
+
+		// getter (not void)
+		[[nodiscard]]
+		constexpr make_clvalue_t<Fty> value() const&
+			noexcept(nothrow_copy_constructibles<const Fty>)
+		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
+			return myValue;
+		}
+
+		// getter (not void)
+		[[nodiscard]]
+		constexpr make_rvalue_t<Fty> value() &&
+			noexcept(nothrow_move_constructibles<Fty>)
+		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
+			return move(myValue);
+		}
+
+		// getter (not void)
+		[[nodiscard]]
+		constexpr make_crvalue_t<Fty> value() const&&
+			noexcept(nothrow_move_constructibles<const Fty>)
+		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
+			return move(myValue);
+		}
+
+		// index getter
+		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() &
+			//noexcept(nothrowCopyPursuer<Index, value_type>)
+			noexcept(Index == Place)
+		{
+			if constexpr (Index == Place)
+			{
+				return value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return _Tail.template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// index getter
+		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&
+			//noexcept(nothrowCopyPursuer<Index, const_value_type>)
+			noexcept(Index == Place)
+		{
+			if constexpr (Index == Place)
+			{
+				return value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return _Tail.template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// index getter
+		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() &&
+			//noexcept(nothrowMovePursuer<Index, value_type>)
+			noexcept(Index == Place)
+		{
+			if constexpr (Index == Place)
+			{
+				return move(*this).value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return move(_Tail).template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// index getter
+		template <size_t Index>
+			requires (Index <= 1 + Place + sizeof...(Rty))
+		[[nodiscard]]
+		constexpr decltype(auto)
+			get() const&&
+			//noexcept(nothrowMovePursuer<Index, const_value_type>)
+			noexcept(Index == Place)
+		{
+			if constexpr (Index == Place)
+			{
+				return move(*this).value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return move(_Tail).template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
+		}
+
+		// type getter
+		template <typename T>
+			requires (meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr decltype(auto)
 			get()&
 		{
-			return myStorage.template get<Index>();
+			if constexpr (same_as<T, Fty>)
+			{
+				return value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return _Tail.template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
+		// type getter
+		template <typename T>
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
-		constexpr const_reference_type<Index>
+		constexpr decltype(auto)
 			get() const&
 		{
-			return myStorage.template get<Index>();
+			if constexpr (same_as<T, Fty>)
+			{
+				return value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return _Tail.template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
+		// type getter
+		template <typename T>
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
-		constexpr rvalue_type<Index>
+		constexpr decltype(auto)
 			get()&&
 		{
-			return move(myStorage).template get<Index>();
+			if constexpr (same_as<T, Fty>)
+			{
+				return move(*this).value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return move(_Tail).template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
+		// type getter
+		template <typename T>
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
-		constexpr const_rvalue_type<Index>
+		constexpr decltype(auto)
 			get() const&&
 		{
-			return move(myStorage).template get<Index>();
+			if constexpr (same_as<T, Fty>)
+			{
+				return move(*this).value();
+			}
+			else if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					return move(_Tail).template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
+			}
+			else
+			{
+				static_assert(always_false<Fty>, "This Monad does not have the indexed type.");
+			}
 		}
 
-		template <typename T>
-		static inline constexpr size_t seek = meta::seek_range<T, base_type>;
-
-		template <typename T>
-		using pop = meta::repeat_n_t<meta::wrap<meta::pop>, base_type, seek<T>>::type;
-
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
-		[[nodiscard]]
-		constexpr auto&
-			get()&
+		// unsafe
+		template<typename Uty>
+		constexpr void set(Uty&& value)
+			noexcept(nothrow_assignables<Fty, Uty>)
 		{
-			return myStorage.template get<T>();
+			myValue = forward<Uty>(value);
+			hasValue = true;
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
-		[[nodiscard]]
-		constexpr const auto&
-			get() const&
+		template <size_t Index, typename Uty>
+			requires (Index == Place)
+		constexpr PlacedVariant& try_set(Uty&& value)
+			noexcept(nothrow_assignables<Fty, Uty>)
 		{
-			return myStorage.template get<T>();
+			static_assert(!same_as<Fty, void>, "Cannot set the value of a void type.");
+			static_assert(!assignable_from<Uty, Fty>, "Uty is not assignable to Fty.");
+
+			set(forward<Uty>(value));
+
+			return *this;
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
-		[[nodiscard]]
-		constexpr auto&&
-			get()&&
+		template <size_t Index, typename Uty>
+			requires (Index != Place)
+		constexpr
+			typename get_node_at<relativeIndex<Index>, node_type>::type&
+			try_set(Uty&& value)
 		{
-			return move(myStorage).template get<T>();
+			if constexpr (1 < mySize && Index <= Place + mySize)
+			{
+				return _Tail.try_set<Index>(forward<Uty>(value));
+			}
+			else
+			{
+				static_assert(always_false<Uty>, "This Monad does not have the indexed type.");
+			}
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
-		[[nodiscard]]
-		constexpr const auto&&
-			get() const&&
+		template <typename... Args>
+		constexpr PlacedVariant& emplace(Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args&&...>)
 		{
-			return move(myStorage).template get<T>();
+			myValue = Fty{ forward<Args>(args)... };
+			hasValue = true;
+
+			return *this;
+		}
+
+		constexpr void reset() noexcept
+		{
+			if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					_Tail.reset();
+				}
+			}
+
+			hasValue = false;
+			isExtended = false;
+		}
+
+		[[nodiscard]]
+		constexpr bool has_value() const noexcept
+		{
+			return hasValue;
 		}
 
 		template <size_t Index>
-			requires (Index < sizeof...(Ts))
+			requires (Index == Place)
+		[[nodiscard]]
 		constexpr bool has_value() const noexcept
 		{
-			return myStorage.template has_value<Index>();
-		}
-
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
-		constexpr bool has_value() const noexcept
-		{
-			return myStorage.template has_value<T>();
+			return hasValue;
 		}
 
 		template <size_t Index>
-			requires (Index < sizeof...(Ts))
+			requires (Place < Index)
+		[[nodiscard]]
+		constexpr bool has_value() const noexcept
+		{
+			if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					try
+					{
+						return _Tail.template has_value<Index>();
+					}
+					catch (...)
+					{
+						return false;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template <typename T>
+			requires (same_as<clean_t<T>, Fty>)
+		[[nodiscard]]
+		constexpr bool has_value() const noexcept
+		{
+			return hasValue;
+		}
+
+		template <typename T>
+			requires (!same_as<clean_t<T>, Fty>)
+		[[nodiscard]]
+		constexpr bool has_value() const noexcept
+		{
+			if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					try
+					{
+						return _Tail.template has_value<T>();
+					}
+					catch (...)
+					{
+						return false;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template <size_t Index>
+			requires (Index == Place)
+		[[nodiscard]]
 		constexpr bool is_valueless() const noexcept
 		{
-			return myStorage.template is_valueless<Index>();
+			return !hasValue;
+		}
+
+		template <size_t Index>
+			requires (Place < Index)
+		[[nodiscard]]
+		constexpr bool is_valueless() const noexcept
+		{
+			if constexpr (1 < mySize)
+			{
+				if (isExtended)
+				{
+					try
+					{
+						return _Tail.template is_valueless<Index>();
+					}
+					catch (...)
+					{
+						return false;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		constexpr PlacedVariant(const PlacedVariant& other) noexcept
+		{
+			(*this).operator=(other);
+		}
+
+		constexpr PlacedVariant(PlacedVariant&& other) noexcept
+		{
+			(*this).operator=(move(other));
+		}
+
+		constexpr PlacedVariant& operator=(const PlacedVariant& other) & noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				myValue = other.myValue;
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				_Tail.operator=(other._Tail);
+			}
+
+			return *this;
+		}
+
+		constexpr PlacedVariant& operator=(PlacedVariant&& other) & noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				myValue = move(other.myValue);
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				_Tail.operator=(move(other._Tail));
+			}
+
+			return *this;
+		}
+
+		constexpr PlacedVariant&& operator=(const PlacedVariant& other) && noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				myValue = other.myValue;
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				_Tail.operator=(other._Tail);
+			}
+
+			return move(*this);
+		}
+
+		constexpr PlacedVariant&& operator=(PlacedVariant&& other) && noexcept
+		{
+			// make empty itself
+			reset();
+
+			if (other.hasValue)
+			{
+				myValue = move(other.myValue);
+				hasValue = true;
+			}
+			else if (other.isExtended)
+			{
+				_Tail.operator=(move(other._Tail));
+			}
+
+			return move(*this);
 		}
 
 	private:
-		base_type myStorage;
+		// type getter (not included void)
+		template <typename T>
+			requires (!notvoids<T> || !meta::included_v<T, Fty, Rty...>)
+		[[nodiscard]]
+		constexpr T& get() const
+		{
+			static_assert(always_false<T>, "Cannot get the not included void type.");
+		}
+
+		union
+		{
+			union
+			{
+				std::monostate voidData;
+				impl_type myValue;
+			};
+			next_type _Tail;
+		};
+
+		bool hasValue = false;
+		bool isExtended = false;
 	};
 
-	template<typename T, typename E>
-	using Expected = LooseMonad<T, E>;
+	using ::std::integral_constant;
+
+	struct hide_variant0
+	{
+		template <size_t I, typename... Ts>
+		using type = PlacedVariant<integral_constant<size_t, I>, Ts...>;
+	};
+
+	struct hide_variant1
+	{
+		template <typename... Ts>
+		using type = typename hide_variant0::template type<0, Ts...>;
+	};
 }
 
-export namespace std
+namespace util
+{
+	template <typename... Ts>
+	using Union = typename detail::hide_variant1::template type<Ts...>;
+}
+
+namespace std
 {
 	template<size_t Index, typename... Ts>
-	struct variant_alternative<Index, util::LooseMonad<Ts...>>
+	struct variant_alternative<Index, util::Union<Ts...>>
 	{
-		static_assert(Index < sizeof...(Ts), "Loosen index out of bounds.");
-
-		using type = meta::at<util::LooseMonad<Ts...>, Index>;
+		using type = meta::at<util::Union<Ts...>, Index>;
 	};
 
 	template<typename... Ts>
-	struct variant_size<util::LooseMonad<Ts...>>
-		: integral_constant<size_t, 1 + sizeof...(Ts)>
+	struct variant_size<util::Union<Ts...>>
+		: integral_constant<size_t, sizeof...(Ts)>
 	{};
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>& _Val)
+		get(util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<Index>()))
 	{
 		return _Val.template get<Index>();
@@ -746,7 +812,7 @@ export namespace std
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>& _Val)
+		get(const util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<Index>()))
 	{
 		return _Val.template get<Index>();
@@ -754,7 +820,7 @@ export namespace std
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>&& _Val)
+		get(util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<Index>()))
 	{
 		return move(_Val).template get<Index>();
@@ -762,7 +828,7 @@ export namespace std
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>&& _Val)
+		get(const util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<Index>()))
 	{
 		return move(_Val).template get<Index>();
@@ -770,7 +836,7 @@ export namespace std
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>& _Val)
+		get(util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<T>()))
 	{
 		return _Val.template get<T>();
@@ -778,7 +844,7 @@ export namespace std
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>& _Val)
+		get(const util::Union<Ts...>& _Val)
 		noexcept(noexcept(_Val.template get<T>()))
 	{
 		return _Val.template get<T>();
@@ -786,7 +852,7 @@ export namespace std
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>&& _Val)
+		get(util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
@@ -794,80 +860,75 @@ export namespace std
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>&& _Val)
+		get(const util::Union<Ts...>&& _Val)
 		noexcept(noexcept(move(_Val).template get<T>()))
 	{
 		return move(_Val).template get<T>();
 	}
 }
 
-#pragma warning(push, 1)
+#pragma warning(push, 0)
 namespace util::test
 {
-	constexpr void do_something() noexcept {}
-
-	void test_loose() noexcept
+	void test_union() noexcept
 	{
-		const LooseMonad<int, float> a0{};
-		const LooseMonad<int, float> b0{ std::in_place_index<0>, 1 };
-		const LooseMonad<int, float> c0{ std::in_place_index<1>, 1.0f };
+		using aa_t = Union<int, void, unsigned long, float>;
 
-		constexpr LooseMonad<int, float> a1{};
-		constexpr LooseMonad<int, float> b1{ std::in_place_index<0>, 1 };
-		constexpr LooseMonad<int, float> c1{ std::in_place_index<1>, 1.0f };
+		constexpr aa_t aa{};
+		using aa_0_t = aa_t::element_type<0>;
+		static_assert(util::is_same_v<aa_0_t, int>, "int");
+		using aa_1_t = aa_t::element_type<1>;
+		//static_assert(is_same_v<aa_1_t, int>, "unsigned long");
+		using aa_2_t = aa_t::element_type<2>;
+		//static_assert(is_same_v<aa_2_t, int>, "float");
+		//using aa_3_t = aa_t::element_type<3>;
 
-		const LooseMonad<int, float> b2{ std::in_place_type<int>, 500 };
-		const LooseMonad<int, float> c2{ std::in_place_type<float>, 500.0f };
+		constexpr aa_0_t aa_ty_0_v = 0;
+		//constexpr aa_1_t aa_ty_1_v;
+		constexpr aa_2_t aa_ty_2_v = 0;
 
-		constexpr LooseMonad<int, float> b3{ std::in_place_type<int>, 500 };
-		constexpr LooseMonad<int, float> c3{ std::in_place_type<float>, 500.0f };
+		aa.myPlace;
+		aa.mySize;
+		aa.relativeIndex<0>;
+		aa.relativeIndex<1>;
+		aa.relativeIndex<2>;
+		aa.relativeIndex<3>;
 
-		const LooseMonad<int, float, float> d2{ std::in_place_index<1>, 500.0f };
-		const LooseMonad<int, float, int> e2{ std::in_place_index<2>, 500 };
-		const LooseMonad<int, float, float> f2{ std::in_place_type<float>, 500.0f };
-		const LooseMonad<int, float, int> g2{ std::in_place_type<float>, 500.0f };
+		constexpr bool a_has_0 = aa.has_value<0>();
+		constexpr bool a_has_1 = aa.has_value<1>();
+		constexpr bool a_has_2 = aa.has_value<2>();
 
-		//LooseMonad<int, float, int>::storage_pop;
-		//constexpr size_t seek = LooseMonad<int, float, int>::seek<int>;
-		//LooseMonad<int, float, int>::pop<int>;
+		using bb_t = Union<int, unsigned long, float, double>;
+		bb_t bb0{};
+		//bb_t bb1{};
+		bb_t bb1(in_place_type<float>, integral_constant<size_t, 0>{}, 4000.034124f);
+		bb0.set(0);
 
-		constexpr LooseMonad<int, float, float> d3{ std::in_place_index<1>, 500.0f };
-		constexpr bool has_d3_0 = d3.has_value<0>();
-		constexpr bool has_d3_1 = d3.has_value<1>();
-		constexpr bool has_d3_2 = d3.has_value<2>();
-		constexpr bool less_d3_0 = d3.is_valueless<0>();
-		constexpr bool less_d3_1 = d3.is_valueless<1>();
-		constexpr bool less_d3_2 = d3.is_valueless<2>();
-		//constexpr int get_d3_i32 = d3.get<int>();
-		constexpr float get_d3_f32 = d3.get<float>();
-		//constexpr double get_d3_f64 = d3.get<double>();
-		constexpr LooseMonad<int, float, int> e3{ std::in_place_index<2>, 500 };
-		constexpr bool has_e3_0 = e3.has_value<0>();
-		constexpr bool has_e3_1 = e3.has_value<1>();
-		constexpr bool has_e3_2 = e3.has_value<2>();
-		constexpr bool less_e3_0 = e3.is_valueless<0>();
-		constexpr bool less_e3_1 = e3.is_valueless<1>();
-		constexpr bool less_e3_2 = e3.is_valueless<2>();
-		constexpr auto get_e3_2 = e3.get<2>();
-		constexpr LooseMonad<int, float, float> f3{ std::in_place_type<float>, 500.0f };
-		//constexpr auto get_f3_0 = f3.get<0>();
-		constexpr auto get_f3_1 = f3.get<1>();
-		//constexpr auto get_f3_2 = f3.get<2>();
-		constexpr LooseMonad<int, float, int> g3{ std::in_place_type<float>, 500.0f };
+		bb0 = bb1;
+		bb0.reset();
 
-		constexpr size_t sz0 = sizeof(LooseMonad<int>);
-		constexpr size_t sz1 = sizeof(LooseMonad<int, float>);
-		constexpr size_t sz2 = sizeof(LooseMonad<int, float>);
-		constexpr size_t sz3 = sizeof(LooseMonad<int, float, float>);
-		constexpr size_t sz4 = sizeof(LooseMonad<int, float, int>);
+		const auto getter0 = bb0.get<0>();
+		const auto getter1 = bb0.get<1>();
+		const auto getter2 = bb0.get<2>();
 
-		constexpr auto& fna1 = a1.if_then<0>([](const int& v) {
-			do_something();
-		});
+		// PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float, double>
+		auto& rb0_tset_0 = bb0.try_set<0>(0);
+		// PlacedVariant<integral_constant<size_t, 1>, unsigned long, float, double>
+		auto& rb0_tset_1 = bb0.try_set<1>(500UL);
+		decltype(auto) rb0_tset_2 = bb0.try_set<2>(500.0f);
+		decltype(auto) rb0_tset_3 = bb0.try_set<3>(500.0);
+		//decltype(auto) rb0_tset_4 = bb0.try_set<4>(500.0);
+		//decltype(auto) rb0_tset_5 = bb0.try_set<5>(500.0);
 
-		constexpr auto& fnb1 = b1.if_then<0>([](const int& v) {
-			do_something();
-		});
+		constexpr Union<int, int, int> cc{};
+		constexpr Union<bool, int, long> dd{};
+		constexpr Union<float, unsigned long long, char> ee{};
+
+		constexpr Union<double, unsigned char, short> ff{ in_place_type<unsigned char>, 'F' };
+		const auto cgetter0 = ff.get<0>();
+		const auto cgetter1 = ff.get<1>();
+		const auto cgetter2 = ff.get<2>();
+		//const auto cgetter3 = ff.get<3>();
 	}
 }
 #pragma warning(pop)
