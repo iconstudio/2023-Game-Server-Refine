@@ -54,8 +54,9 @@ namespace util::detail
 		static_assert(!is_specialization_v<Fty, in_place_type_t>, "Fty must not be in_place_type_t.");
 		static_assert(!is_indexed_v<Fty, in_place_index_t>, "Fty must not be in_place_index_t.");
 
-		using type = remove_const_t<Fty>;
-		using node_type = PlacedVariant<integral_constant<size_t, Place + 1>, Rty...>;
+		using impl_type = conditional_t<notvoids<Fty>, remove_const_t<Fty>, void_guard>;
+		using node_type = PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>;
+		using next_type = typename get_next<node_type>::type;
 
 		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
 		static inline constexpr size_t myPlace = Place;
@@ -153,7 +154,7 @@ namespace util::detail
 		template <size_t Target, typename... Args>
 			requires (Place < Target&& Target < Place + 1 + sizeof...(Rty))
 		constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
-			noexcept(nothrow_constructibles<node_type, in_place_index_t<Target>, Args...>)
+			noexcept(nothrow_constructibles<next_type, in_place_index_t<Target>, Args...>)
 			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
@@ -864,9 +865,9 @@ namespace util::detail
 			union
 			{
 				std::monostate voidData;
-				conditional_t<notvoids<type>, type, void_guard> myValue;
+				impl_type myValue;
 			};
-			node_type _Tail;
+			next_type _Tail;
 		};
 
 		bool hasValue = false;
