@@ -93,8 +93,11 @@ export namespace util
 	template<typename T, typename... Args>
 	concept nothrow_constructibles = std::is_nothrow_constructible_v<T, Args...>;
 
-	template<typename T, typename To>
-	concept nothrow_convertibles = std::is_nothrow_convertible_v<T, To>;
+	template<typename From, typename To>
+	concept nothrow_convertibles = std::is_nothrow_convertible_v<From, To>;
+
+	template<typename From, typename To>
+	concept nothrow_assignables = std::is_nothrow_assignable_v<From, To>;
 
 	template<typename... Ts>
 	concept nothrow_copy_constructibles = make_conjunction<std::is_nothrow_copy_constructible, Ts...>;
@@ -119,9 +122,6 @@ export namespace util
 
 	template<typename T, typename Result, typename... Args>
 	concept nothrow_r_invocables = std::is_nothrow_invocable_r_v<Result, T, Args...>;
-
-	template<typename Lhs, typename Rhs>
-	concept nothrow_assignables = std::is_nothrow_assignable_v<Lhs, Rhs>;
 
 	template<typename T>
 	concept basic_arithmeticals = std::is_arithmetic_v<clean_t<T>>;
