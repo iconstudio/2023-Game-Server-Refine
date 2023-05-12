@@ -762,8 +762,23 @@ namespace util::detail
 
 	using ::std::integral_constant;
 
+	struct hide_variant0
+	{
+		template <size_t I, typename... Ts>
+		using type = PlacedVariant<integral_constant<size_t, I>, Ts...>;
+	};
+
+	struct hide_variant1
+	{
+		template <typename... Ts>
+		using type = typename hide_variant0::template type<0, Ts...>;
+	};
+}
+
+export namespace util
+{
 	template <typename... Ts>
-	using Union = PlacedVariant<FirstIndexer, Ts...>;
+	using Union = typename detail::hide_variant1::template type<Ts...>;
 }
 
 export namespace std
