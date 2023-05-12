@@ -17,6 +17,34 @@ namespace util::detail
 
 	struct void_guard { explicit constexpr void_guard() noexcept = default; };
 
+	template <typename Variant>
+	struct get_next;
+
+	template <size_t Place, typename T, typename... Ts>
+	struct get_next<PlacedVariant<integral_constant<size_t, Place>, T, Ts...>>
+	{
+		using type = PlacedVariant<integral_constant<size_t, Place + 1>, Ts...>;
+	};
+
+	template <size_t End>
+	struct get_next<PlacedVariant<integral_constant<size_t, End>>>
+	{};
+
+	template <size_t Index, typename Variant>
+	struct get_node_at;
+
+	template <size_t Index, size_t Place, typename T, typename... Ts>
+	struct get_node_at<Index, PlacedVariant<integral_constant<size_t, Place>, T, Ts...>>
+	{
+		using type = typename get_node_at<Index - 1, PlacedVariant<integral_constant<size_t, Place + 1>, Ts...>>::type;
+	};
+
+	template <size_t Place, typename T, typename... Ts>
+	struct get_node_at<0, PlacedVariant<integral_constant<size_t, Place>, T, Ts...>>
+	{
+		using type = PlacedVariant<integral_constant<size_t, Place>, T, Ts...>;
+	};
+
 	template <size_t Place, typename Fty, typename... Rty>
 	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
 	{
