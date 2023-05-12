@@ -16,8 +16,12 @@ export namespace net
 	class Address;
 	class EndPoint;
 	class Socket;
+
 	class Context;
+	template<typename T, typename E>
+	class Promise;
 	class SendContext;
+
 	class BasicSession;
 	class User;
 	class Room;
