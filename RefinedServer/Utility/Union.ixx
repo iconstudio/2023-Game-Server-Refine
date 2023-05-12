@@ -8,85 +8,12 @@ import Utility.Meta;
 
 namespace util::detail
 {
-	template <bool _TrivialDestruction, typename... Ts>
-	struct InternalVariant {};
+	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
+	class PlacedVariant;
 
-	template <size_t Place, typename... Ts>
-	struct VariantStorage {};
-
-	template <size_t Place, typename Fty, typename... Rty>
-	struct VariantStorage<Place, Fty, Rty...>
-	{
-		static inline constexpr size_t mySize = 1 + sizeof...(Rty);
-		static inline constexpr size_t myPlace = Place;
-
-		constexpr VariantStorage() noexcept {}
-
-		// ctor (not void)
-		template <class... Ts>
-			requires (notvoids<Fty>)
-		constexpr explicit
-			VariantStorage(integral_constant<size_t, 0>, Ts&&... _Args)
-			noexcept(nothrow_constructibles<Fty, Ts...>)
-			: _Head(static_cast<Ts&&>(_Args)...)
-		{}
-
-		template <size_t _Idx, class... Ts>
-			requires (0 < _Idx)
-		constexpr explicit
-			VariantStorage(integral_constant<size_t, _Idx>, Ts&&... _Args)
-			noexcept(nothrow_constructibles<VariantStorage<Rty...>, integral_constant<size_t, _Idx - 1>, Ts...>)
-			: _Tail(integral_constant<size_t, _Idx - 1>{}, static_cast<Ts&&>(_Args)...)
-		{}
-
-		constexpr VariantStorage(const VariantStorage& other) = default;
-		constexpr VariantStorage(VariantStorage&& other) = default;
-		constexpr VariantStorage& operator=(const VariantStorage& other) = default;
-		constexpr VariantStorage& operator=(VariantStorage&& other) = default;
-
-	protected:
-		union
-		{
-			union
-			{
-				std::monostate voidData = {};
-				remove_const_t<Fty> _Head;
-			};
-			VariantStorage<Place + 1, Rty...> _Tail;
-		};
-	};
-
-	template <typename... Ts>
-	using RouteVariant = InternalVariant<make_conjunction<std::is_trivially_destructible, Ts...>, Ts...>;
-
-	// Storage for variant alternatives (trivially destructible case)
-	template <typename Fty, typename... Rty>
-	struct InternalVariant<true, Fty, Rty...> : VariantStorage<0, Fty, Rty...>
-	{
-		using base = VariantStorage<0, Fty, Rty...>;
-
-		constexpr InternalVariant() noexcept {}
-		using base::base;
-	};
-
-	// Storage for variant alternatives (non-trivially destructible case)
-	template <class Fty, class... Rty>
-	struct InternalVariant<false, Fty, Rty...> : VariantStorage<0, Fty, Rty...>
-	{
-		using base = VariantStorage<0, Fty, Rty...>;
-
-		using base::base;
-
-		// explicitly non-trivial destructor (which would otherwise be defined as deleted
-		// since the class has a variant member with a non-trivial destructor)
-		constexpr ~InternalVariant() noexcept
-		{}
-
-		constexpr InternalVariant(const InternalVariant& other) = default;
-		constexpr InternalVariant(InternalVariant&& other) = default;
-		constexpr InternalVariant& operator=(const InternalVariant& other) = default;
-		constexpr InternalVariant& operator=(InternalVariant&& other) = default;
-	};
+	template <size_t Place>
+	class PlacedVariant<integral_constant<size_t, Place>>
+	{};
 }
 
 namespace util::detail
