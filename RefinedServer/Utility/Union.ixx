@@ -205,51 +205,43 @@ namespace util::detail
 		}
 
 		// getter (not void)
-		template<typename W = Fty>
-			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr W& value() &
-			noexcept(nothrow_copy_constructibles<W>)
+		constexpr make_lvalue_t<Fty> value() &
+			noexcept(nothrow_copy_constructibles<Fty>)
 		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
 			return myValue;
 		}
 
 		// getter (not void)
-		template<typename W = Fty>
-			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr const W& value() const&
-			noexcept(nothrow_copy_constructibles<const W>)
+		constexpr make_clvalue_t<Fty> value() const&
+			noexcept(nothrow_copy_constructibles<const Fty>)
 		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
 			return myValue;
 		}
 
 		// getter (not void)
-		template<typename W = Fty>
-			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr W&& value() &&
-			noexcept(nothrow_move_constructibles<W>)
+		constexpr make_rvalue_t<Fty> value() &&
+			noexcept(nothrow_move_constructibles<Fty>)
 		{
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
+
 			return move(myValue);
 		}
 
 		// getter (not void)
-		template<typename W = Fty>
-			requires (notvoids<W>)
 		[[nodiscard]]
-		constexpr const W&& value() const&&
-			noexcept(nothrow_move_constructibles<const W>)
+		constexpr make_crvalue_t<Fty> value() const&&
+			noexcept(nothrow_move_constructibles<const Fty>)
 		{
-			return move(myValue);
-		}
+			static_assert(!same_as<Fty, void>, "Cannot get void type.");
 
-		// getter (void)
-		template<typename W = Fty>
-			requires (!notvoids<W>)
-		constexpr void value() const noexcept
-		{
-			static_assert(always_false<W>, "Cannot get void type.");
+			return move(myValue);
 		}
 
 		// index getter
@@ -258,7 +250,8 @@ namespace util::detail
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &
-			noexcept(nothrowCopyPursuer<Index, value_type>)
+			//noexcept(nothrowCopyPursuer<Index, value_type>)
+			noexcept(Index == Place)
 		{
 			if constexpr (Index == Place)
 			{
@@ -272,6 +265,7 @@ namespace util::detail
 				}
 				else
 				{
+					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
@@ -287,7 +281,8 @@ namespace util::detail
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
-			noexcept(nothrowCopyPursuer<Index, const_value_type>)
+			//noexcept(nothrowCopyPursuer<Index, const_value_type>)
+			noexcept(Index == Place)
 		{
 			if constexpr (Index == Place)
 			{
@@ -295,7 +290,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<Index>();
+				if (isExtended)
+				{
+					return _Tail.template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -309,7 +312,8 @@ namespace util::detail
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &&
-			noexcept(nothrowMovePursuer<Index, value_type>)
+			//noexcept(nothrowMovePursuer<Index, value_type>)
+			noexcept(Index == Place)
 		{
 			if constexpr (Index == Place)
 			{
@@ -317,7 +321,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<Index>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -331,7 +343,8 @@ namespace util::detail
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
-			noexcept(nothrowMovePursuer<Index, const_value_type>)
+			//noexcept(nothrowMovePursuer<Index, const_value_type>)
+			noexcept(Index == Place)
 		{
 			if constexpr (Index == Place)
 			{
@@ -339,7 +352,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<Index>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<Index>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -347,9 +368,9 @@ namespace util::detail
 			}
 		}
 
-		// type getter (not void)
+		// type getter
 		template <typename T>
-			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&
@@ -360,7 +381,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<T>();
+				if (isExtended)
+				{
+					return _Tail.template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -368,9 +397,9 @@ namespace util::detail
 			}
 		}
 
-		// type getter (not void)
+		// type getter
 		template <typename T>
-			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
@@ -381,7 +410,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return _Tail.template get<T>();
+				if (isExtended)
+				{
+					return _Tail.template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -389,9 +426,9 @@ namespace util::detail
 			}
 		}
 
-		// type getter (not void)
+		// type getter
 		template <typename T>
-			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get()&&
@@ -402,7 +439,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<T>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -410,9 +455,9 @@ namespace util::detail
 			}
 		}
 
-		// type getter (not void)
+		// type getter
 		template <typename T>
-			requires (notvoids<T>&& meta::included_v<T, Fty, Rty...>)
+			requires (meta::included_v<T, Fty, Rty...>)
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
@@ -423,7 +468,15 @@ namespace util::detail
 			}
 			else if constexpr (1 < mySize)
 			{
-				return move(_Tail).template get<T>();
+				if (isExtended)
+				{
+					return move(_Tail).template get<T>();
+				}
+				else
+				{
+					//std::unreachable();
+					throw std::bad_variant_access{};
+				}
 			}
 			else
 			{
@@ -431,200 +484,37 @@ namespace util::detail
 			}
 		}
 
-		// type getter (included void)
-		template <typename T>
-			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
-		[[nodiscard]]
-		constexpr decltype(auto)
-			get()&
+		// unsafe
+		template<typename Uty>
+		constexpr void set(Uty&& value)
+			noexcept(nothrow_assignables<Fty, Uty>)
 		{
-			if constexpr (same_as<T, Fty>)
-			{
-				return value();
-			}
-			else if constexpr (1 < mySize)
-			{
-				return _Tail.template get<T>();
-			}
-			else
-			{
-				static_assert(always_false<T>, "This Monad does not have the indexed type.");
-			}
-		}
-
-		// type getter (included void)
-		template <typename T>
-			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
-		[[nodiscard]]
-		constexpr decltype(auto)
-			get() const&
-		{
-			if constexpr (same_as<T, Fty>)
-			{
-				return value();
-			}
-			else if constexpr (1 < mySize)
-			{
-				return _Tail.template get<T>();
-			}
-			else
-			{
-				static_assert(always_false<T>, "This Monad does not have the indexed type.");
-			}
-		}
-
-		// type getter (included void)
-		template <typename T>
-			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
-		[[nodiscard]]
-		constexpr decltype(auto)
-			get()&&
-		{
-			if constexpr (same_as<T, Fty>)
-			{
-				return move(*this).value();
-			}
-			else if constexpr (1 < mySize)
-			{
-				return move(_Tail).template get<T>();
-			}
-			else
-			{
-				static_assert(always_false<T>, "This Monad does not have the indexed type.");
-			}
-		}
-
-		// type getter (included void)
-		template <typename T>
-			requires (!notvoids<T>&& meta::included_v<T, Fty, Rty...>)
-		[[nodiscard]]
-		constexpr decltype(auto)
-			get() const&&
-		{
-			if constexpr (same_as<T, Fty>)
-			{
-				return move(*this).value();
-			}
-			else if constexpr (1 < mySize)
-			{
-				return move(_Tail).template get<T>();
-			}
-			else
-			{
-				static_assert(always_false<T>, "This Monad does not have the indexed type.");
-			}
-		}
-
-		// type getter (not included void)
-		template <typename T>
-			requires (!notvoids<T> && !meta::included_v<T, Fty, Rty...>)
-		[[nodiscard]]
-		constexpr void get() const
-		{
-			static_assert(always_false<T>, "Cannot get the not included void type.");
-		}
-
-		template<typename W = Fty>
-			requires (notvoids<W>)
-		constexpr PlacedVariant& set(const W& value) &
-			noexcept(nothrow_copy_constructibles<W>)
-		{
-			myValue = value;
+			myValue = forward<Uty>(value);
 			hasValue = true;
+		}
+
+		template <size_t Index, typename Uty>
+			requires (Index == Place)
+		constexpr PlacedVariant& try_set(Uty&& value)
+			noexcept(nothrow_assignables<Fty, Uty>)
+		{
+			static_assert(!same_as<Fty, void>, "Cannot set the value of a void type.");
+			static_assert(!assignable_from<Uty, Fty>, "Uty is not assignable to Fty.");
+
+			set(forward<Uty>(value));
 
 			return *this;
 		}
 
-		template<typename W = Fty>
-			requires (notvoids<W>)
-		constexpr PlacedVariant& set(W&& value) &
-			noexcept(nothrow_move_constructibles<W>)
-		{
-			myValue = move(value);
-			hasValue = true;
-
-			return *this;
-		}
-
-		template<typename W = Fty>
-			requires (notvoids<W>)
-		constexpr PlacedVariant&& set(const W& value) &&
-			noexcept(nothrow_copy_constructibles<W>)
-		{
-			myValue = value;
-			hasValue = true;
-
-			return move(*this);
-		}
-
-		template<typename W = Fty>
-			requires (notvoids<W>)
-		constexpr PlacedVariant&& set(W&& value) &&
-			noexcept(nothrow_move_constructibles<W>)
-		{
-			myValue = move(value);
-			hasValue = true;
-
-			return move(*this);
-		}
-
-		template <typename W = Fty, typename... Args>
-			requires (notvoids<W>)
-		constexpr W& emplace(Args&&... args) &
-			noexcept(nothrow_constructibles<W, Args&&...>)
-		{
-			myValue = W{ forward<Args>(args)... };
-			hasValue = true;
-
-			return myValue;
-		}
-
-		template <typename W = Fty, typename... Args>
-			requires (notvoids<W>)
-		constexpr W&& emplace(Args&&... args) &&
-			noexcept(nothrow_constructibles<W, Args&&...>)
-		{
-			myValue = W{ forward<Args>(args)... };
-			hasValue = true;
-
-			return move(myValue);
-		}
-
 		template <size_t Index, typename Uty>
-			requires (notvoids<Fty>&& Index == Place)
-		constexpr PlacedVariant& try_set(Uty&& value)&
+			requires (Index != Place)
+		constexpr
+			typename get_node_at<relativeIndex<Index>, node_type>::type&
+			try_set(Uty&& value)
 		{
-			return set(forward<Uty>(value));
-		}
-
-		template <size_t Index, typename Uty>
-			requires (notvoids<Fty>&& Index == Place)
-		constexpr PlacedVariant&& try_set(Uty&& value)&&
-		{
-			return set(forward<Uty>(value));
-		}
-
-		template <size_t Index, typename Uty>
-			requires (!notvoids<Fty>&& Index == Place)
-		constexpr void try_set(Uty&& value) const
-		{
-			static_assert(always_false<Uty>, "Cannot set the value of a void type.");
-		}
-
-		template <size_t Index>
-			requires (!notvoids<Fty>&& Index == Place)
-		constexpr void try_set() const
-		{
-			static_assert(always_false<integral_constant<size_t, Index>>, "Cannot set the value of a void type.");
-		}
-
-		template <size_t Index, typename Uty>
-			requires (Index != Place && Index <= 1 + Place + sizeof...(Rty))
-		constexpr decltype(auto) try_set(Uty&& value)&
-		{
-			if constexpr (1 < mySize)
+			if constexpr (1 < mySize && Index <= Place + mySize)
 			{
-				return _Tail.template try_set<Index>(forward<Uty>(value));
+				return _Tail.try_set<Index>(forward<Uty>(value));
 			}
 			else
 			{
@@ -632,18 +522,14 @@ namespace util::detail
 			}
 		}
 
-		template <size_t Index, typename Uty>
-			requires (Index != Place && Index <= 1 + Place + sizeof...(Rty))
-		constexpr decltype(auto) try_set(Uty&& value)&&
+		template <typename... Args>
+		constexpr PlacedVariant& emplace(Args&&... args)
+			noexcept(nothrow_constructibles<Fty, Args&&...>)
 		{
-			if constexpr (1 < mySize)
-			{
-				return move(_Tail).template try_set<Index>(forward<Uty>(value));
-			}
-			else
-			{
-				static_assert(always_false<Uty>, "This Monad does not have the indexed type.");
-			}
+			myValue = Fty{ forward<Args>(args)... };
+			hasValue = true;
+
+			return *this;
 		}
 
 		constexpr void reset() noexcept
@@ -875,7 +761,6 @@ namespace util::detail
 	};
 
 	using ::std::integral_constant;
-	using FirstIndexer = integral_constant<size_t, 0>;
 
 	template <typename... Ts>
 	using Union = PlacedVariant<FirstIndexer, Ts...>;
