@@ -7,7 +7,8 @@ import Net;
 import Net.EndPoint;
 import Net.Socket;
 import Net.CompletionPort;
-import Net.Promise;
+//import Net.Promise;
+#include "Promise.hpp"
 
 class [[nodiscard]] Framework : util::Singleton<Framework>
 {

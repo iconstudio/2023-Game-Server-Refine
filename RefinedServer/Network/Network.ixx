@@ -18,8 +18,6 @@ export namespace net
 	class Socket;
 
 	class Context;
-	template<typename T, typename E>
-	class Promise;
 	class SendContext;
 
 	class BasicSession;

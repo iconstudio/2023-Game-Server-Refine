@@ -3,7 +3,8 @@ module;
 #include <winsock2.h>
 
 export module Net.CompletionPort;
-import Net.Promise;
+//import Net.Promise;
+#include "../RefinedServer/Promise.hpp"
 
 using ulong = unsigned long;
 using ullong = unsigned long long;

@@ -214,6 +214,7 @@
   <ItemGroup>
     <ClInclude Include="Framework.hpp" />
     <ClInclude Include="pch.hpp" />
+    <ClInclude Include="Promise.hpp" />
     <ClInclude Include="stdafx.hpp" />
   </ItemGroup>
   <ItemGroup>
