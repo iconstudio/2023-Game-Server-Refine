@@ -8,6 +8,7 @@ import Net;
 import Net.EndPoint;
 import Net.Context;
 import Net.Intrinsics;
+import Net.Promise;
 
 export namespace net
 {
