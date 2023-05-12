@@ -15,19 +15,15 @@ export namespace util
 	public:
 		static_assert(!same_as<T, nullopt_t>, "T must not be nullopt_t.");
 
-		using base_type = Identity<T>;
-		using value_type = T;
+		using base_type = T;
+		using value_type = Identity<base_type>;
+
 		template<typename U>
 		using rebind_base = Identity<U>;
 		template<typename U>
 		using rebind = Monad<U>;
 
-		explicit constexpr Monad()
-			noexcept(nothrow_constructibles<T>)
-			: myStorage()
-		{}
-
-		constexpr Monad(nullopt_t)
+		constexpr Monad()
 			noexcept(nothrow_constructibles<T>)
 			: myStorage()
 		{}
@@ -42,45 +38,38 @@ export namespace util
 			: myStorage(static_cast<rebind_base<T>&&>(other.myStorage))
 		{}
 
-		constexpr Monad& operator=(const Monad& other) &
-			noexcept(nothrow_copy_assignables<T>) requires(copy_assignables<T>)
-		{
-			myStorage = other.myStorage;
-			return *this;
-		}
+		explicit constexpr Monad(nullopt_t)
+			noexcept(nothrow_constructibles<T>)
+			: myStorage()
+		{}
 
-		constexpr Monad&& operator=(const Monad& other) &&
-			noexcept(nothrow_copy_assignables<T>) requires(copy_assignables<T>)
-		{
-			myStorage = other.myStorage;
-			return static_cast<Monad&&>(*this);
-		}
-
-		constexpr Monad& operator=(Monad&& other) &
-			noexcept(nothrow_move_assignables<T>) requires(move_assignables<T>)
-		{
-			myStorage = static_cast<rebind_base<T>&&>(other.myStorage);
-			return *this;
-		}
-
-		constexpr Monad&& operator=(Monad&& other) &&
-			noexcept(nothrow_move_assignables<T>) requires(move_assignables<T>)
-		{
-			myStorage = static_cast<rebind_base<T>&&>(other.myStorage);
-			return static_cast<Monad&&>(*this);
-		}
-
-		constexpr Monad(const T& fwd)
+		explicit(trivials<T>)
+			constexpr Monad(const T& fwd)
 			noexcept(nothrow_copy_constructibles<T>)
 			: myStorage(fwd)
 			, hasValue(true)
 		{}
 
-		constexpr Monad(T&& fwd)
+		explicit(trivials<T>)
+			constexpr Monad(T&& fwd)
 			noexcept(nothrow_move_constructibles<T>)
 			: myStorage(static_cast<T&&>(fwd))
 			, hasValue(true)
 		{}
+
+		constexpr Monad& operator=(const Monad& other)
+			noexcept(nothrow_copy_assignables<T>) requires(copy_assignables<T>)
+		{
+			myStorage = other.myStorage;
+			return *this;
+		}
+
+		constexpr Monad& operator=(Monad&& other)
+			noexcept(nothrow_move_assignables<T>) requires(move_assignables<T>)
+		{
+			myStorage = static_cast<rebind_base<T>&&>(other.myStorage);
+			return *this;
+		}
 
 		constexpr ~Monad()
 			noexcept(nothrow_destructibles<T>)
@@ -299,7 +288,7 @@ export namespace util
 			static_assert(!is_same_v<fwd_result_t, void>, "Result must not be void.");
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
 
-			using fwd_value_t = fwd_result_t::value_type;
+			using fwd_value_t = fwd_result_t::base_type;
 
 			if (has_value())
 			{
@@ -654,21 +643,25 @@ export namespace util
 			}
 		}
 
+		[[nodiscard]]
 		constexpr T& value() & noexcept
 		{
 			return *myStorage;
 		}
 
+		[[nodiscard]]
 		constexpr const T& value() const& noexcept
 		{
 			return *myStorage;
 		}
 
+		[[nodiscard]]
 		constexpr T&& value() && noexcept
 		{
 			return static_cast<T&&>(*myStorage);
 		}
 
+		[[nodiscard]]
 		constexpr const T&& value() const&& noexcept
 		{
 			return static_cast<const T&&>(*myStorage);
@@ -695,6 +688,7 @@ export namespace util
 		}
 
 		template<convertible_to<T> U>
+		[[nodiscard]]
 		constexpr T value_or(const U& failsafe) const& noexcept(nothrow_constructibles<T>)
 		{
 			if (has_value())
@@ -707,6 +701,7 @@ export namespace util
 			}
 		}
 
+		[[nodiscard]]
 		constexpr T value_or(T&& failsafe) const& noexcept(nothrow_move_constructibles<T>)
 		{
 			if (has_value())
@@ -720,6 +715,7 @@ export namespace util
 		}
 
 		template<convertible_to<T> U>
+		[[nodiscard]]
 		constexpr T value_or(const U& failsafe) && noexcept(nothrow_constructibles<T>)
 		{
 			if (has_value())
@@ -732,6 +728,7 @@ export namespace util
 			}
 		}
 
+		[[nodiscard]]
 		constexpr T&& value_or(T&& failsafe) && noexcept(nothrow_move_constructibles<T>)
 		{
 			if (has_value())
@@ -744,7 +741,14 @@ export namespace util
 			}
 		}
 
+		[[nodiscard]]
 		constexpr bool has_value() const noexcept
+		{
+			return hasValue;
+		}
+
+		[[nodiscard]]
+		explicit constexpr operator bool() const noexcept
 		{
 			return hasValue;
 		}
@@ -754,16 +758,11 @@ export namespace util
 			return value();
 		}
 
-		explicit constexpr operator bool() const noexcept
-		{
-			return hasValue;
-		}
-
 		constexpr ~Monad()
 			noexcept(nothrow_destructibles<T>) = default;
 
 	private:
-		Identity<T> myStorage;
+		value_type myStorage;
 		bool hasValue = false;
 	};
 
@@ -771,7 +770,7 @@ export namespace util
 	class [[nodiscard]] Monad<void>
 	{
 	public:
-		using value_type = void;
+		using base_type = void;
 
 		constexpr Monad() noexcept
 			: hasValue(true)
@@ -823,7 +822,7 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return std::move(*this);
+			return move(*this);
 		}
 
 		template<typename Fn, typename... Args>
@@ -838,7 +837,7 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return std::move(*this);
+			return move(*this);
 		}
 
 		template<typename Fn, typename... Args>
@@ -852,7 +851,7 @@ export namespace util
 
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
 
-			using fwd_value_t = fwd_result_t::value_type;
+			using fwd_value_t = fwd_result_t::base_type;
 
 			if (has_value())
 			{
@@ -875,7 +874,7 @@ export namespace util
 
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
 
-			using fwd_value_t = fwd_result_t::value_type;
+			using fwd_value_t = fwd_result_t::base_type;
 
 			if (has_value())
 			{
@@ -984,7 +983,7 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return *this;
+			return move(*this);
 		}
 
 		template<typename Fn, typename... Args>
@@ -999,7 +998,7 @@ export namespace util
 				forward<Fn>(action)(forward<Args>(args)...);
 			}
 
-			return *this;
+			return move(*this);
 		}
 
 		template<typename Fn, typename... Args>
@@ -1014,7 +1013,7 @@ export namespace util
 			static_assert(!is_same_v<fwd_result_t, void>, "Result must not be void.");
 			static_assert(is_specialization_v<fwd_result_t, Monad>);
 
-			using fwd_value_t = fwd_result_t::value_type;
+			using fwd_value_t = fwd_result_t::base_type;
 
 			if (!has_value())
 			{

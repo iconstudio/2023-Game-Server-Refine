@@ -41,20 +41,20 @@ export namespace util
 
 		constexpr LooseMonad(LooseMonad&& other)
 			noexcept(nothrow_move_constructibles<Ts...>) requires(move_constructibles<Ts...>)
-			: myStorage(move(other.myStorage))
+			: myStorage(static_cast<base_type&&>(other.myStorage))
 		{}
 
 		constexpr LooseMonad& operator=(const LooseMonad& other)
-			noexcept(nothrow_copy_assignables<Ts...>)  requires(copy_assignables<Ts...>)
+			noexcept(nothrow_copy_assignables<Ts...>) requires(copy_assignables<Ts...>)
 		{
 			myStorage = other.myStorage;
 			return *this;
 		}
 
 		constexpr LooseMonad& operator=(LooseMonad&& other)
-			noexcept(nothrow_move_assignables<Ts...>)  requires(move_assignables<Ts...>)
+			noexcept(nothrow_move_assignables<Ts...>) requires(move_assignables<Ts...>)
 		{
-			myStorage = util::move(other.myStorage);
+			myStorage = static_cast<base_type&&>(other.myStorage);
 			return *this;
 		}
 

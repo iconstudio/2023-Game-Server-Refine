@@ -61,7 +61,7 @@ export namespace util
 
 		template<size_t OLength>
 		explicit constexpr Array(const Elem(&raw_data)[OLength])
-			noexcept(std::is_nothrow_copy_assignable_v<Elem>) 
+			noexcept(std::is_nothrow_copy_assignable_v<Elem>)
 			requires (std::copyable<Elem>&& OLength <= Length)
 		{
 			if (std::is_constant_evaluated())
@@ -593,7 +593,7 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			reference
-			at(const size_type& index)&
+			at([[maybe_unused]] const size_type& index)&
 		{
 			return *begin();
 		}
@@ -601,7 +601,7 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			const_reference
-			at(const size_type& index) const&
+			at([[maybe_unused]] const size_type& index) const&
 		{
 			return *cbegin();
 		}
@@ -609,7 +609,7 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			value_type&&
-			at(const size_type& index)&&
+			at([[maybe_unused]] const size_type& index)&&
 		{
 			return std::move(*begin());
 		}
@@ -617,14 +617,14 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			const_value_type&&
-			at(const size_type& index) const&&
+			at([[maybe_unused]] const size_type& index) const&&
 		{
 			return std::move(*cbegin());
 		}
 
 		[[nodiscard]]
 		inline constexpr reference
-			operator[](const size_type& index) & noexcept
+			operator[]([[maybe_unused]] const size_type& index) & noexcept
 		{
 			return *begin();
 		}
@@ -632,7 +632,7 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			const_reference
-			operator[](const size_type& index) const& noexcept
+			operator[]([[maybe_unused]] const size_type& index) const& noexcept
 		{
 			return *cbegin();
 		}
@@ -640,7 +640,7 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			value_type&&
-			operator[](const size_type& index) && noexcept
+			operator[]([[maybe_unused]] const size_type& index) && noexcept
 		{
 			return std::move(*begin());
 		}
@@ -648,7 +648,7 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr
 			const_value_type&&
-			operator[](const size_type& index) const&& noexcept
+			operator[]([[maybe_unused]] const size_type& index) const&& noexcept
 		{
 			return std::move(*begin());
 		}

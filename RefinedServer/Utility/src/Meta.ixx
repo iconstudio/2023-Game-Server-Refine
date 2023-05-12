@@ -17,7 +17,7 @@ namespace meta::detail
 	template <typename T, size_t... Indices, template <typename...> class Predicate>
 	struct invoke_args<T, std::index_sequence<Indices...>, Predicate>
 	{
-		using type = typename Predicate<item<T, Indices>...>;
+		using type = Predicate<item<T, Indices>...>;
 	};
 
 	// construct a sequence consisting of repetitions of T
@@ -95,7 +95,7 @@ export namespace meta
 	template <template <typename...> typename Fn, typename... Args>
 	struct wrapper<std::void_t<Fn<Args...>>, Fn, Args...>
 	{
-		using type = typename Fn<Args...>;
+		using type = Fn<Args...>;
 	};
 
 	// needs result type
@@ -181,7 +181,7 @@ export namespace meta
 	struct foldl;
 
 	template <typename Fn, typename T, typename... Ts>
-	using foldl_t = typename foldl<Fn, T, Ts...>::template type;
+	using foldl_t = typename foldl<Fn, T, Ts...>::type;
 
 	template <typename Fn, typename T, typename U, typename... Rests>
 	struct foldl<Fn, T, U, Rests...>
@@ -987,7 +987,7 @@ namespace meta::test
 		using en0_top = front_t<en0_t>;
 		using en0_bot = back_t<en0_t>;
 
-		using en0_alt = typename repeat_n_t<wrap<pop>, test_rp_list, 0>;
+		using en0_alt = repeat_n_t<wrap<pop>, test_rp_list, 0>;
 		using en0_alt_top = front_t<en0_alt>;
 		using en0_alt_bot = back_t<en0_alt>;
 

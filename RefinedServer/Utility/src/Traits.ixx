@@ -62,7 +62,7 @@ export namespace util
 	using ::std::is_copy_assignable_v;
 	using ::std::is_move_assignable_v;
 
-	// trivals
+	// trivials
 	using ::std::is_trivial;
 	using ::std::is_trivial_v;
 	using ::std::is_trivially_constructible;

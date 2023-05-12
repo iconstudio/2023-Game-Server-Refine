@@ -44,7 +44,9 @@ export namespace util
 
 	using CancellationSource = ::std::stop_source;
 	using CancellationToken = ::std::stop_token;
-	using CancellationCallback = ::std::stop_callback;
+	template<typename Fn>
+	using CancellationCallback = ::std::stop_callback<Fn>;
+
 	using ::std::stop_source;
 	using ::std::stop_token;
 	using ::std::stop_callback;

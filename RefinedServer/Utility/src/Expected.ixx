@@ -18,26 +18,6 @@ export namespace util
 			: myValue()
 		{}
 
-		explicit constexpr Expected(const value_type& value)
-			noexcept(nothrow_copy_constructibles<value_type>)
-			: myValue(value)
-		{}
-
-		explicit constexpr Expected(value_type&& value)
-			noexcept(nothrow_move_constructibles<value_type>)
-			: myValue(static_cast<value_type&&>(value))
-		{}
-
-		constexpr Expected(const error_type& error)
-			noexcept(nothrow_copy_constructibles<error_type>)
-			: myError(error)
-		{}
-
-		constexpr Expected(error_type&& error)
-			noexcept(nothrow_move_constructibles<error_type>)
-			: myError(static_cast<error_type&&>(error))
-		{}
-
 		constexpr Expected(const Expected& other)
 			noexcept(nothrow_copy_constructibles<value_type, error_type>)
 			: myValue(other.myValue)
@@ -48,6 +28,26 @@ export namespace util
 			noexcept(nothrow_move_constructibles<value_type, error_type>)
 			: myValue(static_cast<value_type&&>(other.myValue))
 			, myError(static_cast<error_type&&>(other.myError))
+		{}
+
+		explicit constexpr Expected(const value_type& value)
+			noexcept(nothrow_copy_constructibles<value_type>)
+			: myValue(value)
+		{}
+
+		explicit constexpr Expected(value_type&& value)
+			noexcept(nothrow_move_constructibles<value_type>)
+			: myValue(static_cast<value_type&&>(value))
+		{}
+
+		explicit constexpr Expected(const error_type& error)
+			noexcept(nothrow_copy_constructibles<error_type>)
+			: myError(error)
+		{}
+
+		explicit constexpr Expected(error_type&& error)
+			noexcept(nothrow_move_constructibles<error_type>)
+			: myError(static_cast<error_type&&>(error))
 		{}
 
 		constexpr Expected& operator=(const Expected& other)
@@ -132,7 +132,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		constexpr operator bool() const noexcept
+		explicit constexpr operator bool() const noexcept
 		{
 			return hasValue();
 		}
