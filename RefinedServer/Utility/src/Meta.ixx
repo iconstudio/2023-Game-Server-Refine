@@ -32,8 +32,8 @@ namespace meta::detail
 	struct __at;
 
 #ifdef __clang__
-	template <template <typename...> class Seq, typename... _Types, size_t Index>
-	struct at<Seq<_Types...>, Index, void_t<__type_pack_element<Index, _Types...>>>
+	template <template <typename...> class Seq, size_t Index, typename... _Types>
+	struct __at<Seq<_Types...>, Index, std::void_t<__type_pack_element<Index, _Types...>>>
 	{
 		using type = __type_pack_element<Index, _Types...>;
 	};
@@ -77,7 +77,7 @@ namespace meta::detail
 	{
 		using type = typename decltype(create<Index, void*, enumerate_ptrs>::_Eval(AsPointer<Ts>()...));
 	};*/
-#endif // __clang__
+#endif // !__clang__
 }
 
 export namespace meta
@@ -825,16 +825,16 @@ namespace meta::test
 		using NewTransformT = typename transform<NewBinder, test_seq>::type;
 		constexpr NewTransformT transform_t_test{};
 
-		using NewTransformT_0 = typename at<NewTransformT, 0>;
-		using NewTransformT_0_Int = typename at<NewTransformT, 0>::MetaList;
+		using NewTransformT_0 = at<NewTransformT, 0>;
+		using NewTransformT_0_Int = at<NewTransformT, 0>;
 		constexpr NewTransformT_0_Int transform_t0_test{};
 
-		using NewTransformT_1 = typename at<NewTransformT, 1>;
-		using NewTransformT_1_Int = typename at<NewTransformT, 1>::MetaList;
+		using NewTransformT_1 = at<NewTransformT, 1>;
+		using NewTransformT_1_Int = at<NewTransformT, 1>;
 		constexpr NewTransformT_1_Int transform_t1_test{};
 
-		using NewTransformT_2 = typename at<NewTransformT, 2>;
-		using NewTransformT_2_Int = typename at<NewTransformT, 2>::MetaList;
+		using NewTransformT_2 = at<NewTransformT, 2>;
+		using NewTransformT_2_Int = at<NewTransformT, 2>;
 		constexpr NewTransformT_2_Int transform_t2_test{};
 
 		//using NewTransformT_3 = typename at<NewTransformT, 3>;
