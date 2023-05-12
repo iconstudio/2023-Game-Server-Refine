@@ -1,5 +1,4 @@
 module;
-#include <stdexcept>
 #include <utility>
 #include <type_traits>
 #include <initializer_list>
@@ -39,8 +38,8 @@ export namespace util
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-		static inline constexpr bool NothrowInitializable = std::is_nothrow_default_constructible_v<Elem>;
-		static inline constexpr bool NothrowDestructible = std::is_nothrow_destructible_v<Elem>;
+		static inline constexpr bool NothrowInitializable = false = std::is_nothrow_default_constructible_v<Elem>;
+		static inline constexpr bool NothrowDestructible = false = std::is_nothrow_destructible_v<Elem>;
 
 		constexpr Array() noexcept(NothrowInitializable) = default;
 		constexpr ~Array() noexcept(NothrowDestructible) = default;
@@ -474,41 +473,41 @@ export namespace util
 		constexpr ~Array() noexcept = default;
 
 		template<size_t OLength>
-		constexpr Array(const Elem(&raw_data)[OLength]) noexcept
+		constexpr Array([[maybe_unused]] const Elem(&raw_data)[OLength]) noexcept
 		{}
 
 		template<std::convertible_to<Elem> Elem2>
-		explicit constexpr Array(const std::initializer_list<Elem2> elements) noexcept
+		explicit constexpr Array([[maybe_unused]] const std::initializer_list<Elem2> elements) noexcept
 		{}
 
-		constexpr Array(const Array& other) = default;
-		constexpr Array(Array&& other) = default;
-		inline constexpr Array& operator=(const Array& other) = default;
-		inline constexpr Array& operator=(Array&& other) = default;
+		constexpr Array(const Array& other) noexcept = default;
+		constexpr Array(Array&& other) noexcept = default;
+		inline constexpr Array& operator=(const Array& other) noexcept = default;
+		inline constexpr Array& operator=(Array&& other) noexcept = default;
 
 		template<std::invocable<value_type&> Fn>
-		inline constexpr void apply(Fn&& function) noexcept
+		inline constexpr void apply([[maybe_unused]] Fn&& function) noexcept
 		{}
 
 		template<std::invocable<const_value_type&> Fn>
-		inline constexpr void apply(Fn&& function) const noexcept
+		inline constexpr void apply([[maybe_unused]] Fn&& function) const noexcept
 		{}
 
 		template<std::convertible_to<value_type> OElem, size_t OLength>
-		inline constexpr void assign(const Array<OElem, OLength>& other) noexcept
+		inline constexpr void assign([[maybe_unused]] const Array<OElem, OLength>& other) noexcept
 		{}
 
 		template<std::convertible_to<value_type> OElem, size_t OLength>
-		inline constexpr void assign(Array<OElem, OLength>&& other) noexcept
+		inline constexpr void assign([[maybe_unused]] Array<OElem, OLength>&& other) noexcept
 		{}
 
-		inline constexpr void fill(const value_type& fill_value) noexcept
+		inline constexpr void fill([[maybe_unused]] const value_type& fill_value) noexcept
 		{}
 
-		inline constexpr void fill(value_type&& fill_value) noexcept
+		inline constexpr void fill([[maybe_unused]] value_type&& fill_value) noexcept
 		{}
 
-		inline constexpr void swap(Array& other) noexcept
+		inline constexpr void swap([[maybe_unused]] Array& other) noexcept
 		{}
 
 		[[nodiscard]]

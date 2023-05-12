@@ -38,7 +38,7 @@ export namespace util
 			: myValue(static_cast<T&&>(value))
 		{}
 
-		constexpr Identity& operator=(const Identity& other) &
+		constexpr Identity& operator=(const Identity& other)
 			noexcept(nothrow_copy_assignables<T>)
 			requires(copy_assignables<T>)
 		{
@@ -46,28 +46,12 @@ export namespace util
 			return *this;
 		}
 
-		constexpr Identity&& operator=(const Identity& other) &&
-			noexcept(nothrow_copy_assignables<T>)
-			requires(copy_assignables<T>)
-		{
-			myValue = other.myValue;
-			return move(*this);
-		}
-
-		constexpr Identity& operator=(Identity&& other) &
+		constexpr Identity& operator=(Identity&& other)
 			noexcept(nothrow_move_assignables<T>)
 			requires(move_assignables<T>)
 		{
 			myValue = static_cast<T&&>(other.myValue);
 			return *this;
-		}
-
-		constexpr Identity&& operator=(Identity&& other) &&
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<T>)
-		{
-			myValue = static_cast<T&&>(other.myValue);
-			return move(*this);
 		}
 
 		constexpr void swap(Identity& other) &

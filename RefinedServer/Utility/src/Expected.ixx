@@ -89,56 +89,67 @@ export namespace util
 			return *this;
 		}
 
+		[[nodiscard]]
 		constexpr const T& value() const& noexcept
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr T& value() & noexcept
 		{
 			return myValue;
 		}
 
+		[[nodiscard]]
 		constexpr const T&& value() const&& noexcept
 		{
 			return static_cast<const T&&>(myValue);
 		}
 
+		[[nodiscard]]
 		constexpr T&& value() && noexcept
 		{
 			return static_cast<T&&>(myValue);
 		}
 
+		[[nodiscard]]
 		constexpr const E& error() const& noexcept
 		{
 			return myError;
 		}
 
+		[[nodiscard]]
 		constexpr E& error() & noexcept
 		{
 			return myError;
 		}
 
+		[[nodiscard]]
 		constexpr const E&& error() const&& noexcept
 		{
 			return static_cast<const E&&>(myError);
 		}
 
+		[[nodiscard]]
 		constexpr E&& error() && noexcept
 		{
 			return static_cast<E&&>(myError);
 		}
 
+		[[nodiscard]]
 		constexpr bool hasValue() const noexcept
 		{
 			return myValue.has_value();
 		}
 
+		[[nodiscard]]
 		constexpr bool hasError() const noexcept
 		{
 			return myError.has_value();
 		}
 
+		[[nodiscard]]
 		constexpr operator bool() const noexcept
 		{
 			return hasValue();
