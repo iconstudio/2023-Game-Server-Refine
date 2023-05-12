@@ -3,11 +3,11 @@ import Utility;
 import Utility.Constraints;
 import Utility.Traits;
 import Net;
-import Net.Promise;
+export import Net.Promise;
 
 export namespace net
 {
-	using ioError = ErrorHandler<void>;
+	using ioError = Promise<void, int>;
 
 	inline ioError CheckPending() noexcept
 	{
