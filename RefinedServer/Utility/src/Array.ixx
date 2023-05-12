@@ -45,7 +45,8 @@ export namespace util
 		constexpr Array() noexcept(NothrowInitializable) = default;
 		constexpr ~Array() noexcept(NothrowDestructible) = default;
 
-		constexpr Array(const Elem(&raw_data)[Length]) noexcept(std::is_nothrow_copy_assignable_v<Elem>)
+		explicit constexpr Array(const Elem(&raw_data)[Length])
+			noexcept(std::is_nothrow_copy_assignable_v<Elem>)
 			requires std::copyable<Elem>
 		{
 			if (std::is_constant_evaluated())
@@ -54,12 +55,13 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(myData, raw_data, Length * sizeof(Elem));
+				std::memcpy(_unused, raw_data, Length * sizeof(Elem));
 			}
 		}
 
 		template<size_t OLength>
-		constexpr Array(const Elem(&raw_data)[OLength]) noexcept(std::is_nothrow_copy_assignable_v<Elem>)
+		explicit constexpr Array(const Elem(&raw_data)[OLength])
+			noexcept(std::is_nothrow_copy_assignable_v<Elem>) 
 			requires (std::copyable<Elem>&& OLength <= Length)
 		{
 			if (std::is_constant_evaluated())
@@ -68,12 +70,13 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(myData, raw_data, Length * sizeof(Elem));
+				std::memcpy(_unused, raw_data, Length * sizeof(Elem));
 			}
 		}
 
 		template<std::convertible_to<Elem> Elem2>
-		explicit constexpr Array(const std::initializer_list<Elem2> elements) noexcept(std::is_nothrow_copy_assignable_v<Elem>&& std::is_nothrow_copy_assignable_v<Elem2>)
+		constexpr Array(const std::initializer_list<Elem2> elements)
+			noexcept(std::is_nothrow_copy_assignable_v<Elem>&& std::is_nothrow_copy_assignable_v<Elem2>)
 		{
 			std::copy(elements.begin(), elements.end(), begin());
 		}
@@ -87,7 +90,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(myData, other.data(), Length);
+				std::memcpy(_unused, other.data(), Length);
 			}
 		}
 
@@ -100,21 +103,25 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(myData, other.data(), Length);
+				std::memcpy(_unused, other.data(), Length);
 			}
 		}
 
 		inline constexpr Array& operator=(const Array& other)
-			noexcept(std::is_nothrow_move_assignable_v<Elem>)
-			requires std::movable<Elem>
+			noexcept(std::is_nothrow_move_assignable_v<Elem>) requires std::movable<Elem>
 		{
+			if (&other == static_cast<const Array* const&>(this))
+			{
+				return *this;
+			}
+
 			if (std::is_constant_evaluated())
 			{
 				std::copy(other.cbegin(), other.cend(), begin());
 			}
 			else
 			{
-				std::memcpy(myData, other.data(), Length);
+				std::memcpy(_unused, other.data(), Length);
 			}
 
 			return *this;
@@ -130,7 +137,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(myData, other.data(), Length);
+				std::memcpy(_unused, other.data(), Length);
 			}
 
 			return *this;
@@ -180,13 +187,13 @@ export namespace util
 
 		inline constexpr void fill(const value_type& fill_value) noexcept(std::is_nothrow_copy_assignable_v<value_type>)
 		{
-			std::fill_n(myData, Length, fill_value);
+			std::fill_n(_unused, Length, fill_value);
 		}
 
 		inline constexpr void fill(value_type&& fill_value) noexcept(std::is_nothrow_move_assignable_v<value_type>)
 		{
 			const auto& value = std::move(fill_value);
-			std::fill_n(myData, Length, value);
+			std::fill_n(_unused, Length, value);
 		}
 
 		inline constexpr void swap(std::array<Elem, Length>& other_data) noexcept(std::is_nothrow_swappable_v<std::array<Elem, Length>>)
@@ -212,25 +219,25 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr iterator begin() noexcept
 		{
-			return iterator{ myData, 0 };
+			return iterator{ _unused, 0 };
 		}
 
 		[[nodiscard]]
 		inline constexpr iterator end() noexcept
 		{
-			return iterator{ myData, Length };
+			return iterator{ _unused, Length };
 		}
 
 		[[nodiscard]]
 		inline constexpr const_iterator begin() const noexcept
 		{
-			return const_iterator{ myData, 0 };
+			return const_iterator{ _unused, 0 };
 		}
 
 		[[nodiscard]]
 		inline constexpr const_iterator end() const noexcept
 		{
-			return const_iterator{ myData, Length };
+			return const_iterator{ _unused, Length };
 		}
 
 		[[nodiscard]]
@@ -291,7 +298,7 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return myData[index];
+			return _unused[index];
 		}
 
 		[[nodiscard]]
@@ -304,7 +311,7 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return myData[index];
+			return _unused[index];
 		}
 
 		[[nodiscard]]
@@ -317,7 +324,7 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return std::move(myData[index]);
+			return std::move(_unused[index]);
 		}
 
 		[[nodiscard]]
@@ -330,14 +337,14 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return std::move(myData[index]);
+			return std::move(_unused[index]);
 		}
 
 		[[nodiscard]]
 		inline constexpr reference
 			operator[](_In_range_(0, Length - 1) const size_type& index) & noexcept
 		{
-			return myData[index];
+			return _unused[index];
 		}
 
 		[[nodiscard]]
@@ -345,7 +352,7 @@ export namespace util
 			const_reference
 			operator[](_In_range_(0, Length - 1) const size_type& index) const& noexcept
 		{
-			return myData[index];
+			return _unused[index];
 		}
 
 		[[nodiscard]]
@@ -353,7 +360,7 @@ export namespace util
 			value_type&&
 			operator[](_In_range_(0, Length - 1) const size_type& index) && noexcept
 		{
-			return std::move(myData[index]);
+			return std::move(_unused[index]);
 		}
 
 		[[nodiscard]]
@@ -361,73 +368,73 @@ export namespace util
 			const_value_type&&
 			operator[](_In_range_(0, Length - 1) const size_type& index) const&& noexcept
 		{
-			return std::move(myData[index]);
+			return std::move(_unused[index]);
 		}
 
 		[[nodiscard]]
 		inline constexpr reference front() & noexcept
 		{
-			return myData[0];
+			return _unused[0];
 		}
 
 		[[nodiscard]]
 		inline constexpr const_reference front() const& noexcept
 		{
-			return myData[0];
+			return _unused[0];
 		}
 
 		[[nodiscard]]
 		inline constexpr value_type&& front() && noexcept
 		{
-			return std::move(myData[0]);
+			return std::move(_unused[0]);
 		}
 
 		[[nodiscard]]
 		inline constexpr const value_type&& front() const&& noexcept
 		{
-			return std::move(myData[0]);
+			return std::move(_unused[0]);
 		}
 
 		[[nodiscard]]
 		inline constexpr reference back() & noexcept
 		{
-			return myData[Length - 1];
+			return _unused[Length - 1];
 		}
 
 		[[nodiscard]]
 		inline constexpr const_reference back() const& noexcept
 		{
-			return myData[Length - 1];
+			return _unused[Length - 1];
 		}
 
 		[[nodiscard]]
 		inline constexpr value_type&& back() && noexcept
 		{
-			return std::move(myData[Length - 1]);
+			return std::move(_unused[Length - 1]);
 		}
 
 		[[nodiscard]]
 		inline constexpr const value_type&& back() const&& noexcept
 		{
-			return std::move(myData[Length - 1]);
+			return std::move(_unused[Length - 1]);
 		}
 
 		[[nodiscard]]
 		inline constexpr pointer data() & noexcept
 		{
-			return myData;
+			return _unused;
 		}
 
 		[[nodiscard]]
 		inline constexpr const_pointer data() const& noexcept
 		{
-			return myData;
+			return _unused;
 		}
 
 		[[nodiscard]]
 		inline constexpr pointer&& data() && noexcept
 		{
-			return std::move(myData);
+			return std::move(_unused);
 		}
 
 		[[nodiscard]]
@@ -449,7 +456,7 @@ export namespace util
 		}
 
 	private:
-		Elem myData[Length];
+		[[maybe_unused]] Elem _unused[Length];
 	};
 
 	template<typename Elem>
@@ -731,7 +738,7 @@ export namespace util
 		}
 
 	private:
-		empty_array_elemement myData[1];
+		[[maybe_unused]] empty_array_elemement _unused[1];
 	};
 
 	using ::std::copy;
