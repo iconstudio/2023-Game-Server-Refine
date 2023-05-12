@@ -6,7 +6,7 @@ import Utility;
 import Utility.Constraints;
 import Utility.Meta;
 
-namespace util
+namespace util::detail
 {
 	template <bool _TrivialDestruction, typename... Ts>
 	struct InternalVariant {};
@@ -89,14 +89,9 @@ namespace util
 	};
 }
 
-export namespace util
+namespace util::detail
 {
-	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
-	class PlacedVariant;
-
-	template <size_t Place>
-	class PlacedVariant<integral_constant<size_t, Place>>
-	{};
+	struct void_guard {};
 
 	template <size_t Place, typename Fty, typename... Rty>
 	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
@@ -912,10 +907,6 @@ export namespace util
 		}
 
 	private:
-		friend class node_type;
-
-		struct void_guard {};
-
 		union
 		{
 			union
