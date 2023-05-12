@@ -14,11 +14,8 @@ namespace util::detail
 	template <size_t Place>
 	class PlacedVariant<integral_constant<size_t, Place>>
 	{};
-}
 
-namespace util::detail
-{
-	struct void_guard {};
+	struct void_guard { explicit constexpr void_guard() noexcept = default; };
 
 	template <size_t Place, typename Fty, typename... Rty>
 	class PlacedVariant<integral_constant<size_t, Place>, Fty, Rty...>
