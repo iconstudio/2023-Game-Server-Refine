@@ -104,7 +104,7 @@ export namespace util
 		{
 			if (has_value<Index>())
 			{
-				forward<Fn>(action)(myStorage.template get<Index>());
+				forward<Fn>(action)(myStorage.get<Index>());
 			}
 
 			return *this;
@@ -118,7 +118,7 @@ export namespace util
 		{
 			if (has_value<Index>())
 			{
-				forward<Fn>(action)(myStorage.template get<Index>());
+				forward<Fn>(action)(myStorage.get<Index>());
 			}
 
 			return *this;
@@ -132,7 +132,7 @@ export namespace util
 		{
 			if (has_value<Index>())
 			{
-				forward<Fn>(action)(move(myStorage).template get<Index>());
+				forward<Fn>(action)(move(myStorage).get<Index>());
 			}
 
 			return move(*this);
@@ -146,7 +146,7 @@ export namespace util
 		{
 			if (has_value<Index>())
 			{
-				forward<Fn>(action)(move(myStorage).template get<Index>());
+				forward<Fn>(action)(move(myStorage).get<Index>());
 			}
 
 			return move(*this);
@@ -160,7 +160,7 @@ export namespace util
 		{
 			if (has_value<T>())
 			{
-				forward<Fn>(action)(myStorage.template get<T>());
+				forward<Fn>(action)(myStorage.get<T>());
 			}
 
 			return *this;
@@ -174,7 +174,7 @@ export namespace util
 		{
 			if (has_value<T>())
 			{
-				forward<Fn>(action)(myStorage.template get<T>());
+				forward<Fn>(action)(myStorage.get<T>());
 			}
 
 			return *this;
@@ -188,7 +188,7 @@ export namespace util
 		{
 			if (has_value<T>())
 			{
-				forward<Fn>(action)(move(myStorage).template get<T>());
+				forward<Fn>(action)(move(myStorage).get<T>());
 			}
 
 			return move(*this);
@@ -202,7 +202,7 @@ export namespace util
 		{
 			if (has_value<T>())
 			{
-				forward<Fn>(action)(move(myStorage).template get<T>());
+				forward<Fn>(action)(move(myStorage).get<T>());
 			}
 
 			return move(*this);
@@ -218,7 +218,7 @@ export namespace util
 
 			if (has_value<Index>())
 			{
-				return forward<Fn>(action)(myStorage.template get<Index>());
+				return forward<Fn>(action)(myStorage.get<Index>());
 			}
 			else
 			{
@@ -236,7 +236,7 @@ export namespace util
 
 			if (has_value<Index>())
 			{
-				return forward<Fn>(action)(myStorage.template get<Index>());
+				return forward<Fn>(action)(myStorage.get<Index>());
 			}
 			else
 			{
@@ -254,7 +254,7 @@ export namespace util
 
 			if (has_value<Index>())
 			{
-				return forward<Fn>(action)(move(myStorage).template get<Index>());
+				return forward<Fn>(action)(move(myStorage).get<Index>());
 			}
 			else
 			{
@@ -272,7 +272,7 @@ export namespace util
 
 			if (has_value<Index>())
 			{
-				return forward<Fn>(action)(move(myStorage).template get<Index>());
+				return forward<Fn>(action)(move(myStorage).get<Index>());
 			}
 			else
 			{
@@ -290,7 +290,7 @@ export namespace util
 
 			if (has_value<T>())
 			{
-				return forward<Fn>(action)(myStorage.template get<T>());
+				return forward<Fn>(action)(myStorage.get<T>());
 			}
 			else
 			{
@@ -308,7 +308,7 @@ export namespace util
 
 			if (has_value<T>())
 			{
-				return forward<Fn>(action)(myStorage.template get<T>());
+				return forward<Fn>(action)(myStorage.get<T>());
 			}
 			else
 			{
@@ -326,7 +326,7 @@ export namespace util
 
 			if (has_value<T>())
 			{
-				return forward<Fn>(action)(move(myStorage).template get<T>());
+				return forward<Fn>(action)(move(myStorage).get<T>());
 			}
 			else
 			{
@@ -342,9 +342,9 @@ export namespace util
 		{
 			static_assert(!same_as<monad_result_t<Fn, const T&&>, void>, "Monadic result cannot be void.");
 
-			if (myStorage.template has_value<T>())
+			if (myStorage.has_value<T>())
 			{
-				return forward<Fn>(action)(move(myStorage).template get<T>());
+				return forward<Fn>(action)(move(myStorage).get<T>());
 			}
 			else
 			{
@@ -622,7 +622,7 @@ export namespace util
 		constexpr reference_type<Index>
 			get()&
 		{
-			return myStorage.template get<Index>();
+			return myStorage.get<Index>();
 		}
 
 		template <size_t Index>
@@ -631,7 +631,7 @@ export namespace util
 		constexpr const_reference_type<Index>
 			get() const&
 		{
-			return myStorage.template get<Index>();
+			return myStorage.get<Index>();
 		}
 
 		template <size_t Index>
@@ -640,7 +640,7 @@ export namespace util
 		constexpr rvalue_type<Index>
 			get()&&
 		{
-			return move(myStorage).template get<Index>();
+			return move(myStorage).get<Index>();
 		}
 
 		template <size_t Index>
@@ -649,7 +649,7 @@ export namespace util
 		constexpr const_rvalue_type<Index>
 			get() const&&
 		{
-			return move(myStorage).template get<Index>();
+			return move(myStorage).get<Index>();
 		}
 
 		template <typename T>
@@ -664,7 +664,7 @@ export namespace util
 		constexpr auto&
 			get()&
 		{
-			return myStorage.template get<T>();
+			return myStorage.get<T>();
 		}
 
 		template <typename T>
@@ -673,7 +673,7 @@ export namespace util
 		constexpr const auto&
 			get() const&
 		{
-			return myStorage.template get<T>();
+			return myStorage.get<T>();
 		}
 
 		template <typename T>
@@ -682,7 +682,7 @@ export namespace util
 		constexpr auto&&
 			get()&&
 		{
-			return move(myStorage).template get<T>();
+			return move(myStorage).get<T>();
 		}
 
 		template <typename T>
@@ -691,28 +691,28 @@ export namespace util
 		constexpr const auto&&
 			get() const&&
 		{
-			return move(myStorage).template get<T>();
+			return move(myStorage).get<T>();
 		}
 
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		constexpr bool has_value() const noexcept
 		{
-			return myStorage.template has_value<Index>();
+			return myStorage.has_value<Index>();
 		}
 
 		template <typename T>
 			requires meta::included_range_v<T, base_type>
 		constexpr bool has_value() const noexcept
 		{
-			return myStorage.template has_value<T>();
+			return myStorage.has_value<T>();
 		}
 
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		constexpr bool is_valueless() const noexcept
 		{
-			return myStorage.template is_valueless<Index>();
+			return myStorage.is_valueless<Index>();
 		}
 
 	private:
@@ -741,65 +741,65 @@ export namespace std
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
 		get(util::LooseMonad<Ts...>& _Val)
-		noexcept(noexcept(_Val.template get<Index>()))
+		noexcept(noexcept(_Val.get<Index>()))
 	{
-		return _Val.template get<Index>();
+		return _Val.get<Index>();
 	}
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
 		get(const util::LooseMonad<Ts...>& _Val)
-		noexcept(noexcept(_Val.template get<Index>()))
+		noexcept(noexcept(_Val.get<Index>()))
 	{
-		return _Val.template get<Index>();
+		return _Val.get<Index>();
 	}
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
 		get(util::LooseMonad<Ts...>&& _Val)
-		noexcept(noexcept(move(_Val).template get<Index>()))
+		noexcept(noexcept(move(_Val).get<Index>()))
 	{
-		return move(_Val).template get<Index>();
+		return move(_Val).get<Index>();
 	}
 
 	template<size_t Index, typename... Ts>
 	constexpr decltype(auto)
 		get(const util::LooseMonad<Ts...>&& _Val)
-		noexcept(noexcept(move(_Val).template get<Index>()))
+		noexcept(noexcept(move(_Val).get<Index>()))
 	{
-		return move(_Val).template get<Index>();
+		return move(_Val).get<Index>();
 	}
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
 		get(util::LooseMonad<Ts...>& _Val)
-		noexcept(noexcept(_Val.template get<T>()))
+		noexcept(noexcept(_Val.get<T>()))
 	{
-		return _Val.template get<T>();
+		return _Val.get<T>();
 	}
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
 		get(const util::LooseMonad<Ts...>& _Val)
-		noexcept(noexcept(_Val.template get<T>()))
+		noexcept(noexcept(_Val.get<T>()))
 	{
-		return _Val.template get<T>();
+		return _Val.get<T>();
 	}
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
 		get(util::LooseMonad<Ts...>&& _Val)
-		noexcept(noexcept(move(_Val).template get<T>()))
+		noexcept(noexcept(move(_Val).get<T>()))
 	{
-		return move(_Val).template get<T>();
+		return move(_Val).get<T>();
 	}
 
 	template<typename T, typename... Ts>
 	constexpr decltype(auto)
 		get(const util::LooseMonad<Ts...>&& _Val)
-		noexcept(noexcept(move(_Val).template get<T>()))
+		noexcept(noexcept(move(_Val).get<T>()))
 	{
-		return move(_Val).template get<T>();
+		return move(_Val).get<T>();
 	}
 }
 
