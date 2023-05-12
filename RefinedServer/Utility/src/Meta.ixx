@@ -259,6 +259,12 @@ export namespace meta
 	template <typename LTy, typename RTy>
 	using push_back_t = typename push_back<LTy, RTy>::type;
 
+	template <template <typename...> typename Seq, typename... Lhs, typename... Rhs>
+	struct push_back<Seq<Lhs...>, Seq<Rhs...>>
+	{
+		using type = Seq<Lhs..., Rhs...>;
+	};
+
 	template <template <typename...> typename Seq, typename T, typename... Backs>
 	struct push_back<Seq<Backs...>, T>
 	{
@@ -307,7 +313,9 @@ export namespace meta
 
 	template <template <typename...> typename Seq, typename Last>
 	struct pop_back<Seq<Last>>
-	{};
+	{
+		using type = Seq<>;
+	};
 
 	template <template <typename...> typename Seq>
 	struct pop_back<Seq<>>
@@ -970,7 +978,7 @@ namespace meta::test
 
 		constexpr size_t sz_klist = tsize_v<test_rp_list>;
 
-		// ÀÌ°Å ¸Ç¶¥¿¡ ¾²¸é ÅÍÁü
+		// ï¿½Ì°ï¿½ ï¿½Ç¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		//invoke_r<wrap<pop>, test_rp_list>;
 
 		using en0 = detail::repeat_impl<void, wrap<pop>, test_rp_list, test_range_0>;
