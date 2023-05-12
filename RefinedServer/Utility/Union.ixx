@@ -899,15 +899,28 @@ namespace util::test
 		bb0 = bb1;
 		bb0.reset();
 
+		const auto getter0 = bb0.get<0>();
+		const auto getter1 = bb0.get<1>();
+		const auto getter2 = bb0.get<2>();
+
 		// PlacedVariant<integral_constant<size_t, 0>, int, unsigned long, float, double>
 		auto& rb0_tset_0 = bb0.try_set<0>(0);
 		// PlacedVariant<integral_constant<size_t, 1>, unsigned long, float, double>
-		auto& rb0_tset_1 = bb0.try_set<1>(0UL);
+		auto& rb0_tset_1 = bb0.try_set<1>(500UL);
+		decltype(auto) rb0_tset_2 = bb0.try_set<2>(500.0f);
+		decltype(auto) rb0_tset_3 = bb0.try_set<3>(500.0);
+		//decltype(auto) rb0_tset_4 = bb0.try_set<4>(500.0);
+		//decltype(auto) rb0_tset_5 = bb0.try_set<5>(500.0);
 
 		constexpr Union<int, int, int> cc{};
 		constexpr Union<bool, int, long> dd{};
 		constexpr Union<float, unsigned long long, char> ee{};
-		constexpr Union<double, unsigned char, short> ff{};
+
+		constexpr Union<double, unsigned char, short> ff{ in_place_type<unsigned char>, 'F' };
+		const auto cgetter0 = ff.get<0>();
+		const auto cgetter1 = ff.get<1>();
+		const auto cgetter2 = ff.get<2>();
+		//const auto cgetter3 = ff.get<3>();
 	}
 }
 #pragma warning(pop)
