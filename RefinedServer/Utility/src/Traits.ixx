@@ -129,7 +129,7 @@ export namespace util
 	{};
 
 	template<template<typename...> typename Template, typename... Args>
-	struct is_specialization<Template<Args...>, typename Template> : std::true_type
+	struct is_specialization<Template<Args...>, Template> : std::true_type
 	{};
 
 	template<typename Special, template<typename...> typename Template>
@@ -140,7 +140,7 @@ export namespace util
 	{};
 
 	template<template<size_t...> typename Template, size_t... Indices>
-	struct is_indexed<Template<Indices...>, typename Template> : std::true_type
+	struct is_indexed<Template<Indices...>, Template> : std::true_type
 	{};
 
 	template<typename Special, template<size_t...> typename Template>
@@ -197,7 +197,7 @@ export namespace util
 	{};
 
 	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
-	inline constexpr auto logical_product_v = logical_product<MetaFn, Wrapper, Ts...>::value;
+	inline constexpr bool logical_product_v = logical_product<MetaFn, Wrapper, Ts...>::value;
 
 	template<template<typename> typename MetaFn, typename... Ts>
 	inline constexpr bool make_conjunction = logical_product_v<MetaFn, std::conjunction, Ts...>;

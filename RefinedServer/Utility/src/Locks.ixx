@@ -72,7 +72,7 @@ export namespace util
 	template<typename Lockable>
 	struct OwnedLock
 	{
-		OwnedLock(Lockable& lock) noexcept(noexcept(lock.try_lock()))
+		explicit OwnedLock(Lockable& lock) noexcept(noexcept(lock.try_lock()))
 			: my_lock(lock)
 		{
 			owned = my_lock.try_lock();
@@ -131,10 +131,10 @@ namespace util::test
 		swap(l, l2);
 
 		//l = l2;
-		l = move(l2);
+		//l = move(l2);
 
 		//l2 = l;
-		l2 = move(l);
+		//l2 = move(l);
 
 		(void)l.try_lock();
 		l.unlock();

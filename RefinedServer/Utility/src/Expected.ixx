@@ -7,134 +7,116 @@ import Utility.Constraints;
 export namespace util
 {
 	template<typename T, typename E>
-	class Expected
+	class [[nodiscard]] Expected
 	{
 	public:
 		using value_type = T;
 		using error_type = E;
 
-		constexpr Expected() noexcept(nothrow_constructibles<T>)
+		constexpr Expected()
+			noexcept(nothrow_constructibles<T>)
 			: myValue()
 		{}
 
-		constexpr Expected(const T& value) noexcept(nothrow_copy_constructibles<T>)
+		explicit constexpr Expected(const value_type& value)
+			noexcept(nothrow_copy_constructibles<value_type>)
 			: myValue(value)
 		{}
 
-		constexpr Expected(T&& value) noexcept(nothrow_move_constructibles<T>)
-			: myValue(static_cast<T&&>(value))
+		explicit constexpr Expected(value_type&& value)
+			noexcept(nothrow_move_constructibles<value_type>)
+			: myValue(static_cast<value_type&&>(value))
 		{}
 
-		constexpr Expected(const E& error) noexcept(nothrow_copy_constructibles<E>)
+		constexpr Expected(const error_type& error)
+			noexcept(nothrow_copy_constructibles<error_type>)
 			: myError(error)
 		{}
 
-		constexpr Expected(E&& error) noexcept(nothrow_move_constructibles<E>)
-			: myError(static_cast<E&&>(error))
+		constexpr Expected(error_type&& error)
+			noexcept(nothrow_move_constructibles<error_type>)
+			: myError(static_cast<error_type&&>(error))
 		{}
 
-		constexpr Expected(const Expected& other) noexcept(nothrow_copy_constructibles<T, E>)
+		constexpr Expected(const Expected& other)
+			noexcept(nothrow_copy_constructibles<value_type, error_type>)
 			: myValue(other.myValue)
 			, myError(other.myError)
 		{}
 
-		constexpr Expected(Expected&& other) noexcept(nothrow_move_constructibles<T, E>)
-			: myValue(static_cast<T&&>(other.myValue))
-			, myError(static_cast<E&&>(other.myError))
+		constexpr Expected(Expected&& other)
+			noexcept(nothrow_move_constructibles<value_type, error_type>)
+			: myValue(static_cast<value_type&&>(other.myValue))
+			, myError(static_cast<error_type&&>(other.myError))
 		{}
 
-		constexpr Expected& operator=(const Expected& other) &
-			noexcept(nothrow_copy_assignables<T, E>)
+		constexpr Expected& operator=(const Expected& other)
+			noexcept(nothrow_copy_assignables<value_type, error_type>)
 		{
+			if (&other == static_cast<const Expected* const&>(this))
+			{
+				return *this;
+			}
+
 			myValue = other.myValue;
 			myError = other.myError;
 			return *this;
 		}
 
-		constexpr Expected& operator=(Expected&& other) &
-			noexcept(nothrow_move_assignables<T, E>)
+		constexpr Expected& operator=(Expected&& other)
+			noexcept(nothrow_move_assignables<value_type, error_type>)
 		{
-			myValue = static_cast<T&&>(other.myValue);
-			myError = static_cast<E&&>(other.myError);
-			return *this;
-		}
-
-		constexpr Expected& operator=(const Expected&& other) &
-			noexcept(nothrow_move_assignables<T, E>)
-		{
-			myValue = static_cast<const T&&>(other.myValue);
-			myError = static_cast<const E&&>(other.myError);
-			return *this;
-		}
-
-		constexpr const Expected& operator=(const Expected& other) const&
-			noexcept(nothrow_copy_assignables<T, E>)
-		{
-			myValue = other.myValue;
-			myError = other.myError;
-			return *this;
-		}
-
-		constexpr const Expected& operator=(Expected&& other) const&
-			noexcept(nothrow_move_assignables<T, E>)
-		{
-			myValue = static_cast<T&&>(other.my);
-		}
-
-		constexpr const Expected& operator=(const Expected&& other) const&
-			noexcept(nothrow_move_assignables<T, E>)
-		{
-			myValue = static_cast<const T&&>(other.myValue);
-			myError = static_cast<const E&&>(other.myError);
+			myValue = static_cast<value_type&&>(other.myValue);
+			myError = static_cast<error_type&&>(other.myError);
 			return *this;
 		}
 
 		[[nodiscard]]
-		constexpr const T& value() const& noexcept
+		constexpr value_type& value() & noexcept
 		{
 			return myValue;
 		}
 
 		[[nodiscard]]
-		constexpr T& value() & noexcept
+		constexpr const value_type& value() const& noexcept
 		{
 			return myValue;
 		}
 
 		[[nodiscard]]
-		constexpr const T&& value() const&& noexcept
+		constexpr const value_type&& value() const&& noexcept
 		{
-			return static_cast<const T&&>(myValue);
+			return static_cast<const value_type&&>(myValue);
 		}
 
 		[[nodiscard]]
-		constexpr T&& value() && noexcept
+		constexpr value_type&& value() && noexcept
 		{
-			return static_cast<T&&>(myValue);
+			return static_cast<value_type&&>(myValue);
 		}
 
 		[[nodiscard]]
-		constexpr const E& error() const& noexcept
+		constexpr const error_type& error() const& noexcept
 		{
 			return myError;
 		}
 
 		[[nodiscard]]
-		constexpr E& error() & noexcept
+		constexpr error_type& error() & noexcept
 		{
 			return myError;
 		}
 
 		[[nodiscard]]
-		constexpr const E&& error() const&& noexcept
+		constexpr const error_type&& error() const&& noexcept
 		{
-			return static_cast<const E&&>(myError);
+			return static_cast<const error_type&&>(myError);
 		}
 
 		[[nodiscard]]
-		constexpr E&& error() && noexcept
+		constexpr error_type&& error() && noexcept
 		{
-			return static_cast<E&&>(myError);
+			return static_cast<error_type&&>(myError);
 		}
 
 		[[nodiscard]]
@@ -155,34 +137,35 @@ export namespace util
 			return hasValue();
 		}
 
-		constexpr const T& operator*() const& noexcept
+		constexpr const value_type& operator*() const& noexcept
 		{
 			return myValue.value();
 		}
 
-		constexpr T& operator*() & noexcept
+		constexpr value_type& operator*() & noexcept
 		{
 			return myValue.value();
 		}
 
-		constexpr const T&& operator*() const&& noexcept
+		constexpr const value_type&& operator*() const&& noexcept
 		{
-			return static_cast<const T&&>(myValue.value());
+			return static_cast<const value_type&&>(myValue.value());
 		}
 
-		constexpr T&& operator*() && noexcept
+		constexpr value_type&& operator*() && noexcept
 		{
-			return static_cast<T&&>(myValue.value());
+			return static_cast<value_type&&>(myValue.value());
 		}
 
-		constexpr void swap(Expected& other) noexcept(nothrow_swappables<T, E>)
+		constexpr void swap(Expected& other)
+			noexcept(nothrow_swappables<value_type, error_type>)
 		{
 			std::swap(myValue, other.myValue);
 			std::swap(myError, other.myError);
 		}
 
-		private:
-			std::optional<T> myValue;
-			std::optional<E> myError;
+	private:
+		std::optional<value_type> myValue;
+		std::optional<error_type> myError;
 	};
 }
