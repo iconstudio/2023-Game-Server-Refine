@@ -399,3 +399,4 @@ FodyWeavers.xsd
 /.idea/workspace.xml
 /.idea/misc.xml
 /RefinedServer/Utility/cmake-build-debug
+/RefinedServer/Utility/.idea
