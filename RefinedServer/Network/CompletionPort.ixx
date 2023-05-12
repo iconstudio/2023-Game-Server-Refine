@@ -63,7 +63,7 @@ export namespace net
 		[[nodiscard]]
 		static inline
 			ErrorHandler<CompletionPort>
-			Create(const ulong& concurrent_hint) noexcept
+			Establish(const ulong& concurrent_hint) noexcept
 		{
 			const HANDLE handle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, concurrent_hint);
 

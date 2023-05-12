@@ -11,6 +11,11 @@ import Net.Promise;
 
 class [[nodiscard]] Framework : util::Singleton<Framework>
 {
+private:
+	static inline constexpr size_t maxNPCs = 1000;
+	static inline constexpr size_t maxUsers = 1000;
+	static inline constexpr unsigned concurrentHint = 6;
+
 public:
 	Framework() noexcept;
 	~Framework() noexcept = default;
@@ -44,9 +49,6 @@ public:
 
 private:
 	net::Proxy Close(net::Socket& socket) noexcept;
-
-	static inline constexpr size_t maxNPCs = 1000;
-	static inline constexpr size_t maxUsers = 1000;
 
 	net::CompletionPort ioPort;
 	net::Socket nameSocket;
