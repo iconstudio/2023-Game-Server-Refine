@@ -11,8 +11,10 @@ endif ()
 
 project("Utility")
 
-add_executable(Utility "src/")
-set_property(TARGET Utility PROPERTY CXX_STANDARD 20)
+add_executable(Utility "src/Testbed.cpp" src/Array.ixx src/Atomic.ixx src/Constraints.ixx src/Expected.ixx src/Identity.ixx src/Locks.ixx src/LooseMonad.ixx src/Memory.ixx src/Meta.ixx src/Monad.ixx src/Print.ixx src/Singleton.ixx src/ src/Thread.ixx src/Traits.ixx src/Union.ixx src/Utility.ixx)
+
+set_target_properties(Utility PROPERTIES LINKER_LANGUAGE CXX)
+set_property(TARGET Utility PROPERTY CXX_STANDARD 23)
 
 # TODO: 필요한 경우 테스트를 추가하고 대상을 설치합니다.
 # add_test(NAME Utility COMMAND Utility)
