@@ -26,5 +26,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CompletionPort.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IoState.ixx" />
   </ItemGroup>
 </Project>
