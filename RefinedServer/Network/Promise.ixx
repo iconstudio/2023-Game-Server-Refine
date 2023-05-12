@@ -244,11 +244,11 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<util::lv_invocable<T> Fn>
+		template<typename Fn, typename U = T>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) &
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&>())))
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
 		{
 			if (IsSuccess())
 			{
@@ -262,11 +262,11 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<util::cl_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&>())))
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
 		{
 			if (IsSuccess())
 			{
@@ -280,11 +280,11 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<util::rv_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<T&&>())))
+			noexcept(noexcept(util::forward<Fn>(action)(util::move(*this).GetResult())))
 		{
 			if (IsSuccess())
 			{
@@ -298,11 +298,11 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<util::cr_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<const T&&>())))
+			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
 		{
 			if (IsSuccess())
 			{

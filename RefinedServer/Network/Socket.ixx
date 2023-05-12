@@ -87,10 +87,20 @@ export namespace net
 
 		constexpr Socket(Socket&& other) noexcept
 			: isOut(false), myHandle(static_cast<::SOCKET&&>(other.myHandle))
-			, myAddress(), myEndPoint()
+			, myAddress(util::move(other.myAddress)), myEndPoint(util::move(other.myEndPoint))
 		{
 			other.isOut = true;
 		}
+
+		explicit constexpr Socket(const SOCKET& handle) noexcept
+			: isOut(false), myHandle(handle)
+			, myAddress(), myEndPoint()
+		{}
+
+		explicit constexpr Socket(SOCKET&& handle) noexcept
+			: isOut(false), myHandle(static_cast<SOCKET&&>(handle))
+			, myAddress(), myEndPoint()
+		{}
 
 		constexpr Socket& operator=(Socket&& other) noexcept
 		{
@@ -100,30 +110,18 @@ export namespace net
 			return *this;
 		}
 
-		explicit constexpr Socket(const SOCKET& handle) noexcept
-			: isOut(false), myHandle(handle)
-		{}
-
-		explicit constexpr Socket(SOCKET&& handle) noexcept
-			: isOut(false), myHandle(static_cast<SOCKET&&>(handle))
-		{}
-
 		~Socket() noexcept
 		{
-			if (!isOut)
+			if (!isOut && IsValid())
 			{
 				::closesocket(myHandle);
+				myHandle = abi::InvalidSocket;
 			}
-		}
-
-		ioError BeginRecv(WSABUF& buffer, Context* context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
-		{
-			return io::Execute(::WSARecv, myHandle, &buffer, 1UL, bytes, &flags, context, nullptr);
 		}
 
 		inline ioError Bind(const EndPoint& target) noexcept
 		{
-			return io::Execute(::bind, myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()).else_then([&]() {
+			return io::Execute(::bind, myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()).if_then([&, this]() {
 				myAddress = target;
 			});
 		}
@@ -145,6 +143,16 @@ export namespace net
 			return io::Execute(::listen, myHandle, backlog);
 		}
 
+		inline ioError BeginRecv(WSABUF& buffer, Context* context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		{
+			if (buffer.len <= 0)
+			{
+				return -1;
+			}
+
+			return io::Execute(::WSARecv, myHandle, &buffer, 1UL, bytes, &flags, context, nullptr);
+		}
+
 		inline constexpr bool IsValid() const noexcept
 		{
 			return myHandle != INVALID_SOCKET;
@@ -155,6 +163,14 @@ export namespace net
 			return myHandle != INVALID_SOCKET;
 		}
 
+		Socket(const Socket& other) = delete;
+		Socket(const volatile Socket& other) = delete;
+		Socket& operator=(const Socket& other) = delete;
+		Socket& operator=(const volatile Socket& other) = delete;
+		Socket& operator=(const Socket& other) volatile = delete;
+		Socket& operator=(const volatile Socket& other) volatile = delete;
+
+	private:
 		inline constexpr bool IsOut() const noexcept
 		{
 			return isOut;
@@ -165,14 +181,6 @@ export namespace net
 			return isOut;
 		}
 
-		Socket(const Socket& other) = delete;
-		Socket(const volatile Socket& other) = delete;
-		Socket& operator=(const Socket& other) = delete;
-		Socket& operator=(const volatile Socket& other) = delete;
-		Socket& operator=(const Socket& other) volatile = delete;
-		Socket& operator=(const volatile Socket& other) volatile = delete;
-
-	private:
 		volatile bool isOut;
 		SOCKET myHandle;
 		EndPoint myAddress, myEndPoint;
