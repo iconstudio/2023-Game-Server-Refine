@@ -209,7 +209,7 @@ export namespace util
 	struct is_explicit_constructible : conditional_t<is_trivial_v<T>, false_type, true_type> {};
 
 	template<typename T>
-	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::template value;
+	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::value;
 
 	template<typename Fn, typename... Args>
 	using monad_result_t = clean_t<std::invoke_result_t<Fn, Args...>>;

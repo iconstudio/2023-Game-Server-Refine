@@ -59,7 +59,7 @@ export namespace util
 		}
 
 		template <typename T>
-			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !same_as<clean_t<T>, in_place_type_t> && !same_as<clean_t<T>, in_place_index_t>)
+			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !is_specialization_v<clean_t<T>, in_place_type_t> && !is_indexed_v<clean_t<T>, in_place_index_t>)
 		explicit(util::is_explicit_constructible_v<T>)
 			constexpr
 			LooseMonad(T&& object) noexcept
@@ -77,7 +77,7 @@ export namespace util
 
 		template <typename T, typename... Args>
 			requires (meta::included_v<T, Ts...>)
-		explicit(util::is_explicit_constructible_v<T>)
+		explicit(is_explicit_constructible_v<T>)
 			constexpr
 			LooseMonad(in_place_type_t<T>, Args&&... args)
 			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
@@ -858,11 +858,11 @@ namespace util::test
 		constexpr size_t sz3 = sizeof(LooseMonad<int, float, float>);
 		constexpr size_t sz4 = sizeof(LooseMonad<int, float, int>);
 
-		constexpr auto& fna1 = a1.if_then<0>([](const int& v) {
+		constexpr auto& fn1 = c1.if_then<0>([](const int& v) {
 			do_something();
 		});
 
-		constexpr auto& fnb1 = b1.if_then<0>([](const int& v) {
+		constexpr auto& fn2 = b1.if_then<0>([](const int& v) {
 			do_something();
 		});
 	}

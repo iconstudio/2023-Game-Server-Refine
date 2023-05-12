@@ -79,11 +79,11 @@ namespace util::detail
 		template <size_t Index>
 		using const_rvalue_type = add_rvalue_reference_t<value_type<Index>>;
 
-		template <size_t Index, template<size_t> typename>
+		template <size_t Index, template<size_t> typename Indexer>
 		static inline constexpr bool nothrowCopyPursuer = (Index == myPlace && nothrow_copy_constructibles<Fty>)
 			|| (Index != myPlace && 1 < mySize && nothrow_copy_constructibles<Indexer<Index>>);
 
-		template <size_t Index, template<size_t> typename>
+		template <size_t Index, template<size_t> typename Indexer>
 		static inline constexpr bool nothrowMovePursuer = (Index == myPlace && nothrow_move_constructibles<Fty>)
 			|| (Index != myPlace && 1 < mySize && nothrow_move_constructibles<Indexer<Index>>);
 
