@@ -2,6 +2,7 @@
 #include "Framework.hpp"
 
 import Utility.Print;
+import Utility.Error;
 
 using namespace net;
 
@@ -16,16 +17,24 @@ void Framework::Awake()
 {
 	util::Println("서버를 초기화하는 중...");
 
+	const int result_startup = Startup();
+	if (result_startup != 0)
+	{
+		util::Println("WSAStartup에 실패했습니다. 오류 코드: {}", std::move(result_startup));
+
+		util::err::RaiseSystemError(result_startup);
+	}
+
 	CompletionPort::Establish(concurrentHint).if_then(
 		[this](CompletionPort&& port) noexcept {
 		ioPort = std::move(port);
 	}).else_then([this](int&& error_code) {
-		util::Println("IOCP를 생성하는데 실패했습니다. 오류 코드: {}", std::move(error_code));
+		util::Println("IOCP를 생성하는데 실패했습니다. 오류 코드: {}", error_code);
 
-		throw std::system_error{ make_error_code(std::errc::invalid_argument) };
+		util::err::RaiseSystemError(std::move(error_code));
 	});
 
-	nameSocket = {};
+	nameSocket = Socket::CreateTCP();
 }
 
 void Framework::Start() noexcept

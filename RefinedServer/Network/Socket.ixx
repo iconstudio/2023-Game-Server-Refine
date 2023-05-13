@@ -5,6 +5,7 @@ module;
 
 export module Net.Socket;
 import Utility;
+import Utility.Error;
 import Net;
 import Net.EndPoint;
 import Net.Context;
@@ -78,6 +79,18 @@ export namespace net
 
 		inline constexpr unsigned long DEFAULT_ACCEPT_BUFFER_SIZE = sizeof(SOCKADDR_IN) + 16;
 		inline constexpr ::SOCKET InvalidSocket = INVALID_SOCKET;
+
+		[[nodiscard]]
+		inline SOCKET CreateRawTCP(const SocketType& type) noexcept
+		{
+			return ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, NULL, type);
+		}
+
+		[[nodiscard]]
+		inline SOCKET CreateRawUDP(const SocketType& type) noexcept
+		{
+			return ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, NULL, type);
+		}
 	}
 
 	using ::SOCKET;
@@ -199,45 +212,43 @@ export namespace net
 			return myHandle != abi::InvalidSocket;
 		}
 
-		static inline Socket CreateTCP(SocketType flag = SocketType::SoFlagOverlapped)
+		static inline Socket CreateTCP(SocketType type = SocketType::SoFlagOverlapped)
 		{
 #if _DEBUG
-			SOCKET socket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, NULL, flag);
-
+			SOCKET socket = abi::CreateRawTCP(type);
 			if (socket == abi::InvalidSocket)
 			{
-				throw std::system_error{ ::WSAGetLastError(), std::system_category() };
+				util::err::RaiseSystemError(WSAGetLastError());
 			}
 
-			if (flag == SocketType::SoFlagOverlapped)
+			if (type == SocketType::SoFlagOverlapped)
 			{
 				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
 
 			return Socket{ socket };
 #else // _DEBUG
-			return Socket{ ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, flag) };
+			return Socket{ abi::CreateRawTCP(type) };
 #endif // !_DEBUG
 		}
 
-		static inline Socket CreateUDP(SocketType flag = SocketType::SoFlagOverlapped)
+		static inline Socket CreateUDP(SocketType type = SocketType::SoFlagOverlapped)
 		{
 #if _DEBUG
-			SOCKET socket = ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, NULL, flag);
-
+			SOCKET socket = abi::CreateRawUDP(type);
 			if (socket == abi::InvalidSocket)
 			{
-				throw std::system_error{ ::WSAGetLastError(), std::system_category() };
+				util::err::RaiseSystemError(WSAGetLastError());
 			}
 
-			if (flag == SocketType::SoFlagOverlapped)
+			if (type == SocketType::SoFlagOverlapped)
 			{
 				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
 
 			return Socket{ socket };
 #else // _DEBUG
-			return Socket{ ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, 0, flag) };
+			return Socket{ abi::CreateRawUDP(type) };
 #endif // !_DEBUG
 	}
 
