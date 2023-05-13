@@ -80,8 +80,8 @@ export namespace util
 		explicit(is_explicit_constructible_v<T>)
 			constexpr
 			LooseMonad(in_place_type_t<T>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, std::integral_constant<size_t, 0>, Args...>)
-			: myStorage(in_place_type<T>, std::integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
+			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, Args...>)
+			: myStorage(in_place_type<T>, static_cast<Args&&>(args)...)
 		{}
 
 		constexpr ~LooseMonad()

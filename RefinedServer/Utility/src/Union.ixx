@@ -130,32 +130,42 @@ namespace util::detail
 		{}
 
 		// Initialize my value with Args by a Type (not void)
-		template <typename T, size_t Hint, typename... Args>
+	template <typename T, typename... Args>
 			requires (same_as<clean_t<T>, Fty>&& notvoids<Fty>)
 		explicit(is_explicit_constructible_v<T>)
 			constexpr
-			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+			PlacedVariant(in_place_type_t<T>, Args&&... args)
 			noexcept(nothrow_constructibles<Fty, Args...>)
 			: PlacedVariant(in_place, static_cast<Args&&>(args)...)
 		{}
 
 		// Initialize my value with Args by a Type (void)
-		// T = void
-		template <typename T, size_t Hint, typename... Args>
+		template <typename T, typename... Args>
 			requires (same_as<clean_t<T>, Fty> && !notvoids<Fty>)
-		explicit
-			constexpr
-			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Hint>, Args&&... args)
+		explicit constexpr
+			PlacedVariant(in_place_type_t<T>, Args&&... args)
 			noexcept
 			: PlacedVariant(in_place, nullopt)
 		{}
 
 		// Recursively find the place onto Tail
 		template <size_t Target, typename... Args>
-			requires (Place < Target&& Target < Place + 1 + sizeof...(Rty))
-		constexpr PlacedVariant(in_place_index_t<Target>, Args&&... args)
+			requires (Target < Place + 1 + sizeof...(Rty))
+		explicit constexpr
+			PlacedVariant(in_place_index_t<Target>, Args&&... args)
 			noexcept(nothrow_constructibles<next_type, in_place_index_t<Target>, Args...>)
 			: _Tail(in_place_index<Target>, static_cast<Args&&>(args)...)
+			, isExtended(true)
+		{}
+
+		// Recursively find the specified type
+		template <typename T, typename... Args>
+			requires (!same_as<clean_t<T>, Fty> && meta::included_v<T, Fty, Rty...>)
+		explicit
+			constexpr
+			PlacedVariant(in_place_type_t<T>, Args&&... args)
+			noexcept(nothrow_constructibles<T, Args...>)
+			: _Tail(in_place_type<T>, static_cast<Args&&>(args)...)
 			, isExtended(true)
 		{}
 
@@ -167,26 +177,15 @@ namespace util::detail
 			static_assert(always_false<in_place_index_t<Target>>, "Target index is out of range.");
 		}
 
-		// Place the specified type
+		// When cannot find the specified type
 		template <typename T, typename... Args>
-			requires (!same_as<clean_t<T>, Fty>)
+			requires (!same_as<clean_t<T>, Fty>&& !meta::included_v<T, Fty, Rty...>)
 		explicit
 			constexpr
 			PlacedVariant(in_place_type_t<T>, Args&&... args)
-			noexcept(nothrow_constructibles<T, Args...>)
-			: PlacedVariant(in_place_type<T>, integral_constant<size_t, 0>{}, static_cast<Args&&>(args)...)
-		{}
-
-		// Place the specified type from hint
-		template <typename T, size_t Guard, typename... Args>
-			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
-		explicit
-			constexpr
-			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
-			noexcept(nothrow_constructibles<T, Args...>)
-			: _Tail(in_place_type<T>, integral_constant<size_t, Guard + 1>{}, static_cast<Args&&>(args)...)
-			, isExtended(true)
-		{}
+		{
+			static_assert(always_false<in_place_type_t<T>>, "Target type is not included.");
+		}
 
 		constexpr ~PlacedVariant()
 			noexcept(nothrow_destructibles<Fty, Rty...>)
@@ -830,7 +829,7 @@ namespace util::test
 	{
 		using aa_t = Union<int, void, unsigned long, float>;
 
-		constexpr aa_t aa{ in_place_type<unsigned long>, integral_constant<size_t, 0>{}, 600UL };
+		constexpr aa_t aa{ in_place_type<unsigned long>, 600UL };
 		using aa_0_t = aa_t::element_type<0>;
 		static_assert(util::is_same_v<aa_0_t, int>, "int");
 		using aa_1_t = aa_t::element_type<1>;
@@ -854,11 +853,15 @@ namespace util::test
 		constexpr bool a_has_1 = aa.has_value<1>();
 		constexpr bool a_has_2 = aa.has_value<2>();
 		constexpr bool a_has_3 = aa.has_value<3>();
+		aa.~PlacedVariant();
+
+		//constexpr Union<int> aa2{ in_place_type<unsigned long>, 600UL };
+		constexpr Union<int> aa2{ in_place_type<int>, 600UL };
 
 		using bb_t = Union<int, unsigned long, float, double>;
 		bb_t bb0{};
 		//bb_t bb1{};
-		bb_t bb1(in_place_type<float>, integral_constant<size_t, 0>{}, 4000.034124f);
+		bb_t bb1(in_place_type<float>, 4000.034124f);
 		bb0.set(0);
 
 		bb0 = bb1;
