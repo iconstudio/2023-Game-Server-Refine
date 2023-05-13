@@ -55,7 +55,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(_unused, raw_data, Length * sizeof(Elem));
+				std::memcpy(myData, raw_data, Length * sizeof(Elem));
 			}
 		}
 
@@ -70,7 +70,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(_unused, raw_data, Length * sizeof(Elem));
+				std::memcpy(myData, raw_data, Length * sizeof(Elem));
 			}
 		}
 
@@ -90,7 +90,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(_unused, other.data(), Length);
+				std::memcpy(myData, other.data(), Length);
 			}
 		}
 
@@ -103,7 +103,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(_unused, other.data(), Length);
+				std::memcpy(myData, other.data(), Length);
 			}
 		}
 
@@ -121,7 +121,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(_unused, other.data(), Length);
+				std::memcpy(myData, other.data(), Length);
 			}
 
 			return *this;
@@ -137,7 +137,7 @@ export namespace util
 			}
 			else
 			{
-				std::memcpy(_unused, other.data(), Length);
+				std::memcpy(myData, other.data(), Length);
 			}
 
 			return *this;
@@ -187,13 +187,13 @@ export namespace util
 
 		inline constexpr void fill(const value_type& fill_value) noexcept(std::is_nothrow_copy_assignable_v<value_type>)
 		{
-			std::fill_n(_unused, Length, fill_value);
+			std::fill_n(myData, Length, fill_value);
 		}
 
 		inline constexpr void fill(value_type&& fill_value) noexcept(std::is_nothrow_move_assignable_v<value_type>)
 		{
 			const auto& value = std::move(fill_value);
-			std::fill_n(_unused, Length, value);
+			std::fill_n(myData, Length, value);
 		}
 
 		inline constexpr void swap(std::array<Elem, Length>& other_data) noexcept(std::is_nothrow_swappable_v<std::array<Elem, Length>>)
@@ -219,25 +219,25 @@ export namespace util
 		[[nodiscard]]
 		inline constexpr iterator begin() noexcept
 		{
-			return iterator{ _unused, 0 };
+			return iterator{ myData, 0 };
 		}
 
 		[[nodiscard]]
 		inline constexpr iterator end() noexcept
 		{
-			return iterator{ _unused, Length };
+			return iterator{ myData, Length };
 		}
 
 		[[nodiscard]]
 		inline constexpr const_iterator begin() const noexcept
 		{
-			return const_iterator{ _unused, 0 };
+			return const_iterator{ myData, 0 };
 		}
 
 		[[nodiscard]]
 		inline constexpr const_iterator end() const noexcept
 		{
-			return const_iterator{ _unused, Length };
+			return const_iterator{ myData, Length };
 		}
 
 		[[nodiscard]]
@@ -298,7 +298,7 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return _unused[index];
+			return myData[index];
 		}
 
 		[[nodiscard]]
@@ -311,7 +311,7 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return _unused[index];
+			return myData[index];
 		}
 
 		[[nodiscard]]
@@ -324,7 +324,7 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return std::move(_unused[index]);
+			return std::move(myData[index]);
 		}
 
 		[[nodiscard]]
@@ -337,14 +337,14 @@ export namespace util
 				throw std::length_error{ "배열의 크기 참조 오류" };
 			}
 
-			return std::move(_unused[index]);
+			return std::move(myData[index]);
 		}
 
 		[[nodiscard]]
 		inline constexpr reference
 			operator[](_In_range_(0, Length - 1) const size_type& index) & noexcept
 		{
-			return _unused[index];
+			return myData[index];
 		}
 
 		[[nodiscard]]
@@ -352,7 +352,7 @@ export namespace util
 			const_reference
 			operator[](_In_range_(0, Length - 1) const size_type& index) const& noexcept
 		{
-			return _unused[index];
+			return myData[index];
 		}
 
 		[[nodiscard]]
@@ -360,7 +360,7 @@ export namespace util
 			value_type&&
 			operator[](_In_range_(0, Length - 1) const size_type& index) && noexcept
 		{
-			return std::move(_unused[index]);
+			return std::move(myData[index]);
 		}
 
 		[[nodiscard]]
@@ -368,73 +368,73 @@ export namespace util
 			const_value_type&&
 			operator[](_In_range_(0, Length - 1) const size_type& index) const&& noexcept
 		{
-			return std::move(_unused[index]);
+			return std::move(myData[index]);
 		}
 
 		[[nodiscard]]
 		inline constexpr reference front() & noexcept
 		{
-			return _unused[0];
+			return myData[0];
 		}
 
 		[[nodiscard]]
 		inline constexpr const_reference front() const& noexcept
 		{
-			return _unused[0];
+			return myData[0];
 		}
 
 		[[nodiscard]]
 		inline constexpr value_type&& front() && noexcept
 		{
-			return std::move(_unused[0]);
+			return std::move(myData[0]);
 		}
 
 		[[nodiscard]]
 		inline constexpr const value_type&& front() const&& noexcept
 		{
-			return std::move(_unused[0]);
+			return std::move(myData[0]);
 		}
 
 		[[nodiscard]]
 		inline constexpr reference back() & noexcept
 		{
-			return _unused[Length - 1];
+			return myData[Length - 1];
 		}
 
 		[[nodiscard]]
 		inline constexpr const_reference back() const& noexcept
 		{
-			return _unused[Length - 1];
+			return myData[Length - 1];
 		}
 
 		[[nodiscard]]
 		inline constexpr value_type&& back() && noexcept
 		{
-			return std::move(_unused[Length - 1]);
+			return std::move(myData[Length - 1]);
 		}
 
 		[[nodiscard]]
 		inline constexpr const value_type&& back() const&& noexcept
 		{
-			return std::move(_unused[Length - 1]);
+			return std::move(myData[Length - 1]);
 		}
 
 		[[nodiscard]]
 		inline constexpr pointer data() & noexcept
 		{
-			return _unused;
+			return myData;
 		}
 
 		[[nodiscard]]
 		inline constexpr const_pointer data() const& noexcept
 		{
-			return _unused;
+			return myData;
 		}
 
 		[[nodiscard]]
 		inline constexpr pointer&& data() && noexcept
 		{
-			return std::move(_unused);
+			return std::move(myData);
 		}
 
 		[[nodiscard]]
@@ -456,7 +456,7 @@ export namespace util
 		}
 
 	private:
-		[[maybe_unused]] Elem _unused[Length];
+		Elem myData[Length];
 	};
 
 	template<typename Elem>
