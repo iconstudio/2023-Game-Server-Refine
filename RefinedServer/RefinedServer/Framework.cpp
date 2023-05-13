@@ -34,7 +34,12 @@ void Framework::Awake()
 		util::err::RaiseSystemError(std::move(error_code));
 	});
 
-	nameSocket = Socket::CreateTCP();
+	Socket::CreateTCP().if_then([this](Socket&& socket) {
+		nameSocket = std::move(socket);
+	}).else_then([](int&& error_code) {
+		util::Println("서버의 TCP 소켓을 생성하는데 실패했습니다. 오류 코드: {}", error_code);
+		util::err::RaiseSystemError(std::move(error_code));
+	});
 }
 
 void Framework::Start() noexcept

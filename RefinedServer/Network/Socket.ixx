@@ -212,19 +212,24 @@ export namespace net
 			return myHandle != abi::InvalidSocket;
 		}
 
-		static inline Socket CreateTCP(SocketType type = SocketType::SoFlagOverlapped)
+		static inline
+			Promise<Socket, int>
+			CreateTCP(SocketType type = SocketType::SoFlagOverlapped)
 		{
 #if _DEBUG
 			SOCKET socket = abi::CreateRawTCP(type);
 			if (socket == abi::InvalidSocket)
 			{
-				util::err::RaiseSystemError(WSAGetLastError());
+				return WSAGetLastError();
 			}
 
 			if (type == SocketType::SoFlagOverlapped)
 			{
 				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
+
+			BOOL option = TRUE;
+			::setsockopt(socket, SOL_SOCKET, SO_DEBUG, reinterpret_cast<char*>(&option), sizeof(option));
 
 			return Socket{ socket };
 #else // _DEBUG
@@ -232,19 +237,24 @@ export namespace net
 #endif // !_DEBUG
 		}
 
-		static inline Socket CreateUDP(SocketType type = SocketType::SoFlagOverlapped)
+		static inline
+			Promise<Socket, int>
+			CreateUDP(SocketType type = SocketType::SoFlagOverlapped)
 		{
 #if _DEBUG
 			SOCKET socket = abi::CreateRawUDP(type);
 			if (socket == abi::InvalidSocket)
 			{
-				util::err::RaiseSystemError(WSAGetLastError());
+				return WSAGetLastError();
 			}
 
 			if (type == SocketType::SoFlagOverlapped)
 			{
 				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
+
+			BOOL option = TRUE;
+			::setsockopt(socket, SOL_SOCKET, SO_DEBUG, reinterpret_cast<char*>(&option), sizeof(option));
 
 			return Socket{ socket };
 #else // _DEBUG
