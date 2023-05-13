@@ -6,7 +6,7 @@
 
 	<Type Name="util::Array&lt;*&gt;">
 		<Intrinsic Category="Property" Name="__AcqType" Expression="&quot;$T1&quot;"/>
-		<Intrinsic Category="Property" Name="__AcqLen" Expression="$T2"/>
+		<Intrinsic Category="Property" Name="__AcqLen" Expression="static_cast&lt;size_t&gt;($T2)"/>
 		<Intrinsic Category="Data" Name="__Dots" Expression="&quot;...&quot;"/>
 		<Intrinsic Category="Method" Name="__CheckSize" Expression="10 &lt;= $T2"/>
 
@@ -16,7 +16,7 @@
 			<Synthetic Name="자료형">
 				<DisplayString>{__AcqType()}</DisplayString>
 			</Synthetic>
-			<Item Name="길이">static_cast&lt;size_t&gt;(__AcqLen())</Item>
+			<Item Name="길이">__AcqLen()</Item>
 
 			<Synthetic Name="버퍼">
 				<DisplayString>첫 원소 10개</DisplayString>
@@ -81,11 +81,14 @@
 							<ExpandedItem>myData[9]</ExpandedItem>
 						</Expand>
 					</Synthetic>
+					<Synthetic Name=" ">
+						<DisplayString>...</DisplayString>
+					</Synthetic>
 				</Expand>
 			</Synthetic>
 
-			<Synthetic Name="나머지 원소" Condition="10 &lt; $T2">
-				<DisplayString>{__Dots()} ({$T2 - 10}개)</DisplayString>
+			<Synthetic Name="버퍼" Condition="10 &lt; $T2">
+				<DisplayString>(나머지 원소 {$T2 - 10}개)</DisplayString>
 
 				<Expand>
 					<IndexListItems>
