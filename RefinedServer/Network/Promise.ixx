@@ -146,7 +146,7 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<util::lv_invocable<util::make_lvalue_t<T>> Fn>
+		template<util::lv_invocable<T> Fn>
 		inline friend constexpr
 			auto
 			operator>>(Promise& promise, Fn&& action)
@@ -413,9 +413,9 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<typename Fn, typename U = T>
+		template<util::lv_invocable<T> Fn>
 		constexpr
-			const Promise&
+			Promise&
 			if_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
@@ -438,7 +438,7 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<typename Fn>
+		template<util::cl_invocable<T> Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
@@ -463,7 +463,7 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<typename Fn>
+		template<util::rv_invocable<T> Fn>
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
@@ -488,7 +488,7 @@ export namespace net
 		/// if_then (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<typename Fn>
+		template<util::cr_invocable<T> Fn>
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
@@ -504,6 +504,78 @@ export namespace net
 				{
 					util::forward<Fn>(action)(util::move(*this).GetResult());
 				}
+			}
+
+			return util::move(*this);
+		}
+
+		/// <summary>
+		/// if_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			Promise&
+			if_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		/// <summary>
+		/// if_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			const Promise&
+			if_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return *this;
+		}
+
+		/// <summary>
+		/// if_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			Promise&&
+			if_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)();
+			}
+
+			return util::move(*this);
+		}
+
+		/// <summary>
+		/// if_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			const Promise&&
+			if_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!IsFailed())
+			{
+				util::forward<Fn>(action)();
 			}
 
 			return util::move(*this);
