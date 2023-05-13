@@ -147,7 +147,7 @@ export namespace net
 			return io::Execute(::listen, myHandle, backlog);
 		}
 
-		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		inline ioError Recv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
@@ -155,6 +155,36 @@ export namespace net
 			}
 
 			return io::Execute(::WSARecv, myHandle, &buffer, 1UL, bytes, &flags, context, nullptr);
+		}
+
+		inline ioError Send(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		{
+			if (buffer.len <= 0)
+			{
+				return -1;
+			}
+
+			return io::Execute(::WSARecv, myHandle, &buffer, 1UL, bytes, &flags, context, nullptr);
+		}
+
+		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		{
+			if (buffer.len <= 0)
+			{
+				return -1;
+			}
+
+			return io::Execute(::WSARecv, myHandle, &buffer, 1UL, bytes, &flags, context, routine);
+		}
+
+		inline ioError BeginSend(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		{
+			if (buffer.len <= 0)
+			{
+				return -1;
+			}
+
+			return io::Execute(::WSASend, myHandle, &buffer, 1UL, bytes, &flags, context, routine);
 		}
 
 		inline constexpr bool IsValid() const noexcept
