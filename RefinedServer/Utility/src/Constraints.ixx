@@ -97,7 +97,7 @@ export namespace util
 	concept nothrow_convertibles = std::is_nothrow_convertible_v<From, To>;
 
 	template<typename From, typename To>
-	concept nothrow_assignables = std::is_nothrow_assignable_v<From, To>;
+	concept nothrow_assignables = std::is_nothrow_assignable_v<To, From>;
 
 	template<typename... Ts>
 	concept nothrow_copy_constructibles = make_conjunction<std::is_nothrow_copy_constructible, Ts...>;

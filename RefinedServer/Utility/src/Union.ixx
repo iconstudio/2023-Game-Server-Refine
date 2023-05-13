@@ -231,7 +231,7 @@ namespace util::detail
 		{
 			static_assert(!same_as<Fty, void>, "Cannot get void type.");
 
-			return move(myValue);
+			return static_cast<Fty&&>(myValue);
 		}
 
 		// getter (not void)
@@ -241,7 +241,7 @@ namespace util::detail
 		{
 			static_assert(!same_as<Fty, void>, "Cannot get void type.");
 
-			return move(myValue);
+			return static_cast<const Fty&&>(myValue);
 		}
 
 		// index getter
@@ -487,21 +487,21 @@ namespace util::detail
 		// unsafe
 		template<typename Uty>
 		constexpr void set(Uty&& value)
-			noexcept(nothrow_assignables<Uty, Fty>)
+			noexcept(nothrow_assignables<util::add_rvalue_reference_t<Uty>, Fty>)
 		{
-			myValue = forward<Uty>(value);
+			myValue = static_cast<Uty&&>(value);
 			hasValue = true;
 		}
 
 		template <size_t Index, typename Uty>
 			requires (Index == Place)
 		constexpr PlacedVariant& try_set(Uty&& value)
-			noexcept(nothrow_assignables<Uty, Fty>)
+			noexcept(nothrow_assignables<util::add_rvalue_reference_t<Uty>, Fty>)
 		{
 			static_assert(!same_as<Fty, void>, "Cannot set the value of a void type.");
 			static_assert(!assignable_from<Uty, Fty>, "Uty is not assignable to Fty.");
 
-			set(forward<Uty>(value));
+			set(static_cast<Uty&&>(value));
 
 			return *this;
 		}
@@ -670,10 +670,10 @@ namespace util::detail
 
 		constexpr PlacedVariant(PlacedVariant&& other) noexcept
 		{
-			(*this).operator=(move(other));
+			(*this).operator=(static_cast<PlacedVariant&&>(other));
 		}
 
-		constexpr PlacedVariant& operator=(const PlacedVariant& other) & noexcept
+		constexpr PlacedVariant& operator=(const PlacedVariant& other) noexcept
 		{
 			// make empty itself
 			reset();
@@ -691,14 +691,14 @@ namespace util::detail
 			return *this;
 		}
 
-		constexpr PlacedVariant& operator=(PlacedVariant&& other) & noexcept
+		constexpr PlacedVariant& operator=(PlacedVariant&& other) noexcept
 		{
 			// make empty itself
 			reset();
 
 			if (other.hasValue)
 			{
-				myValue = move(other.myValue);
+				myValue = static_cast<Fty&&>(other.myValue);
 				hasValue = true;
 			}
 			else if (other.isExtended)
@@ -707,42 +707,6 @@ namespace util::detail
 			}
 
 			return *this;
-		}
-
-		constexpr PlacedVariant&& operator=(const PlacedVariant& other) && noexcept
-		{
-			// make empty itself
-			reset();
-
-			if (other.hasValue)
-			{
-				myValue = other.myValue;
-				hasValue = true;
-			}
-			else if (other.isExtended)
-			{
-				_Tail.operator=(other._Tail);
-			}
-
-			return move(*this);
-		}
-
-		constexpr PlacedVariant&& operator=(PlacedVariant&& other) && noexcept
-		{
-			// make empty itself
-			reset();
-
-			if (other.hasValue)
-			{
-				myValue = move(other.myValue);
-				hasValue = true;
-			}
-			else if (other.isExtended)
-			{
-				_Tail.operator=(move(other._Tail));
-			}
-
-			return move(*this);
 		}
 
 	private:
