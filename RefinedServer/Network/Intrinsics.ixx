@@ -47,31 +47,27 @@ export namespace net
 		}
 	}
 
-	inline ioError CheckIO(int&& socket_fn_result) noexcept
-	{
-		if (debug::CheckError(static_cast<int&&>(socket_fn_result)))
-		{
-			return CheckPending();
-		}
-		else
-		{
-			return util::nullopt;
-		}
-	}
-
 	export namespace io
 	{
 		template<typename Fn, typename... Args>
-		concept so_invocables = util::r_invocables<Fn, int, SOCKET, Args...>;
+		concept so_invocables = util::r_invocables<Fn, int, Args...>;
 
 		template<typename Fn, typename... Args>
-			requires so_invocables<Fn, Args...>
 		inline
 			ioError
-			Execute(Fn&& fn, SOCKET socket, Args&&... args)
-			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<SOCKET>(), util::declval<Args>()...)))
+			Execute(Fn&& fn, Args&&... args)
+			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Args>()...)))
 		{
-			return CheckIO(util::forward<Fn>(fn)(socket, util::forward<Args>(args)...));
+			static_assert(util::invocables<Fn, Args...>, "The functor should be able to execute via args.");
+			static_assert(util::r_invocables<Fn, int, Args...>, "The functor should return a int.");
+
+#if _DEBUG
+			int&& result = util::forward<Fn>(fn)(util::forward<Args>(args)...);
+
+			return CheckIO(static_cast<int&&>(result));
+#else // _DEBUG
+			return CheckIO(util::forward<Fn>(fn)(util::forward<Args>(args)...));
+#endif
 		}
 
 		template<typename Class, typename Method, typename... Args>

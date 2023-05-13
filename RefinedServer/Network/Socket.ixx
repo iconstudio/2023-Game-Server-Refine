@@ -155,12 +155,12 @@ export namespace net
 
 		inline constexpr bool IsValid() const noexcept
 		{
-			return myHandle != INVALID_SOCKET;
+			return myHandle != abi::InvalidSocket;
 		}
 
 		inline constexpr bool IsValid() const volatile noexcept
 		{
-			return myHandle != INVALID_SOCKET;
+			return myHandle != abi::InvalidSocket;
 		}
 
 		Socket(const Socket& other) = delete;
