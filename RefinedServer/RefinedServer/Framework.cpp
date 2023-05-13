@@ -14,6 +14,8 @@ Framework::Framework() noexcept
 
 void Framework::Awake()
 {
+	util::Println("서버를 초기화하는 중...");
+
 	CompletionPort::Establish(concurrentHint).if_then(
 		[this](CompletionPort&& port) noexcept {
 		ioPort = std::move(port);
@@ -28,7 +30,7 @@ void Framework::Awake()
 
 void Framework::Start() noexcept
 {
-	util::Println("서버를 시작합니다.");
+	util::Println("서버를 시작합니다...");
 }
 
 void Framework::Update() noexcept
