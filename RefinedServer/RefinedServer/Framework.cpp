@@ -15,7 +15,7 @@ Framework::Framework() noexcept
 void Framework::Awake()
 {
 	CompletionPort::Establish(concurrentHint).if_then(
-		[this](CompletionPort&& port) {
+		[this](CompletionPort&& port) noexcept {
 		ioPort = std::move(port);
 	}).else_then([this](int&& error_code) {
 		util::Println("IOCP를 생성하는데 실패했습니다. 오류 코드: {}", std::move(error_code));
