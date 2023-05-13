@@ -53,6 +53,9 @@ export namespace net
 		using ::SOCKET;
 		using ::OVERLAPPED;
 		using ::OVERLAPPED_ENTRY;
+		using ::LPOVERLAPPED_COMPLETION_ROUTINE;
+		using ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
+
 		using ::RIO_NOTIFICATION_COMPLETION_TYPE;
 		using ::RIORESULT;
 		using ::PRIORESULT;
@@ -76,6 +79,7 @@ export namespace net
 	}
 
 	using ::SOCKET;
+	using CompletionRoutine = ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
 
 	class [[nodiscard]] Socket
 	{
@@ -143,7 +147,7 @@ export namespace net
 			return io::Execute(::listen, myHandle, backlog);
 		}
 
-		inline ioError BeginRecv(WSABUF& buffer, Context* context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
