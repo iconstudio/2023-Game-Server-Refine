@@ -245,7 +245,6 @@ namespace util::detail
 
 		// index getter
 		template <size_t Index>
-			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &
@@ -276,7 +275,6 @@ namespace util::detail
 
 		// index getter
 		template <size_t Index>
-			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&
@@ -307,7 +305,6 @@ namespace util::detail
 
 		// index getter
 		template <size_t Index>
-			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &&
@@ -338,7 +335,6 @@ namespace util::detail
 
 		// index getter
 		template <size_t Index>
-			requires (Index <= 1 + Place + sizeof...(Rty))
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
