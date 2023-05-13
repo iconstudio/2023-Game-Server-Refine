@@ -143,7 +143,7 @@ export namespace net
 
 		template<util::lv_invocable<util::make_lvalue_t<T>> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			auto
 			operator>>(Promise& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
@@ -166,7 +166,7 @@ export namespace net
 
 		template<util::cl_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			auto
 			operator>>(const Promise& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
@@ -189,7 +189,7 @@ export namespace net
 
 		template<util::rv_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			auto
 			operator>>(Promise&& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
@@ -212,7 +212,7 @@ export namespace net
 
 		template<util::cr_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			auto
 			operator>>(const Promise&& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
@@ -1042,7 +1042,7 @@ export namespace net
 
 		template<util::cl_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			auto
 			operator>>(const Promise& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
@@ -1065,7 +1065,7 @@ export namespace net
 
 		template<util::rv_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			auto
 			operator>>(Promise&& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
@@ -1088,7 +1088,7 @@ export namespace net
 
 		template<util::cr_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			auto
 			operator>>(const Promise&& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
@@ -1147,7 +1147,7 @@ export namespace net
 
 		template<util::lv_invocable<T> Fn>
 		constexpr
-			const Promise&
+			Promise&
 			if_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
@@ -1437,12 +1437,6 @@ export namespace net
 		}
 
 	private:
-		consteval void GetResult() const noexcept
-			requires (!util::notvoids<T>)
-		{
-			return;
-		}
-
 		monad_t myState;
 	};
 
