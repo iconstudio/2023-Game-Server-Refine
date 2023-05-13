@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="util::Singleton&lt;*&gt;">
+		<DisplayString>싱글톤 객체 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::Array&lt;*&gt;">
+		<Intrinsic Category="Property" Name="__AcqType" Expression="&quot;$T1&quot;"/>
+		
+		<DisplayString>배열 &lt;{&quot;$T1&quot;}&gt; ({$T2}개)</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="원소">__AcqType()</Item>
+			<Item Name="길이">$T2</Item>
+			
+			<ArrayItems>
+				<Size>$T2</Size>
+				<ValuePointer>myData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+</AutoVisualizer>

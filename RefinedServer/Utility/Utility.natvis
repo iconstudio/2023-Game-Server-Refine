@@ -1,10 +1,99 @@
-<?xml version="1.0" encoding="utf-8"?> 
+<?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="util::Singleton&lt;*&gt;">
 		<DisplayString>싱글톤 객체 {&quot;$T1&quot;}</DisplayString>
 	</Type>
 
 	<Type Name="util::Array&lt;*&gt;">
-		<DisplayString>배열 {&quot;$T1&quot;}, {$T2}개</DisplayString>
+		<Intrinsic Category="Property" Name="__AcqType" Expression="&quot;$T1&quot;"/>
+		<Intrinsic Category="Property" Name="__AcqLen" Expression="$T2"/>
+		<Intrinsic Category="Data" Name="__Dots" Expression="&quot;...&quot;"/>
+		<Intrinsic Category="Method" Name="__CheckSize" Expression="10 &lt;= $T2"/>
+
+		<DisplayString>배열 &lt;{&quot;$T1&quot;}, {$T2}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<Synthetic Name="자료형">
+				<DisplayString>{__AcqType()}</DisplayString>
+			</Synthetic>
+			<Item Name="길이">static_cast&lt;size_t&gt;(__AcqLen())</Item>
+
+			<Synthetic Name="버퍼">
+				<DisplayString>첫 원소 10개</DisplayString>
+				<Expand>
+					<Synthetic Name="원소 [0]" Condition="0 &lt; $T2">
+						<DisplayString>{*myData[0]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[0]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [1]" Condition="1 &lt; $T2">
+						<DisplayString>{*myData[1]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[1]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [2]" Condition="2 &lt; $T2">
+						<DisplayString>{*myData[2]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[2]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [3]" Condition="3 &lt; $T2">
+						<DisplayString>{*myData[3]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[3]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [4]" Condition="4 &lt; $T2">
+						<DisplayString>{*myData[4]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[4]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [5]" Condition="5 &lt; $T2">
+						<DisplayString>{*myData[5]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[5]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [6]" Condition="6 &lt; $T2">
+						<DisplayString>{*myData[6]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[6]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [7]" Condition="7 &lt; $T2">
+						<DisplayString>{*myData[7]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[7]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [8]" Condition="8 &lt; $T2">
+						<DisplayString>{*myData[8]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[8]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [9]" Condition="9 &lt; $T2">
+						<DisplayString>{*myData[9]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[9]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+				</Expand>
+			</Synthetic>
+
+			<Synthetic Name="나머지 원소" Condition="10 &lt; $T2">
+				<DisplayString>{__Dots()} ({$T2 - 10}개)</DisplayString>
+
+				<Expand>
+					<IndexListItems>
+						<Size>$T2 - 10</Size>
+						<ValueNode>*(myData[10 + $i])</ValueNode>
+					</IndexListItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
 	</Type>
 </AutoVisualizer>
