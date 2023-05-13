@@ -397,9 +397,10 @@ noexcept
 		{
 #if _DEBUG
 			std::string_view str = fmt.get();
-			std::string buffer = std::string{ str.cbegin(), str.cend() } + '\n';
+			//std::string buffer = std::string{ str.cbegin(), str.cend() } + '\n';
 
 			std::fputs(str.data(), stream);
+			std::fputs("\n", stream);
 #else // _DEBUG
 			std::fputs(fmt.get().data(), stream);
 			std::fputs("\n", stream);
@@ -409,9 +410,10 @@ noexcept
 		{
 #if _DEBUG
 			std::wstring_view str = fmt.get();
-			std::wstring buffer = std::wstring{ str.cbegin(), str.cend() } + L'\n';
+			//std::wstring buffer = std::wstring{ str.cbegin(), str.cend() } + L'\n';
 
 			std::fputws(str.data(), stream);
+			std::fputws(L"\n", stream);
 #else // _DEBUG
 			std::fputws(fmt.get().data(), stream);
 			std::fputws(L"\n", stream);
