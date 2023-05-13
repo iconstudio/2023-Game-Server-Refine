@@ -53,6 +53,8 @@ private:
 	net::CompletionPort ioPort;
 	net::Socket nameSocket;
 	net::EndPoint nameEndPoint;
+	net::Socket gameSocket;
+	net::EndPoint gameEndPoint;
 
 	util::Array<net::BasicSession*, maxNPCs> everySession;
 	util::Array<net::User*, maxUsers> everyUser;

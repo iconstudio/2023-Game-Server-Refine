@@ -10,6 +10,7 @@ Framework::Framework() noexcept
 	: Singleton(this)
 	, ioPort()
 	, nameSocket(), nameEndPoint()
+	, gameSocket(), gameEndPoint()
 	, everySession(), everyUser()
 {}
 
@@ -38,6 +39,13 @@ void Framework::Awake()
 		nameSocket = std::move(socket);
 	}).else_then([](int&& error_code) {
 		util::Println("서버의 TCP 소켓을 생성하는데 실패했습니다. 오류 코드: {}", error_code);
+		util::err::RaiseSystemError(std::move(error_code));
+	});
+
+	Socket::CreateUDP().if_then([this](Socket&& socket) {
+		gameSocket = std::move(socket);
+	}).else_then([](int&& error_code) {
+		util::Println("서버의 UDP 소켓을 생성하는데 실패했습니다. 오류 코드: {}", error_code);
 		util::err::RaiseSystemError(std::move(error_code));
 	});
 }
