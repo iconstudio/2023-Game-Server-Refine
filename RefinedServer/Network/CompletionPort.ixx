@@ -147,7 +147,7 @@ export namespace net
 		}
 		else
 		{
-			return io::success;
+			return { io::make_success() };
 		}
 	}
 
