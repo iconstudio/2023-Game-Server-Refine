@@ -1,6 +1,7 @@
 module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
+#include <system_error>
 
 export module Net.Socket;
 import Utility;
@@ -35,6 +36,7 @@ export namespace net
 		Linger = SO_LINGER,
 		DontLinger = SO_DONTLINGER,
 		KeepAlive = SO_KEEPALIVE,
+		Update = SO_UPDATE_ACCEPT_CONTEXT
 	};
 
 	enum SocketIos : unsigned long
@@ -197,6 +199,48 @@ export namespace net
 			return myHandle != abi::InvalidSocket;
 		}
 
+		static inline Socket CreateTCP(SocketType flag = SocketType::SoFlagOverlapped)
+		{
+#if _DEBUG
+			SOCKET socket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, NULL, flag);
+
+			if (socket == abi::InvalidSocket)
+			{
+				throw std::system_error{ ::WSAGetLastError(), std::system_category() };
+			}
+
+			if (flag == SocketType::SoFlagOverlapped)
+			{
+				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
+			}
+
+			return Socket{ socket };
+#else // _DEBUG
+			return Socket{ ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, flag) };
+#endif // !_DEBUG
+		}
+
+		static inline Socket CreateUDP(SocketType flag = SocketType::SoFlagOverlapped)
+		{
+#if _DEBUG
+			SOCKET socket = ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, NULL, flag);
+
+			if (socket == abi::InvalidSocket)
+			{
+				throw std::system_error{ ::WSAGetLastError(), std::system_category() };
+			}
+
+			if (flag == SocketType::SoFlagOverlapped)
+			{
+				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
+			}
+
+			return Socket{ socket };
+#else // _DEBUG
+			return Socket{ ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, 0, flag) };
+#endif // !_DEBUG
+	}
+
 		Socket(const Socket& other) = delete;
 		Socket(const volatile Socket& other) = delete;
 		Socket& operator=(const Socket& other) = delete;
@@ -218,5 +262,5 @@ export namespace net
 		volatile bool isOut;
 		SOCKET myHandle;
 		EndPoint myAddress, myEndPoint;
-	};
+};
 }
