@@ -60,6 +60,28 @@ export namespace net::io
 
 	template<typename T>
 		requires(util::notvoids<T>)
+	constexpr defer_t<T> make_defered(const T& value)
+		noexcept(util::nothrow_copy_constructibles<T>)
+	{
+		return defer_t<T>{ value };
+	}
+
+	template<typename T>
+		requires(util::notvoids<T>)
+	constexpr defer_t<T> make_defered(T&& value)
+		noexcept(util::nothrow_copy_constructibles<T>)
+	{
+		return defer_t<T>{ static_cast<T&&>(value) };
+	}
+
+	constexpr just_defered_t make_defered()
+		noexcept
+	{
+		return defered;
+	}
+
+	template<typename T>
+		requires(util::notvoids<T>)
 	constexpr failure_t<T> make_failure(const T& value)
 		noexcept(util::nothrow_copy_constructibles<T>)
 	{
