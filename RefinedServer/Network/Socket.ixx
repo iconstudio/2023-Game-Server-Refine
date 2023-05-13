@@ -225,7 +225,7 @@ export namespace net
 
 			if (type == SocketType::SoFlagOverlapped)
 			{
-				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
+				//::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
 
 			BOOL option = TRUE;
@@ -250,7 +250,7 @@ export namespace net
 
 			if (type == SocketType::SoFlagOverlapped)
 			{
-				::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
+				//::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
 
 			BOOL option = TRUE;
