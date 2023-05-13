@@ -146,40 +146,23 @@ export namespace util
 	template<typename Special, template<size_t...> typename Template>
 	inline constexpr bool is_indexed_v = is_indexed<Special, Template>::value;
 
-	template<typename... Ts>
-	struct avoid_void;
-
-	// skip the first void
-	template<typename Void, typename... Rests>
-		requires (is_same_v<Void, void>)
-	struct avoid_void<Void, Rests...> : avoid_void<Rests...>
-	{};
-
-	// get the first
-	template<typename Fty, typename... Rty>
-		requires (!is_same_v<Fty, void>)
-	struct avoid_void<Fty, Rty...>
+	template<typename T>
+	struct avoid_void
 	{
-		using type = Fty;
+		template<typename Fn, typename... Args>
+		static consteval auto Eval() noexcept(std::is_nothrow_invocables<Fn, Args...>)->std::invoke_result_t<Fn, Args...>;
 	};
-
-	// remove the secondary void
-	template<typename T, typename Void, typename... Rests>
-		requires (is_same_v<Void, void>)
-	struct avoid_void<T, Void, Rests...> : avoid_void<T, Rests...>
-	{};
 
 	template<typename Void>
 		requires (is_same_v<Void, void>)
 	struct avoid_void<Void>
-	{};
+	{
+		template<typename Fn, typename... Args>
+		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn, Args...>) -> std::invoke_result_t<Fn, Args...>;
 
-	template<>
-	struct avoid_void<>
-	{};
-
-	template<typename... Ts>
-	using avoid_void_t = typename avoid_void<Ts...>::type;
+		template<typename Fn>
+		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn>)->std::invoke_result_t<Fn>;
+	};
 
 	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
 	struct logical_product
