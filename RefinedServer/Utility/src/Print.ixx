@@ -396,14 +396,14 @@ noexcept
 		if constexpr (std::is_same_v<Char, char>)
 		{
 			std::string_view str = fmt.get();
-			const std::string& buffer{ str.cbegin(), str.cend() };
+			std::string buffer{ str.cbegin(), str.cend() };
 
 			std::fputs((buffer + '\n').data(), stream);
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
 		{
 			std::wstring_view str = fmt.get();
-			const std::wstring& buffer{ str.cbegin(), str.cend() };
+			std::wstring buffer{ str.cbegin(), str.cend() };
 
 			std::fputws((buffer + L'\n').data(), stream);
 		}
