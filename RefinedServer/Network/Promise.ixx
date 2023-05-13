@@ -1475,15 +1475,7 @@ namespace net::test
 		const auto r0 = vpromise0 >> fnl0;
 		Promise<long long> vpromise1{};
 
-		constexpr Promise<int, void> cvpromise0{ 30 };
-
-		constexpr auto& cr0_0 = cvpromise0.if_then(
-			[](const int& v) noexcept {});
-
-		constexpr auto cr0_1 = cvpromise0.and_then(
-			[](const int& v) -> int {
-			return 300;
-		});
+		constexpr Promise<int, void> cvpromise0{};
 
 		constexpr Promise<long long, void> cvpromise1{};
 

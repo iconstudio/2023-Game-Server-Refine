@@ -30,7 +30,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Testbed.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Thread.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Traits.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\Union.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Union.ixx">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utility.ixx" />
   </ItemGroup>
 </Project>
