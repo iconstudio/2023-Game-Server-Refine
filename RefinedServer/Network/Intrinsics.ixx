@@ -14,7 +14,7 @@ export namespace net
 		int error = debug::WSAGetLastError();
 		if (debug::CheckPending(error))
 		{
-			return io::success;
+			return util::nullopt;
 		}
 		else
 		{
@@ -27,7 +27,7 @@ export namespace net
 		int error = debug::WSAGetLastError();
 		if (debug::CheckIncomplete(error))
 		{
-			return io::success;
+			return util::nullopt;
 		}
 		else
 		{
@@ -43,7 +43,7 @@ export namespace net
 		}
 		else
 		{
-			return io::success;
+			return util::nullopt;
 		}
 	}
 
@@ -55,7 +55,7 @@ export namespace net
 		}
 		else
 		{
-			return io::success;
+			return util::nullopt;
 		}
 	}
 
@@ -69,7 +69,7 @@ export namespace net
 		inline
 			ioError
 			Execute(Fn&& fn, SOCKET socket, Args&&... args)
-			noexcept(noexcept(util::invoke(util::forward<Fn>(fn), util::declval<SOCKET>(), util::declval<Args>()...)))
+			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<SOCKET>(), util::declval<Args>()...)))
 		{
 			return CheckIO(util::forward<Fn>(fn)(socket, util::forward<Args>(args)...));
 		}

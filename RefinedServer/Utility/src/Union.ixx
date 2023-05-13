@@ -170,7 +170,7 @@ namespace util::detail
 		// Place the specified type
 		template <typename T, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>)
-		explicit(is_explicit_constructible_v<T>)
+		explicit
 			constexpr
 			PlacedVariant(in_place_type_t<T>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
@@ -180,7 +180,7 @@ namespace util::detail
 		// Place the specified type from hint
 		template <typename T, size_t Guard, typename... Args>
 			requires (!same_as<clean_t<T>, Fty>&& Guard <= 1 + sizeof...(Rty))
-		explicit(is_explicit_constructible_v<T>)
+		explicit
 			constexpr
 			PlacedVariant(in_place_type_t<T>, integral_constant<size_t, Guard>, Args&&... args)
 			noexcept(nothrow_constructibles<T, Args...>)
@@ -487,7 +487,7 @@ namespace util::detail
 		// unsafe
 		template<typename Uty>
 		constexpr void set(Uty&& value)
-			noexcept(nothrow_assignables<Fty, Uty>)
+			noexcept(nothrow_assignables<Uty, Fty>)
 		{
 			myValue = forward<Uty>(value);
 			hasValue = true;
@@ -496,7 +496,7 @@ namespace util::detail
 		template <size_t Index, typename Uty>
 			requires (Index == Place)
 		constexpr PlacedVariant& try_set(Uty&& value)
-			noexcept(nothrow_assignables<Fty, Uty>)
+			noexcept(nothrow_assignables<Uty, Fty>)
 		{
 			static_assert(!same_as<Fty, void>, "Cannot set the value of a void type.");
 			static_assert(!assignable_from<Uty, Fty>, "Uty is not assignable to Fty.");
@@ -514,7 +514,7 @@ namespace util::detail
 		{
 			if constexpr (1 < mySize && Index <= Place + mySize)
 			{
-				return _Tail.template try_set<Index>(forward<Uty>(value));
+				return _Tail.template try_set<Index>(static_cast<Uty&&>(value));
 			}
 			else
 			{
@@ -866,7 +866,7 @@ namespace util::test
 	{
 		using aa_t = Union<int, void, unsigned long, float>;
 
-		constexpr aa_t aa{};
+		constexpr aa_t aa{ in_place_type<unsigned long>, integral_constant<size_t, 0>{}, 600UL };
 		using aa_0_t = aa_t::element_type<0>;
 		static_assert(util::is_same_v<aa_0_t, int>, "int");
 		using aa_1_t = aa_t::element_type<1>;
@@ -889,6 +889,7 @@ namespace util::test
 		constexpr bool a_has_0 = aa.has_value<0>();
 		constexpr bool a_has_1 = aa.has_value<1>();
 		constexpr bool a_has_2 = aa.has_value<2>();
+		constexpr bool a_has_3 = aa.has_value<3>();
 
 		using bb_t = Union<int, unsigned long, float, double>;
 		bb_t bb0{};

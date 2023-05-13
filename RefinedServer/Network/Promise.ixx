@@ -22,6 +22,20 @@ export namespace net
 				return util::nothrow_invocables<Fn, Args...>;
 			}
 		}
+
+		template<typename... Args>
+			requires (util::same_as<U, void>)
+		static constexpr auto Execute(Fn&& functor, [[maybe_unused]] Args...) noexcept(noexcept(util::forward<Fn>(functor)()))
+		{
+			return util::forward<Fn>(functor)();
+		}
+
+		template<typename... Args>
+			requires (!util::same_as<U, void>)
+		static constexpr auto Execute(Fn&& functor, Args&&... args) noexcept(noexcept(util::forward<Fn>(functor)(util::forward<Args>(args)...)))
+		{
+			return util::forward<Fn>(functor)(util::forward<Args>(args)...);
+		}
 	};
 
 	template<typename T, typename E = void>
@@ -31,6 +45,8 @@ export namespace net
 	class Promise<T, E> final
 	{
 	public:
+		static_assert(!util::same_as<T, E>, "T and E must not to be same!");
+
 		using succeed_t = io::success_t<T>;
 		using failed_t = io::failure_t<E>;
 		using defered_t = io::just_defered_t;
@@ -38,6 +54,10 @@ export namespace net
 
 		constexpr Promise() noexcept
 			: myState()
+		{}
+
+		constexpr Promise(util::nullopt_t) noexcept
+			: myState(util::nullopt)
 		{}
 
 		template<typename U>
@@ -52,10 +72,6 @@ export namespace net
 		constexpr Promise(U&& fail)
 			noexcept(util::nothrow_copy_constructibles<E>)
 			: myState(util::in_place_type<failed_t>, io::make_failure(util::forward<U>(fail)))
-		{}
-
-		constexpr Promise(util::nullopt_t) noexcept
-			: myState(util::nullopt)
 		{}
 
 		constexpr Promise(const Promise& other) noexcept
@@ -116,10 +132,14 @@ export namespace net
 		}
 
 		constexpr ~Promise()
-			noexcept(util::nothrow_destructibles<T, E>) requires(util::notvoids<T>) = default;
+			noexcept(util::nothrow_destructibles<succeed_t, failed_t, defered_t>)
+			requires(util::trivially_destructibles<succeed_t, failed_t, defered_t>)
+		{}
 
 		constexpr ~Promise()
-			noexcept(util::nothrow_destructibles<E>) requires(!util::notvoids<T>) = default;
+			noexcept(util::nothrow_destructibles<succeed_t, failed_t, defered_t>)
+			requires(!util::trivially_destructibles<succeed_t, failed_t, defered_t>)
+		= default;
 
 		template<util::lv_invocable<util::make_lvalue_t<T>> Fn>
 		inline friend constexpr
@@ -129,7 +149,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(promise.GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(promise.GetResult());
+				}
 			}
 			else
 			{
@@ -145,7 +172,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(promise.GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(promise.GetResult());
+				}
 			}
 			else
 			{
@@ -161,7 +195,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(util::move(promise).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(promise).GetResult());
+				}
 			}
 			else
 			{
@@ -177,7 +218,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(util::move(promise).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(promise).GetResult());
+				}
 			}
 			else
 			{
@@ -269,7 +317,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(GetResult());
+				}
 			}
 
 			return *this;
@@ -287,7 +342,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(GetResult());
+				}
 			}
 
 			return *this;
@@ -305,7 +367,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(util::move(*this).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 
 			return util::move(*this);
@@ -323,7 +392,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(util::move(*this).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 
 			return util::move(*this);
@@ -335,7 +411,7 @@ export namespace net
 		/// <param name="action"></param>
 		template<util::lv_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			auto
 			and_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
@@ -343,7 +419,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(GetResult());
+				}
 			}
 			else
 			{
@@ -357,7 +440,7 @@ export namespace net
 		/// <param name="action"></param>
 		template<util::cl_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			auto
 			and_then(Fn&& action) const&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
@@ -365,7 +448,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(GetResult());
+				}
 			}
 			else
 			{
@@ -379,7 +469,7 @@ export namespace net
 		/// <param name="action"></param>
 		template<util::rv_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			auto
 			and_then(Fn&& action) &&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
@@ -387,7 +477,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(util::move(*this).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 			else
 			{
@@ -401,7 +498,7 @@ export namespace net
 		/// <param name="action"></param>
 		template<util::cr_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			auto
 			and_then(Fn&& action) const&&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
@@ -409,7 +506,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(util::move(*this).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 			else
 			{
@@ -904,20 +1008,31 @@ export namespace net
 		}
 
 		constexpr ~Promise()
-			noexcept(util::nothrow_destructibles<T>) requires(util::notvoids<T>) = default;
+			noexcept(util::nothrow_destructibles<succeed_t, failed_t, defered_t>)
+			requires(util::trivially_destructibles<succeed_t, failed_t, defered_t>)
+		= default;
 
 		constexpr ~Promise()
-			noexcept requires(!util::notvoids<T>) = default;
+			noexcept(util::nothrow_destructibles<succeed_t, failed_t, defered_t>)
+			requires(!util::trivially_destructibles<succeed_t, failed_t, defered_t>)
+		{}
 
 		template<util::lv_invocable<T> Fn>
 		inline friend constexpr
-			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			auto
 			operator>>(Promise& promise, Fn&& action)
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(promise.GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(promise.GetResult());
+				}
 			}
 			else
 			{
@@ -933,7 +1048,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(promise.GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(promise.GetResult());
+				}
 			}
 			else
 			{
@@ -949,7 +1071,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(util::move(promise).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(promise).GetResult());
+				}
 			}
 			else
 			{
@@ -965,7 +1094,14 @@ export namespace net
 		{
 			if (promise.IsSuccess())
 			{
-				return util::forward<Fn>(action)(util::move(promise).GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(promise).GetResult());
+				}
 			}
 			else
 			{
@@ -1017,7 +1153,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(GetResult());
+				}
 			}
 
 			return *this;
@@ -1031,7 +1174,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(GetResult());
+				}
 			}
 
 			return *this;
@@ -1045,7 +1195,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 
 			return util::move(*this);
@@ -1059,7 +1216,14 @@ export namespace net
 		{
 			if (IsSuccess())
 			{
-				util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					util::forward<Fn>(action)();
+				}
+				else
+				{
+					util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 
 			return util::move(*this);
@@ -1067,7 +1231,7 @@ export namespace net
 
 		template<util::lv_invocable<T> Fn>
 		constexpr
-			decltype(auto)
+			auto
 			and_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
@@ -1075,7 +1239,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(GetResult());
+				}
 			}
 			else
 			{
@@ -1085,7 +1256,7 @@ export namespace net
 
 		template<util::cl_invocable<T> Fn>
 		constexpr
-			decltype(auto)
+			auto
 			and_then(Fn&& action) const&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
@@ -1093,7 +1264,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(GetResult());
+				}
 			}
 			else
 			{
@@ -1103,7 +1281,7 @@ export namespace net
 
 		template<util::rv_invocable<T> Fn>
 		constexpr
-			decltype(auto)
+			auto
 			and_then(Fn&& action) &&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
@@ -1111,7 +1289,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 			else
 			{
@@ -1121,7 +1306,7 @@ export namespace net
 
 		template<util::cr_invocable<T> Fn>
 		constexpr
-			decltype(auto)
+			auto
 			and_then(Fn&& action) const&&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
@@ -1129,7 +1314,14 @@ export namespace net
 
 			if (IsSuccess())
 			{
-				return util::forward<Fn>(action)(GetResult());
+				if constexpr (util::same_as<T, void>)
+				{
+					return util::forward<Fn>(action)();
+				}
+				else
+				{
+					return util::forward<Fn>(action)(util::move(*this).GetResult());
+				}
 			}
 			else
 			{
@@ -1283,12 +1475,12 @@ namespace net::test
 		const auto r0 = vpromise0 >> fnl0;
 		Promise<long long> vpromise1{};
 
-		constexpr Promise<int, void> cvpromise0{};
-		const auto& cr0_0 = cvpromise0.if_then(
-			[](const int& v) -> int {
-			return 300;
-		});
-		const auto cr0_1 = cvpromise0.and_then(
+		constexpr Promise<int, void> cvpromise0{ 30 };
+
+		constexpr auto& cr0_0 = cvpromise0.if_then(
+			[](const int& v) noexcept {});
+
+		constexpr auto cr0_1 = cvpromise0.and_then(
 			[](const int& v) -> int {
 			return 300;
 		});
