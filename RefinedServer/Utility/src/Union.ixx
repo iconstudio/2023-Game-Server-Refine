@@ -65,7 +65,7 @@ namespace util::detail
 		static inline constexpr size_t relativeIndex = Index - Place;
 
 		template <size_t Index>
-		using element_type = meta::at<meta::MetaList<Fty, Rty...>, relativeIndex<Index>>;
+		using element_type = std::tuple_element_t<relativeIndex<Index>, std::tuple<Fty, Rty...>>;
 		template <size_t Index>
 		using value_type = element_type<Index>;
 		template <size_t Index>
