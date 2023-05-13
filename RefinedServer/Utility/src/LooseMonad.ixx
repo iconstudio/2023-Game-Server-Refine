@@ -16,7 +16,7 @@ export namespace util
 		using base_type = Union<Ts...>;
 
 		template<size_t Index>
-		using element_type = std::tuple_element_t<Index, std::tuple<Ts...>>;
+		using element_type = base_type::template element_type<Index>;
 		template<size_t Index>
 		using reference_type = element_type<Index>&;
 		template<size_t Index>
