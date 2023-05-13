@@ -591,7 +591,7 @@ export namespace net
 			and_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -620,7 +620,7 @@ export namespace net
 			and_then(Fn&& action) const&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -649,7 +649,7 @@ export namespace net
 			and_then(Fn&& action) &&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -678,7 +678,7 @@ export namespace net
 			and_then(Fn&& action) const&&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -694,6 +694,94 @@ export namespace net
 			else
 			{
 				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+			}
+		}
+
+		/// <summary>
+		/// and_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			auto
+			and_then(Fn&& action) &
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
+
+			if (!IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		/// <summary>
+		/// and_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			auto
+			and_then(Fn&& action) const&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
+
+			if (!IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		/// <summary>
+		/// and_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			auto
+			and_then(Fn&& action) &&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
+
+			if (!IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		/// <summary>
+		/// and_then (not failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			auto
+			and_then(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
+
+			if (!IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -853,7 +941,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (!IsSuccess())
 			{
@@ -877,7 +965,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (!IsSuccess())
 			{
@@ -901,7 +989,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (!IsSuccess())
 			{
@@ -925,7 +1013,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (!IsSuccess())
 			{
@@ -949,7 +1037,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn, E&>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (IsFailed())
 			{
@@ -973,7 +1061,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn, const E&>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (IsFailed())
 			{
@@ -997,7 +1085,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn, E&&>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (IsFailed())
 			{
@@ -1021,7 +1109,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn, const E&&>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (IsFailed())
 			{
@@ -1291,7 +1379,7 @@ export namespace net
 			operator<<(const Promise& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
 
 			if (promise.IsFailed())
 			{
@@ -1309,7 +1397,7 @@ export namespace net
 			operator<<(Promise&& promise, Fn&& action)
 			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
 
 			if (promise.IsFailed())
 			{
@@ -1411,7 +1499,7 @@ export namespace net
 			and_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1436,7 +1524,7 @@ export namespace net
 			and_then(Fn&& action) const&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1461,7 +1549,7 @@ export namespace net
 			and_then(Fn&& action) &&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1486,7 +1574,7 @@ export namespace net
 			and_then(Fn&& action) const&&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1541,7 +1629,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (!IsSuccess())
 			{
@@ -1561,7 +1649,7 @@ export namespace net
 		{
 			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!util::same_as<fwd_result_t, void>, "Monadic result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (!IsSuccess())
 			{
