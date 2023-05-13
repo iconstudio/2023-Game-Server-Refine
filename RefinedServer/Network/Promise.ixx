@@ -141,6 +141,11 @@ export namespace net
 			requires(!util::trivially_destructibles<succeed_t, failed_t, defered_t>)
 		= default;
 
+		/// <summary>
+		/// operator>> (on succeed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
 		template<util::lv_invocable<util::make_lvalue_t<T>> Fn>
 		inline friend constexpr
 			auto
@@ -164,6 +169,11 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// operator>> (on succeed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
 		template<util::cl_invocable<T> Fn>
 		inline friend constexpr
 			auto
@@ -187,6 +197,11 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// operator>> (on succeed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
 		template<util::rv_invocable<T> Fn>
 		inline friend constexpr
 			auto
@@ -210,6 +225,11 @@ export namespace net
 			}
 		}
 
+		/// <summary>
+		/// operator>> (on succeed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
 		template<util::cr_invocable<T> Fn>
 		inline friend constexpr
 			auto
@@ -230,6 +250,90 @@ export namespace net
 			else
 			{
 				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+			}
+		}
+
+		/// <summary>
+		/// operator>> (not failed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		inline friend constexpr
+			auto
+			operator>>(Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!promise.IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		/// <summary>
+		/// operator>> (not failed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		inline friend constexpr
+			auto
+			operator>>(const Promise& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!promise.IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		/// <summary>
+		/// operator>> (not failed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		inline friend constexpr
+			auto
+			operator>>(Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!promise.IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
+			}
+		}
+
+		/// <summary>
+		/// operator>> (not failed)
+		/// </summary>
+		/// <param name="promise"></param>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		inline friend constexpr
+			auto
+			operator>>(const Promise&& promise, Fn&& action)
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			if (!promise.IsFailed())
+			{
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
