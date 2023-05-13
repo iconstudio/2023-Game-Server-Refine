@@ -167,24 +167,24 @@ export namespace net
 			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, bytes, flags, context, routine);
 		}
 
-		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
 				return -1;
 			}
 
-			return io::Execute(::WSARecv, myHandle, util::addressof(buffer), 1UL, bytes, &flags, context, routine);
+			return io::Execute(::WSARecv, myHandle, util::addressof(buffer), 1UL, nullptr, &flags, context, routine);
 		}
 
-		inline ioError BeginSend(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long* bytes = nullptr, const unsigned long& flags = 0) noexcept
+		inline ioError BeginSend(WSABUF& buffer, Context* const& context, CompletionRoutine routine, const unsigned long& flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
 				return -1;
 			}
 
-			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, bytes, flags, context, routine);
+			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine);
 		}
 
 		inline constexpr bool IsValid() const noexcept
