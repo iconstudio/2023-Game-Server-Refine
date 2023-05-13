@@ -225,6 +225,9 @@
       <FileType>Document</FileType>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Utility\Utility.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

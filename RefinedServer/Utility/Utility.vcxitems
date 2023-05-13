@@ -39,4 +39,8 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utility.ixx" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\..\..\2023-Server\Server\NewServer\Utility.natvis" />
+    <Natvis Include="$(MSBuildThisFileDirectory)Utility.natvis" />
+  </ItemGroup>
 </Project>

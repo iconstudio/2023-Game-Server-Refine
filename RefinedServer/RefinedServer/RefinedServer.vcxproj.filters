@@ -42,4 +42,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Utility\Utility.natvis">
+      <Filter>리소스 파일</Filter>
+    </Natvis>
+  </ItemGroup>
 </Project>

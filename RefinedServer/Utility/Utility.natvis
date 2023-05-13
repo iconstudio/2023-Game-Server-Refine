@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="util::Singleton&lt;*&gt;">
+		<DisplayString>싱글톤 객체 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::Array&lt;*&gt;">
+		<DisplayString>배열 {&quot;$T1&quot;}, {$T2}개</DisplayString>
+	</Type>
+</AutoVisualizer>
