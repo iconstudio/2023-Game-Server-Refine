@@ -732,12 +732,21 @@ namespace util::detail
 		template <typename... Ts>
 		using type = typename hide_variant0::template type<0, Ts...>;
 	};
+
+	struct hide_variant2
+	{
+		template <size_t I, typename... Ts>
+		using type = typename hide_variant0::template type<I, Ts...>;
+	};
 }
 
 export namespace util
 {
 	template <typename... Ts>
 	using Union = typename detail::hide_variant1::template type<Ts...>;
+
+	template <size_t I, typename... Ts>
+	using DerivedUnion = typename detail::hide_variant2::template type<I, Ts...>;
 }
 
 export namespace std
@@ -854,7 +863,7 @@ namespace util::test
 		//constexpr Union<int> aa2{ in_place_type<unsigned long>, 600UL };
 		constexpr Union<int> aa2{ in_place_type<int>, 600UL };
 
-		using bb_t = Union<int, unsigned long, float, double>;
+		using bb_t = Union<int, unsigned long, float, double, void, long long>;
 		bb_t bb0{};
 		//bb_t bb1{};
 		bb_t bb1(in_place_type<float>, 4000.034124f);
@@ -873,6 +882,8 @@ namespace util::test
 		auto& rb0_tset_1 = bb0.try_set<1>(500UL);
 		decltype(auto) rb0_tset_2 = bb0.try_set<2>(500.0f);
 		decltype(auto) rb0_tset_3 = bb0.try_set<3>(500.0);
+		//decltype(auto) rb0_tset_4 = bb0.try_set<4>(0);
+		decltype(auto) rb0_tset_5 = bb0.try_set<5>(0);
 		//decltype(auto) rb0_tset_4 = bb0.try_set<4>(500.0);
 		//decltype(auto) rb0_tset_5 = bb0.try_set<5>(500.0);
 
