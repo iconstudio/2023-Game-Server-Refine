@@ -142,7 +142,7 @@ export namespace net
 		= default;
 
 		/// <summary>
-		/// operator>> (on succeed)
+		/// operator>>, parameter T (on succeed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -170,7 +170,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (on succeed)
+		/// operator>>, parameter T (on succeed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -198,7 +198,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (on succeed)
+		/// operator>>, parameter T (on succeed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -226,7 +226,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (on succeed)
+		/// operator>>, parameter T (on succeed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -254,7 +254,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (not failed)
+		/// operator>>, no parameter (not failed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -275,7 +275,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (not failed)
+		/// operator>>, no parameter (not failed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -296,7 +296,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (not failed)
+		/// operator>>, no parameter (not failed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -317,7 +317,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// operator>> (not failed)
+		/// operator>>, no parameter (not failed)
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
@@ -410,7 +410,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (on succeed)
+		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::lv_invocable<T> Fn>
@@ -435,7 +435,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (on succeed)
+		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::cl_invocable<T> Fn>
@@ -460,7 +460,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (on succeed)
+		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::rv_invocable<T> Fn>
@@ -485,7 +485,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (on succeed)
+		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::cr_invocable<T> Fn>
@@ -510,7 +510,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (not failed)
+		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -528,7 +528,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (not failed)
+		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -546,7 +546,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (not failed)
+		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -564,7 +564,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// if_then (not failed)
+		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -582,7 +582,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (on succeed)
+		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::lv_invocable<T> Fn>
@@ -611,7 +611,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (on succeed)
+		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::cl_invocable<T> Fn>
@@ -640,7 +640,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (on succeed)
+		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::rv_invocable<T> Fn>
@@ -669,7 +669,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (on succeed)
+		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::cr_invocable<T> Fn>
@@ -698,7 +698,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (not failed)
+		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -720,7 +720,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (not failed)
+		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -742,7 +742,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (not failed)
+		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -764,7 +764,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// and_then (not failed)
+		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -786,7 +786,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// else_then, no parameter (on not succeed)
+		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -804,7 +804,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// else_then, no parameter (on not succeed)
+		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -822,7 +822,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// else_then, no parameter (on not succeed)
+		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -840,7 +840,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// else_then, no parameter (on not succeed)
+		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -930,7 +930,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// or_else, no parameter (on not succeed)
+		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -954,7 +954,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// or_else, no parameter (on not succeed)
+		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -978,7 +978,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// or_else, no parameter (on not succeed)
+		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
@@ -1002,7 +1002,7 @@ export namespace net
 		}
 
 		/// <summary>
-		/// or_else, no parameter (on not succeed)
+		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
 		template<util::invocables Fn>
