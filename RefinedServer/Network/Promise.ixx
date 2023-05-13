@@ -7,6 +7,23 @@ export import Net.IoState;
 
 export namespace net
 {
+	template<typename Fn, typename U>
+	struct noexcept_t
+	{
+		template<typename... Args>
+		static consteval bool Eval() noexcept
+		{
+			if constexpr (!util::same_as<U, void>)
+			{
+				return util::nothrow_invocables<Fn>;
+			}
+			else
+			{
+				return util::nothrow_invocables<Fn, Args...>;
+			}
+		}
+	};
+
 	template<typename T, typename E = void>
 	class Promise;
 
@@ -104,11 +121,11 @@ export namespace net
 		constexpr ~Promise()
 			noexcept(util::nothrow_destructibles<E>) requires(!util::notvoids<T>) = default;
 
-		template<util::lv_invocable<T> Fn>
+		template<util::lv_invocable<util::make_lvalue_t<T>> Fn>
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_lvalue_t<T>>
 			operator>>(Promise& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -124,7 +141,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_clvalue_t<T>>
 			operator>>(const Promise& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -140,7 +157,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_rvalue_t<T>>
 			operator>>(Promise&& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -156,7 +173,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_crvalue_t<T>>
 			operator>>(const Promise&& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -248,7 +265,7 @@ export namespace net
 		constexpr
 			const Promise&
 			if_then(Fn&& action) &
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -266,7 +283,7 @@ export namespace net
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -284,7 +301,7 @@ export namespace net
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)(util::move(*this).GetResult())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -302,7 +319,7 @@ export namespace net
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -320,7 +337,7 @@ export namespace net
 		constexpr
 			util::monad_result_t<Fn, util::make_lvalue_t<T>>
 			and_then(Fn&& action) &
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -342,7 +359,7 @@ export namespace net
 		constexpr
 			util::monad_result_t<Fn, util::make_clvalue_t<T>>
 			and_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -364,7 +381,7 @@ export namespace net
 		constexpr
 			util::monad_result_t<Fn, util::make_rvalue_t<T>>
 			and_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -386,7 +403,7 @@ export namespace net
 		constexpr
 			util::monad_result_t<Fn, util::make_crvalue_t<T>>
 			and_then(Fn&& action) const&&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -896,7 +913,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_lvalue_t<T>>
 			operator>>(Promise& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -912,7 +929,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_clvalue_t<T>>
 			operator>>(const Promise& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -928,7 +945,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_rvalue_t<T>>
 			operator>>(Promise&& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -944,7 +961,7 @@ export namespace net
 		inline friend constexpr
 			util::monad_result_t<Fn, util::make_crvalue_t<T>>
 			operator>>(const Promise&& promise, Fn&& action)
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
@@ -996,7 +1013,7 @@ export namespace net
 		constexpr
 			const Promise&
 			if_then(Fn&& action) &
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -1010,7 +1027,7 @@ export namespace net
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -1024,7 +1041,7 @@ export namespace net
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -1038,7 +1055,7 @@ export namespace net
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
@@ -1050,9 +1067,9 @@ export namespace net
 
 		template<util::lv_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_lvalue_t<T>>
+			decltype(auto)
 			and_then(Fn&& action) &
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_lvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -1068,9 +1085,9 @@ export namespace net
 
 		template<util::cl_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_clvalue_t<T>>
+			decltype(auto)
 			and_then(Fn&& action) const&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_clvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -1086,9 +1103,9 @@ export namespace net
 
 		template<util::rv_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_rvalue_t<T>>
+			decltype(auto)
 			and_then(Fn&& action) &&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_rvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -1104,9 +1121,9 @@ export namespace net
 
 		template<util::cr_invocable<T> Fn>
 		constexpr
-			util::monad_result_t<Fn, util::make_crvalue_t<T>>
+			decltype(auto)
 			and_then(Fn&& action) const&&
-			noexcept(noexcept(util::forward<Fn>(action)(util::declval<util::make_crvalue_t<T>>())))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Monadic result cannot be void.");
 
@@ -1272,8 +1289,8 @@ namespace net::test
 			return 300;
 		});
 		const auto cr0_1 = cvpromise0.and_then(
-			[](const int& v) -> Promise<int, void> {
-			return Promise<int, void>::succeed_t{ 300 };
+			[](const int& v) -> int {
+			return 300;
 		});
 
 		constexpr Promise<long long, void> cvpromise1{};
