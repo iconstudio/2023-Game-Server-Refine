@@ -395,17 +395,27 @@ noexcept
 	{
 		if constexpr (std::is_same_v<Char, char>)
 		{
+#if _DEBUG
 			std::string_view str = fmt.get();
-			std::string buffer{ str.cbegin(), str.cend() };
+			std::string buffer = std::string{ str.cbegin(), str.cend() } + '\n';
 
-			std::fputs((buffer + '\n').data(), stream);
+			std::fputs(str.data(), stream);
+#else // _DEBUG
+			std::fputs(fmt.get().data(), stream);
+			std::fputs("\n", stream);
+#endif // !_DEBUG
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
 		{
+#if _DEBUG
 			std::wstring_view str = fmt.get();
-			std::wstring buffer{ str.cbegin(), str.cend() };
+			std::wstring buffer = std::wstring{ str.cbegin(), str.cend() } + L'\n';
 
-			std::fputws((buffer + L'\n').data(), stream);
+			std::fputws(str.data(), stream);
+#else // _DEBUG
+			std::fputws(fmt.get().data(), stream);
+			std::fputws(L"\n", stream);
+#endif // !_DEBUG
 		}
 	}
 	else if constexpr (std::is_same_v<Char, char>)
