@@ -222,31 +222,37 @@ export namespace net
 			return myHandle;
 		}
 
+		[[nodiscard]]
 		constexpr const volatile SOCKET& Handle() const volatile& noexcept
 		{
 			return myHandle;
 		}
 
+		[[nodiscard]]
 		constexpr SOCKET&& Handle() && noexcept
 		{
 			return static_cast<SOCKET&&>(myHandle);
 		}
 
+		[[nodiscard]]
 		constexpr volatile SOCKET&& Handle() volatile&& noexcept
 		{
 			return static_cast<volatile SOCKET&&>(myHandle);
 		}
 
+		[[nodiscard]]
 		constexpr bool IsValid() const noexcept
 		{
 			return myHandle != abi::InvalidSocket;
 		}
 
+		[[nodiscard]]
 		constexpr bool IsValid() const volatile noexcept
 		{
 			return myHandle != abi::InvalidSocket;
 		}
 
+		[[nodiscard]]
 		static inline
 			Promise<Socket, int>
 			CreateTCP(SocketType type = SocketType::SoFlagOverlapped)
@@ -272,6 +278,7 @@ export namespace net
 #endif // !_DEBUG
 		}
 
+		[[nodiscard]]
 		static inline
 			Promise<Socket, int>
 			CreateUDP(SocketType type = SocketType::SoFlagOverlapped)
@@ -305,11 +312,13 @@ export namespace net
 		Socket& operator=(const volatile Socket& other) volatile = delete;
 
 	private:
+		[[nodiscard]]
 		inline constexpr bool IsOut() const noexcept
 		{
 			return isOut;
 		}
 
+		[[nodiscard]]
 		inline constexpr bool IsOut() const volatile noexcept
 		{
 			return isOut;
