@@ -1,7 +1,6 @@
 module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
-#include <system_error>
 
 export module Net.Socket;
 import Utility;
@@ -160,6 +159,11 @@ export namespace net
 		inline ioError Listen(const int& backlog = constants::LISTEN_MAX) noexcept
 		{
 			return io::Execute(::listen, myHandle, backlog);
+		}
+
+		inline ioError BeginAccept(Socket& client)
+		{
+
 		}
 
 		inline ioError Recv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept

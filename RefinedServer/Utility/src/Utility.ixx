@@ -66,7 +66,16 @@ export namespace util
 	using ::std::move;
 	using ::std::forward;
 	using ::std::move_if_noexcept;
-	using ::std::addressof;
+	//using ::std::addressof;
+
+	template <class _Ty>
+	[[nodiscard]] __forceinline constexpr _Ty* addressof(_Ty& _Val) noexcept
+	{
+		return __builtin_addressof(_Val);
+	}
+
+	template <class _Ty>
+	const _Ty* addressof(const _Ty&&) = delete;
 
 	using ::std::is_constant_evaluated;
 	using ::std::copy;
