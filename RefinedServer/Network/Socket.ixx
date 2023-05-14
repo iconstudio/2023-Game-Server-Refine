@@ -216,7 +216,13 @@ export namespace net
 			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine);
 		}
 
+		[[nodiscard]]
 		constexpr const SOCKET& Handle() const& noexcept
+		{
+			return myHandle;
+		}
+
+		constexpr const volatile SOCKET& Handle() const volatile& noexcept
 		{
 			return myHandle;
 		}
@@ -224,6 +230,11 @@ export namespace net
 		constexpr SOCKET&& Handle() && noexcept
 		{
 			return static_cast<SOCKET&&>(myHandle);
+		}
+
+		constexpr volatile SOCKET&& Handle() volatile&& noexcept
+		{
+			return static_cast<volatile SOCKET&&>(myHandle);
 		}
 
 		constexpr bool IsValid() const noexcept
