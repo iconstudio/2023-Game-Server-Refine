@@ -67,7 +67,7 @@ void Framework::Awake()
 	gameSocket.Bind(gameEndPoint).else_then(OnError("서버의 UDP 주소를 지정하는데 실패했습니다."));
 
 	nameSocket.Listen().if_then([]() noexcept {
-		util::Println("서버의 수용을 시작합니다.");
+		util::Println("TCP 소켓에서 수용을 대기합니다.");
 	}).else_then(OnError("서버의 수용 시작 단계가 실패했습니다."));
 }
 
