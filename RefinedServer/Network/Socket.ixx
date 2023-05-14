@@ -164,9 +164,17 @@ export namespace net
 			return io::Execute(::listen, myHandle, backlog);
 		}
 
-		inline ioError BeginAccept(Socket& client)
+		inline ioError Accept(const Socket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
 		{
+			return Accept(client, buffer, util::addressof(context), util::addressof(result_bytes));
+		}
 
+		inline ioError Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
+		{
+			return io::ExecuteVia(CheckBool, ::AcceptEx
+				, myHandle, client.myHandle, buffer, 0UL
+				, abi::DEFAULT_ACCEPT_SIZE, abi::DEFAULT_ACCEPT_SIZE, result_bytes
+				, context);
 		}
 
 		inline ioError Recv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
