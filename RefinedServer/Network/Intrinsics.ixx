@@ -47,6 +47,18 @@ export namespace net
 		}
 	}
 
+	inline ioError CheckBool(const int& bool_fn_result) noexcept
+	{
+		if (0 == bool_fn_result)
+		{
+			return CheckPending();
+		}
+		else
+		{
+			return io::make_success();
+		}
+	}
+
 	export namespace io
 	{
 		template<typename Fn, typename... Args>
