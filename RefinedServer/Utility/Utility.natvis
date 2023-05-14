@@ -167,6 +167,10 @@
 		<DisplayString Condition="myStorage.mySize == 3">느슨한 모나드 {{ {"$T1"}, {"$T3"}, {"$T5"} }}</DisplayString>
 		<DisplayString Condition="myStorage.mySize == 4">느슨한 모나드 {{ {"$T1"}, {"$T3"}, {"$T5"}, {"$T7"} }}</DisplayString>
 		<DisplayString Condition="4 &lt; myStorage.mySize">느슨한 모나드 {{ {"$T1"}, {"$T3"}, {"$T5"}, {"$T7"}, ... }}</DisplayString>
+
+		<Expand HideRawView="true">
+			<ExpandedItem>myStorage</ExpandedItem>
+		</Expand>
 	</Type>
 	
 	<Type Name="util::LooseMonad&lt;*&gt;">

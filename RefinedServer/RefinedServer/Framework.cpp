@@ -28,7 +28,7 @@ public:
 		util::err::RaiseSystemError(std::move(error_code));
 
 #if _DEBUG
-		//std::unreachable();
+		std::unreachable();
 #endif // !_DEBUG
 	}
 
