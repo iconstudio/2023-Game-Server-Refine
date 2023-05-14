@@ -142,7 +142,9 @@ export namespace net
 
 		inline ioError Bind(const EndPoint& target) noexcept
 		{
-			return io::Execute(::bind, myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()).if_then([&, this]() {
+			return CheckIO(bind(myHandle
+				, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize())).if_then(
+				[&, this]() {
 				myAddress = target;
 			});
 		}
