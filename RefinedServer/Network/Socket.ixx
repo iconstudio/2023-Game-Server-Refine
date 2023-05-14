@@ -13,6 +13,9 @@ import Net.Promise;
 
 export namespace net
 {
+	using ::UINT_PTR;
+	using ::SOCKET;
+
 	enum SocketDatagram : int
 	{
 		Datagram = SOCK_DGRAM,
