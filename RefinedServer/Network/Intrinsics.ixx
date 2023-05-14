@@ -14,7 +14,7 @@ export namespace net
 		int error = debug::WSAGetLastError();
 		if (debug::CheckPending(error))
 		{
-			return io::make_defered();
+			return { io::make_defered() };
 		}
 		else
 		{
@@ -27,7 +27,7 @@ export namespace net
 		int error = debug::WSAGetLastError();
 		if (debug::CheckIncomplete(error))
 		{
-			return io::make_defered();
+			return { io::make_defered() };
 		}
 		else
 		{
