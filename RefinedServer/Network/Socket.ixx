@@ -209,12 +209,22 @@ export namespace net
 			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine);
 		}
 
-		inline constexpr bool IsValid() const noexcept
+		constexpr const SOCKET& Handle() const& noexcept
+		{
+			return myHandle;
+		}
+
+		constexpr SOCKET&& Handle() && noexcept
+		{
+			return static_cast<SOCKET&&>(myHandle);
+		}
+
+		constexpr bool IsValid() const noexcept
 		{
 			return myHandle != abi::InvalidSocket;
 		}
 
-		inline constexpr bool IsValid() const volatile noexcept
+		constexpr bool IsValid() const volatile noexcept
 		{
 			return myHandle != abi::InvalidSocket;
 		}
