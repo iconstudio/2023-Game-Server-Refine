@@ -12,7 +12,7 @@ Framework::Framework() noexcept
 	, acceptContext(Operation::ACCEPT), acceptBuffer(), accceptResultSize(0)
 	, nameSocket(), nameEndPoint()
 	, gameSocket(), gameEndPoint()
-	, everySession(), everyUser()
+	, userManager()
 {}
 
 class OnError
