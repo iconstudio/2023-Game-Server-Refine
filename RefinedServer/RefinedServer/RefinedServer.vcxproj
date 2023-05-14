@@ -214,7 +214,6 @@
   <ItemGroup>
     <ClInclude Include="Framework.hpp" />
     <ClInclude Include="pch.hpp" />
-    <ClInclude Include="Promise.hpp" />
     <ClInclude Include="stdafx.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +225,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Natvis Include="..\Network\Network.natvis" />
     <Natvis Include="..\Utility\Utility.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

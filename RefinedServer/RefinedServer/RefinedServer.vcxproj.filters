@@ -38,12 +38,12 @@
     <ClInclude Include="Framework.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Promise.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility\Utility.natvis">
+      <Filter>리소스 파일</Filter>
+    </Natvis>
+    <Natvis Include="..\Network\Network.natvis">
       <Filter>리소스 파일</Filter>
     </Natvis>
   </ItemGroup>

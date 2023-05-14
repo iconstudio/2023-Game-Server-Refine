@@ -33,4 +33,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)UserIdentifier.ixx" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)Network.natvis" />
+  </ItemGroup>
 </Project>
