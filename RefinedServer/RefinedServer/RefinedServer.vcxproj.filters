@@ -46,5 +46,8 @@
     <Natvis Include="..\Network\Network.natvis">
       <Filter>리소스 파일</Filter>
     </Natvis>
+    <Natvis Include="Server.natvis">
+      <Filter>리소스 파일</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

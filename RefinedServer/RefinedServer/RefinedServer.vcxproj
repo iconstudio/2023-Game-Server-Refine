@@ -227,6 +227,7 @@
   <ItemGroup>
     <Natvis Include="..\Network\Network.natvis" />
     <Natvis Include="..\Utility\Utility.natvis" />
+    <Natvis Include="Server.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
