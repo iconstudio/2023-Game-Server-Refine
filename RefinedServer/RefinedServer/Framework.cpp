@@ -56,26 +56,29 @@ void Framework::Awake()
 		nameSocket = std::move(socket);
 	}).else_then(OnError("서버의 TCP 소켓을 생성하는데 실패했습니다."));
 
-	nameEndPoint = EndPoint::CreateStaticTCP(AddressFamily::IPv4, serverPort);
+	nameEndPoint = EndPoint::CreateStaticTCP(AddressFamily::IPv4, tcpPort);
 	nameSocket.Bind(nameEndPoint).else_then(OnError("서버의 주소를 지정하는데 실패했습니다."));
 
 	Socket::CreateUDP().if_then([this](Socket&& socket) noexcept {
 		gameSocket = std::move(socket);
 	}).else_then(OnError("서버의 UDP 소켓을 생성하는데 실패했습니다."));
 
+	gameEndPoint = EndPoint::CreateStaticUDP(AddressFamily::IPv4, udpPort);
+	gameSocket.Bind(gameEndPoint).else_then(OnError("서버의 UDP 주소를 지정하는데 실패했습니다."));
+
 	nameSocket.Listen().if_then([]() noexcept {
 		util::Println("서버의 수용을 시작합니다.");
 	}).else_then(OnError("서버의 수용 시작 단계가 실패했습니다."));
-
-	auto test_socket = Socket::CreateTCP();
-
-	nameSocket.Accept(*test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize)
-		.else_then(OnError("첫번째 비동기 수용 단계가 실패했습니다."));
 }
 
 void Framework::Start() noexcept
 {
 	util::Println("서버를 시작합니다...");
+
+	auto test_socket = Socket::CreateTCP();
+
+	nameSocket.Accept(*test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize)
+		.else_then(OnError("첫번째 비동기 수용 단계가 실패했습니다."));
 }
 
 void Framework::Update() noexcept
