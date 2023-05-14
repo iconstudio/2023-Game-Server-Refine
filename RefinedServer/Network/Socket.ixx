@@ -4,7 +4,7 @@ module;
 
 export module Net.Socket;
 import Utility;
-import Utility.Error;
+import Utility.Option;
 import Net;
 import Net.EndPoint;
 import Net.Context;
@@ -142,8 +142,8 @@ export namespace net
 
 		inline ioError Bind(const EndPoint& target) noexcept
 		{
-			return CheckIO(bind(myHandle
-				, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()));
+			return io::Execute(::bind, myHandle
+				, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize());
 		}
 
 		inline ioError Connect(const EndPoint& target) noexcept
@@ -284,7 +284,7 @@ export namespace net
 #else // _DEBUG
 			return Socket{ abi::CreateRawUDP(type) };
 #endif // !_DEBUG
-	}
+		}
 
 		Socket(const Socket& other) = delete;
 		Socket(const volatile Socket& other) = delete;
@@ -307,5 +307,5 @@ export namespace net
 		volatile bool isOut;
 		SOCKET myHandle;
 		EndPoint myAddress, myEndPoint;
-};
+	};
 }
