@@ -15,12 +15,12 @@
 		<DisplayString>배열 &lt;{&quot;$T1&quot;}, {$T2}&gt;</DisplayString>
 
 		<Expand HideRawView="true">
-			<Synthetic Name="자료형">
-				<DisplayString>{__AcqType()}</DisplayString>
+			<Synthetic Name="[자료형]">
+				<DisplayString>{"$T1"}</DisplayString>
 			</Synthetic>
-			<Item Name="길이">__AcqLen()</Item>
+			<Item Name="[길이]">__AcqLen()</Item>
 
-			<Synthetic Name="버퍼">
+			<Synthetic Name="[버퍼]">
 				<DisplayString>첫 원소 10개</DisplayString>
 				<Expand>
 					<Synthetic Name="원소 [0]" Condition="0 &lt; $T2">
@@ -89,7 +89,7 @@
 				</Expand>
 			</Synthetic>
 
-			<Synthetic Name="버퍼" Condition="10 &lt; $T2">
+			<Synthetic Name="[버퍼]" Condition="10 &lt; $T2">
 				<DisplayString>(나머지 원소 {$T2 - 10}개)</DisplayString>
 
 				<Expand>
@@ -111,7 +111,7 @@
 
 		<DisplayString>항등원 {__UnwrapTy()}</DisplayString>
 		<Expand HideRawView="true">
-			<Item Name="값">myValue</Item>
+			<Item Name="[값]">myValue</Item>
 		</Expand>
 	</Type>
 
@@ -133,12 +133,12 @@
 
 		<Expand HideRawView="true">
 			<ExpandedItem Condition="__HasValue()">myValue</ExpandedItem>
-			<Item Name="크기">mySize</Item>
-			<Item Name="순서">myPlace</Item>
-			<Item Name="확장 노드" Condition="__IsExtended()">_Tail</Item>
-			<Item Name="노드 순서">__AcqPlace()</Item>
-			<Item Name="소유 여부">__HasValue()</Item>
-			<Item Name="확장 여부">__IsExtended()</Item>
+			<Item Name="[크기]">mySize</Item>
+			<Item Name="[순서]">myPlace</Item>
+			<Item Name="[확장]" Condition="__IsExtended()">_Tail</Item>
+			<Item Name="[노드 순서]">__AcqPlace()</Item>
+			<Item Name="[소유 여부]">__HasValue()</Item>
+			<Item Name="[확장 여부]">__IsExtended()</Item>
 
 			<Synthetic Name="다음 노드" Optional="true">
 				<DisplayString>{_Tail}</DisplayString>

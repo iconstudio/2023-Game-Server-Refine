@@ -1,3 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?> 
-<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010"> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="net::CompletionPort">
+		<DisplayString>완료 포트 {{ 핸들 = {static_cast&lt;unsigned long long&gt;(rawHandle)} }}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Name="[핸들]">rawHandle</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="::_OVERLAPPED" Inheritable="false">
+		<DisplayString Condition="Offset != 0, OffsetHigh != 0">동기화 구조체 (오프셋={Offset}, 최고 오프셋={OffsetHigh})</DisplayString>
+		<DisplayString Condition="Offset == 0, OffsetHigh == 0">동기화 구조체 (오프셋={Offset}, 최고 오프셋={OffsetHigh})</DisplayString>
+	</Type>
+
+	<Type Name="net::Context" Inheritable="false">
+		<Intrinsic Category="Property" Name="__Op" Expression="myOperation"/>
+
+		<DisplayString>문맥 객체 {{ 명령 = {__Op()} }}</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="[명령]">__Op()</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="net::Socket">
+		<DisplayString>소켓 {{ 핸들 = {myHandle} }}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Name="[핸들]">myHandle</Item>
+			<Item Name="[임시 소켓]">isOut</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="net::Address">
+		<Intrinsic Category="Property" Name="is_static" Expression="isStatic"/>
+
+		<DisplayString ExcludeView="noparens" Condition="!is_static()">동적 주소 {addressFamily}, {protocolType}</DisplayString>
+		<DisplayString ExcludeView="noparens" Condition="is_static()">고정 주소 {addressFamily}, {protocolType}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Name="[주소 패밀리]">addressFamily</Item>
+			<Item Name="[통신규약]">protocolType</Item>
+			<Item Name="[IP 주소]" Condition="!is_static()">myIP</Item>
+			<Item Name="[포트 번호]">myPort</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="net::EndPoint">
+		<Intrinsic Category="Data" Name="__GetAddr" Expression="endPoint.sin_addr.S_un"/>
+		<Intrinsic Category="Property" Name="__GetAddrNum" Expression="endPoint.sin_addr.S_un.S_addr"/>
+		<Intrinsic Category="Property" Name="__HasAddrNum" Expression="0 != endPoint.sin_addr.S_un.S_addr"/>
+		<Intrinsic Category="Property" Name="__GetFamily" Expression="endPoint.sin_family"/>
+		<Intrinsic Category="Property" Name="__GetPort" Expression="endPoint.sin_port"/>
+
+		<DisplayString>지정 주소 {{ 패밀리={__GetFamily()}, 포트={__GetPort()} }}</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="[주소]" Condition="!__HasAddrNum()">__GetAddr()</Item>
+			<Item Name="[주소]" Condition="__HasAddrNum()">__GetAddrNum()</Item>
+			<Item Name="[패밀리]">__GetFamily()</Item>
+			<Item Name="[포트]">__GetPort()</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="net::Promise&lt;*&gt;">
+		<AlternativeType Name="net::Promise&lt;*&gt;*"/>
+		<DisplayString>프로미스 &lt;{"$T1"}, {"$T2"}&gt;</DisplayString>
+
+		<Expand>
+			<Synthetic Name="[값 자료형]">
+				<DisplayString>{"$T1"}</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[오류 자료형]">
+				<DisplayString>{"$T2"}</DisplayString>
+			</Synthetic>
+			<ExpandedItem>myState</ExpandedItem>
+		</Expand>
+	</Type>
 </AutoVisualizer>
