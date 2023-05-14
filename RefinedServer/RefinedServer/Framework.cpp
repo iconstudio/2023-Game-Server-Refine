@@ -15,6 +15,26 @@ Framework::Framework() noexcept
 	, everySession(), everyUser()
 {}
 
+class OnError
+{
+public:
+	constexpr OnError(util::string_view msg) noexcept
+		: myMsg(msg)
+	{}
+
+	void operator()(int&& error_code)
+	{
+		util::Println("{} (오류 코드: {})", myMsg, error_code);
+		util::err::RaiseSystemError(std::move(error_code));
+
+#if _DEBUG
+		//std::unreachable();
+#endif // !_DEBUG
+	}
+
+	util::string_view myMsg;
+};
+
 void Framework::Awake()
 {
 	util::Println("서버를 초기화하는 중...");
@@ -22,7 +42,7 @@ void Framework::Awake()
 	const int result_startup = Startup();
 	if (result_startup != 0)
 	{
-		util::Println("WSAStartup에 실패했습니다. 오류 코드: {}", std::move(result_startup));
+		util::Println("WSAStartup에 실패했습니다. (오류 코드: {})", std::move(result_startup));
 
 		util::err::RaiseSystemError(result_startup);
 	}
@@ -30,47 +50,22 @@ void Framework::Awake()
 	CompletionPort::Establish(concurrentHint).if_then(
 		[this](CompletionPort&& port) noexcept {
 		ioPort = std::move(port);
-	}).else_then([this](int&& error_code) {
-		util::Println("IOCP를 생성하는데 실패했습니다. 오류 코드: {}", error_code);
-		util::err::RaiseSystemError(std::move(error_code));
-
-#if !_DEBUG
-		return;
-#endif // !_DEBUG
-	});
+	}).else_then(OnError("IOCP를 생성하는데 실패했습니다."));
 
 	Socket::CreateTCP().if_then([this](Socket&& socket) noexcept {
 		nameSocket = std::move(socket);
-	}).else_then([](int&& error_code) {
-		util::Println("서버의 TCP 소켓을 생성하는데 실패했습니다. 오류 코드: {}", error_code);
-		util::err::RaiseSystemError(std::move(error_code));
+	}).else_then(OnError("서버의 TCP 소켓을 생성하는데 실패했습니다."));
 
-#if !_DEBUG
-		return;
-#endif // !_DEBUG
-	});
+	nameEndPoint = EndPoint::CreateStaticTCP(AddressFamily::IPv4, serverPort);
+	nameSocket.Bind(nameEndPoint).else_then(OnError("서버의 UDP 소켓을 생성하는데 실패했습니다."));
 
 	Socket::CreateUDP().if_then([this](Socket&& socket) noexcept {
 		gameSocket = std::move(socket);
-	}).else_then([](int&& error_code) {
-		util::Println("서버의 UDP 소켓을 생성하는데 실패했습니다. 오류 코드: {}", error_code);
-		util::err::RaiseSystemError(std::move(error_code));
-
-#if !_DEBUG
-		return;
-#endif // !_DEBUG
-	});
+	}).else_then(OnError("서버의 UDP 소켓을 생성하는데 실패했습니다."));
 
 	nameSocket.Listen().if_then([]() noexcept {
 		util::Println("서버의 수용을 시작합니다.");
-	}).else_then([](int&& error_code) {
-		util::Println("서버의 수용 시작 단계가 실패했습니다. 오류 코드: {}", error_code);
-		util::err::RaiseSystemError(std::move(error_code));
-
-#if !_DEBUG
-		return;
-#endif // !_DEBUG
-	});
+	}).else_then(OnError("서버의 수용 시작 단계가 실패했습니다."));
 
 	nameSocket.Accept(gameSocket, acceptBuffer, acceptContext, accceptResultSize).else_then(
 		[](int&& error_code) {
