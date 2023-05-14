@@ -9,6 +9,7 @@ using namespace net;
 Framework::Framework() noexcept
 	: Singleton(this)
 	, ioPort()
+	, acceptContext(Operation::ACCEPT), acceptBuffer(), accceptResultSize(0)
 	, nameSocket(), nameEndPoint()
 	, gameSocket(), gameEndPoint()
 	, everySession(), everyUser()

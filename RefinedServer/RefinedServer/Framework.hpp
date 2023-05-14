@@ -5,6 +5,7 @@ import Utility.Singleton;
 import Utility.Array;
 import Net;
 import Net.EndPoint;
+import Net.Context;
 import Net.Socket;
 import Net.CompletionPort;
 import Net.Promise;
@@ -51,6 +52,11 @@ private:
 	net::Proxy Close(net::Socket& socket) noexcept;
 
 	net::CompletionPort ioPort;
+
+	net::Context acceptContext;
+	char acceptBuffer[64];
+	unsigned long accceptResultSize;
+
 	net::Socket nameSocket;
 	net::EndPoint nameEndPoint;
 	net::Socket gameSocket;
