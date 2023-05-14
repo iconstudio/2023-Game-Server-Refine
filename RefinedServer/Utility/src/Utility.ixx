@@ -78,6 +78,8 @@ export namespace util
 	const _Ty* addressof(const _Ty&&) = delete;
 
 	using ::std::is_constant_evaluated;
+	using ::std::unreachable;
+
 	using ::std::copy;
 	using ::std::copy_n;
 	using ::std::uninitialized_copy;

@@ -28,7 +28,7 @@ public:
 		util::err::RaiseSystemError(std::move(error_code));
 
 #if _DEBUG
-		std::unreachable();
+		//std::unreachable();
 #endif // !_DEBUG
 	}
 
@@ -43,6 +43,8 @@ void Framework::Awake()
 	if (result_startup != 0)
 	{
 		OnError("WSAStartup에 실패했습니다.")(std::move(result_startup));
+
+		util::unreachable();
 	}
 
 	CompletionPort::Establish(concurrentHint).if_then(
