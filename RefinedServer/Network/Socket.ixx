@@ -79,7 +79,7 @@ export namespace net
 		using ::RIO_RQ;
 		using ::PRIO_RQ;
 
-		inline constexpr unsigned long DEFAULT_ACCEPT_BUFFER_SIZE = sizeof(SOCKADDR_IN) + 16;
+		inline constexpr unsigned long DEFAULT_ACCEPT_SIZE = sizeof(SOCKADDR_IN) + 16UL;
 		inline constexpr ::SOCKET InvalidSocket = INVALID_SOCKET;
 
 		[[nodiscard]]
