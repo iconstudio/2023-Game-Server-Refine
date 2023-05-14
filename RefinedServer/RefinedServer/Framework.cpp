@@ -39,12 +39,10 @@ void Framework::Awake()
 {
 	util::Println("서버를 초기화하는 중...");
 
-	const int result_startup = Startup();
+	int result_startup = Startup();
 	if (result_startup != 0)
 	{
-		util::Println("WSAStartup에 실패했습니다. (오류 코드: {})", std::move(result_startup));
-
-		util::err::RaiseSystemError(result_startup);
+		OnError("WSAStartup에 실패했습니다.")(std::move(result_startup));
 	}
 
 	CompletionPort::Establish(concurrentHint).if_then(
