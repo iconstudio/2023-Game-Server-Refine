@@ -98,16 +98,42 @@ export namespace net
 
 	class [[nodiscard]] Socket
 	{
+		struct init_t {};
+
+		constexpr Socket(init_t) noexcept
+		{
+			optDebug.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Debug, flag);
+			});
+
+			optReuseAddress.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Recyclable, flag);
+			});
+
+			optDontRoute.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::DontRoute, flag);
+			});
+
+			optBroadcast.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Broadcast, flag);
+			});
+
+			optUseLoopback.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::UseLoopback, flag);
+			});
+		}
+
 	public:
 		constexpr Socket() noexcept
-			: isOut(false), myHandle(abi::InvalidSocket)
-			, myAddress(), myEndPoint()
+			: Socket(init_t{})
 		{}
 
 		constexpr Socket(Socket&& other) noexcept
-			: isOut(false), myHandle(static_cast<::SOCKET&&>(other.myHandle))
-			, myAddress(util::move(other.myAddress)), myEndPoint(util::move(other.myEndPoint))
+			: Socket(init_t{})
 		{
+			myHandle = static_cast<::SOCKET&&>(other.myHandle);
+			myAddress = util::move(other.myAddress);
+			myEndPoint = util::move(other.myEndPoint);
 			other.isOut = true;
 		}
 
@@ -331,8 +357,8 @@ export namespace net
 			return isOut;
 		}
 
-		volatile bool isOut;
-		SOCKET myHandle;
-		EndPoint myAddress, myEndPoint;
+		volatile bool isOut{ false };
+		SOCKET myHandle{ abi::InvalidSocket };
+		EndPoint myAddress{}, myEndPoint{};
 	};
 }
