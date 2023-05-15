@@ -304,11 +304,6 @@ export namespace net
 				return WSAGetLastError();
 			}
 
-			if (type == SocketType::SoFlagOverlapped)
-			{
-				//::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
-			}
-
 			BOOL option = TRUE;
 			::setsockopt(socket, SOL_SOCKET, SO_DEBUG, reinterpret_cast<char*>(&option), sizeof(option));
 
@@ -328,11 +323,6 @@ export namespace net
 			if (socket == abi::InvalidSocket)
 			{
 				return WSAGetLastError();
-			}
-
-			if (type == SocketType::SoFlagOverlapped)
-			{
-				//::setsockopt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, reinterpret_cast<char*>(&socket), sizeof(socket));
 			}
 
 			BOOL option = TRUE;
