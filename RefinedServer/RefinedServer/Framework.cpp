@@ -10,10 +10,9 @@ using namespace ::core;
 Framework::Framework() noexcept
 	: Singleton(this)
 	, ioPort()
-	, acceptContext(Operation::ACCEPT), acceptBuffer(), accceptResultSize(0)
 	, nameSocket(), nameEndPoint()
 	, gameSocket(), gameEndPoint()
-	, userManager()
+	, userManager(nameSocket)
 {}
 
 class OnError
@@ -96,8 +95,6 @@ void Framework::Start() noexcept
 		util::Println("TCP 소켓에서 수용을 대기합니다.");
 	}).else_then(OnError("서버의 수용 시작 단계가 실패했습니다."));
 
-	BeginAccept(userid_t::begin).else_then(OnError("첫번째 비동기 수용 단계가 실패했습니다."));
-
 	userManager.Start();
 }
 
@@ -119,9 +116,6 @@ void Framework::UpdateOnce(const float& delta_time) noexcept
 
 ioError Framework::BeginAccept(const userid_t& start)
 {
-	auto test_socket = Socket::CreateTCP();
-
-	return nameSocket.Accept(*test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize);
 }
 
 void Framework::EndAccept() noexcept

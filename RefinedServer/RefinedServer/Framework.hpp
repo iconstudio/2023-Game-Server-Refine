@@ -60,10 +60,6 @@ private:
 	net::Socket nameSocket;
 	net::EndPoint nameEndPoint;
 
-	net::Context acceptContext;
-	char acceptBuffer[64];
-	unsigned long accceptResultSize;
-
 	net::Socket gameSocket;
 	net::EndPoint gameEndPoint;
 

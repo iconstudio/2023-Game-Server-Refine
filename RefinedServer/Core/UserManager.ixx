@@ -15,14 +15,21 @@ export namespace core::service
 		static inline constexpr size_t maxNPCs = maxSessions - maxUsers;
 
 	public:
-		UserManager() noexcept;
+		UserManager(net::Socket& listener) noexcept;
 		~UserManager() noexcept;
 
 		void Awake();
 		void Start() noexcept;
 
+	private:
+		net::Socket& nameListener;
+
 		util::Array<BasicUser*, maxSessions> everySession;
 		util::Array<User*, maxUsers> everyUser;
 		util::Array<BasicUser*, maxNPCs> everyNPCs;
+
+		net::Context acceptContext;
+		char acceptBuffer[64];
+		unsigned long accceptResultSize;
 	};
 }
