@@ -114,19 +114,13 @@ export namespace util
 		using OptHandler = std::function<void(const InternalOpt& option)>;
 
 		constexpr Option() noexcept
-			: myOption()
-			, myHandlers(8ULL)
+			: myHandlers(8ULL)
 		{}
 
-		constexpr Option(const InternalOpt init) noexcept(nothrow_copy_constructibles<InternalOpt>)
-			: myOption(init)
-			, myHandlers(8ULL)
-		{}
-
-		constexpr Option(const InternalOpt init, const OptHandler handler) noexcept(nothrow_copy_constructibles<InternalOpt>)
-			: Option(init)
+		constexpr Option(const std::initializer_list<OptHandler> handler) noexcept
+			: Option()
 		{
-			myHandlers.push_back(handler);
+			myHandlers.append_range(handler);
 		}
 
 		constexpr ~Option() noexcept
@@ -137,62 +131,17 @@ export namespace util
 
 		constexpr Option& operator=(const InternalOpt& option) noexcept
 		{
-			if (option != myOption)
+			for (OptHandler& handler : myHandlers)
 			{
-				for (OptHandler& handler : myHandlers)
-				{
-					handler(option);
-				}
-
-				myOption = option;
+				handler(option);
 			}
 
 			return *this;
 		}
 
-		constexpr InternalOpt& operator*() & noexcept
-		{
-			return myOption;
-		}
-
-		constexpr const InternalOpt& operator*() const& noexcept
-		{
-			return myOption;
-		}
-
-		constexpr InternalOpt&& operator*() && noexcept
-		{
-			return util::move(myOption);
-		}
-
-		constexpr const InternalOpt&& operator*() const&& noexcept
-		{
-			return util::move(myOption);
-		}
-
 		constexpr void AddListener(const OptHandler handler) noexcept
 		{
 			myHandlers.push_back(handler);
-		}
-
-		constexpr InternalOpt& Get() & noexcept
-		{
-			return myOption;
-		}
-
-		constexpr const InternalOpt& Get() const& noexcept
-		{
-			return myOption;
-		}
-
-		constexpr InternalOpt&& Get() && noexcept
-		{
-			return util::move(myOption);
-		}
-
-		constexpr const InternalOpt&& Get() const&& noexcept
-		{
-			return util::move(myOption);
 		}
 
 		Option(const Option&) = delete;
@@ -201,7 +150,6 @@ export namespace util
 		constexpr Option& operator=(Option&&) noexcept = default;
 
 	private:
-		InternalOpt myOption;
 		std::vector<OptHandler> myHandlers;
 	};
 }
