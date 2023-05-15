@@ -1,5 +1,6 @@
 module;
 #include <exception>
+#include <string_view>
 
 module Core.UserManager;
 import Utility;
