@@ -111,7 +111,7 @@ export namespace util
 	class Option<InternalOpt&>
 	{
 	public:
-		using OptHandler = std::function<void(const InternalOpt& option)>;
+		using OptHandler = std::function<void(InternalOpt& option)>;
 
 		constexpr Option() noexcept
 			: myHandlers(8ULL)
