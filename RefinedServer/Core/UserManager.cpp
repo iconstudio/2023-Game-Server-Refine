@@ -59,8 +59,18 @@ void UserManager::Awake()
 
 void UserManager::Start() noexcept
 {
+	BeginAccept(userid_t::begin).else_then(OnError("첫번째 비동기 수용 단계가 실패했습니다."));
+}
+
+net::ioError core::service::UserManager::BeginAccept(const core::userid_t& start)
+{
 	auto test_socket = Socket::CreateTCP();
 
-	//BeginAccept(userid_t::begin).else_then(OnError("첫번째 비동기 수용 단계가 실패했습니다."));
-	nameListener.Accept(*test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize);
+	return nameListener.Accept(*test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize);
 }
+
+void core::service::UserManager::EndAccept() noexcept
+{}
+
+void core::service::UserManager::EndFailedAccept() noexcept
+{}

@@ -3,6 +3,7 @@ import Utility;
 import Utility.Singleton;
 import Utility.Array;
 import Net.Socket;
+import Net.Intrinsics;
 import Core.User;
 import Core.User.Basic;
 
@@ -20,6 +21,10 @@ export namespace core::service
 
 		void Awake();
 		void Start() noexcept;
+
+		net::ioError BeginAccept(const core::userid_t& start);
+		void EndAccept() noexcept;
+		void EndFailedAccept() noexcept;
 
 	private:
 		net::Socket& nameListener;

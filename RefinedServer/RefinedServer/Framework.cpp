@@ -116,13 +116,18 @@ void Framework::UpdateOnce(const float& delta_time) noexcept
 
 ioError Framework::BeginAccept(const userid_t& start)
 {
+	return userManager.BeginAccept(start);
 }
 
 void Framework::EndAccept() noexcept
-{}
+{
+	userManager.EndAccept();
+}
 
 void Framework::EndFailedAccept() noexcept
-{}
+{
+	userManager.EndFailedAccept();
+}
 
 Proxy Framework::BeginWelcome()
 {
