@@ -6,9 +6,7 @@ module Core.UserManager;
 import Utility;
 import Utility.Error;
 import Utility.Print;
-import Net.User.Identifier;
-
-using namespace ::net;
+import Core.User.Identifier;
 
 core::UserManager::UserManager() noexcept
 	: Singleton(this)
@@ -27,7 +25,7 @@ void core::UserManager::Awake()
 	{
 		for (auto& session : everyUser)
 		{
-			session = new net::User(user_id++);
+			session = new User(user_id++);
 
 			everySession[index++] = session;
 		}
@@ -42,7 +40,7 @@ void core::UserManager::Awake()
 	{
 		for (auto& session : everyNPCs)
 		{
-			session = new net::BasicUser(user_id++);
+			session = new BasicUser(user_id++);
 
 			everySession[index++] = session;
 		}

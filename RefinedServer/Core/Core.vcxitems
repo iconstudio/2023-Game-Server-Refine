@@ -15,6 +15,12 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Asynchron.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PacketIdentifier.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)UserIdentifier.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)UserManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)UserManager.ixx" />
   </ItemGroup>

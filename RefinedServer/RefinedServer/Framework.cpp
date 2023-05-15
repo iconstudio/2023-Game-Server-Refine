@@ -4,7 +4,8 @@
 import Utility.Print;
 import Utility.Error;
 
-using namespace net;
+using namespace ::net;
+using namespace ::core;
 
 Framework::Framework() noexcept
 	: Singleton(this)

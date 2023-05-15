@@ -1,10 +1,10 @@
-export module Net.User.Basic;
-import Net.Session;
+export module Core.User.Basic;
 import Net.Socket;
-import Net.Session.Asynchron;
-export import Net.User.Identifier;
+import Core.Session;
+import Core.Asynchron;
+export import Core.User.Identifier;
 
-export namespace net
+export namespace core
 {
 	class [[nodiscard]] BasicUser
 		: public Asynchron<BasicUser, userid_t>

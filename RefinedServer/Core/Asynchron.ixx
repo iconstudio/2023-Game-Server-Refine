@@ -1,14 +1,14 @@
-export module Net.Session.Asynchron;
+export module Core.Asynchron;
 import Utility;
 import Net.Context;
-import Net.Session;
+import Core.Session;
 
-export namespace net
+export namespace core
 {
 	template<typename T, session_identifiers ID>
 	class Asynchron
 		: public Session<T, ID>
-		, public Context
+		, public net::Context
 	{
 	public:
 		using base = Session<T, ID>;

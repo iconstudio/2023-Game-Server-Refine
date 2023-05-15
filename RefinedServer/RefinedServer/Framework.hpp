@@ -9,7 +9,7 @@ import Net.Context;
 import Net.Socket;
 import Net.CompletionPort;
 import Net.Intrinsics;
-import Net.User;
+import Core.User;
 import Core.UserManager;
 
 class [[nodiscard]] Framework : util::Singleton<Framework>
@@ -31,7 +31,7 @@ public:
 	void Update() noexcept;
 	void UpdateOnce(const float& delta_time) noexcept;
 
-	net::ioError BeginAccept(const net::userid_t& start);
+	net::ioError BeginAccept(const core::userid_t& start);
 	void EndAccept() noexcept;
 	void EndFailedAccept() noexcept;
 
@@ -43,7 +43,7 @@ public:
 	void EndDispose() noexcept;
 	void EndFailedDispose() noexcept;
 
-	net::Proxy Dispose(net::User* const& user);
+	net::Proxy Dispose(core::User* const& user);
 
 	bool Poll() noexcept;
 	bool Post() noexcept;

@@ -4,9 +4,9 @@ module;
 #include <istream>
 #include <format>
 #include <limits>
-export module Net.User.Identifier;
+export module Core.User.Identifier;
 
-export namespace net
+export namespace core
 {
 	inline consteval unsigned long long GetMaxUsers() noexcept
 	{
@@ -91,9 +91,9 @@ export namespace net
 
 export namespace std
 {
-	inline string to_string(const net::userid_t& pid) noexcept
+	inline string to_string(const core::userid_t& pid) noexcept
 	{
-		if (net::userid_t::invalid == pid)
+		if (core::userid_t::invalid == pid)
 		{
 			return "Invalid ID";
 		}
@@ -103,22 +103,22 @@ export namespace std
 		}
 	}
 
-	inline ostream& operator<<(ostream& stream, const net::userid_t& pid) noexcept
+	inline ostream& operator<<(ostream& stream, const core::userid_t& pid) noexcept
 	{
 		return stream << to_string(pid);
 	}
 
-	inline istream& operator>>(istream& stream, net::userid_t& pid) noexcept
+	inline istream& operator>>(istream& stream, core::userid_t& pid) noexcept
 	{
 		unsigned int buffer{};
 		stream >> buffer;
 
-		pid = static_cast<net::userid_t>(buffer);
+		pid = static_cast<core::userid_t>(buffer);
 		return stream;
 	}
 	
 	template<>
-	struct formatter<net::userid_t>
+	struct formatter<core::userid_t>
 	{
 		inline format_parse_context::iterator parse(format_parse_context& context) const noexcept
 		{
@@ -126,7 +126,7 @@ export namespace std
 		}
 
 		template<int = 0>
-		inline auto format(const net::userid_t& id, format_context& context) const noexcept
+		inline auto format(const core::userid_t& id, format_context& context) const noexcept
 		{
 			return std::format_to(context.out(), "ID<{}>", to_string(id));
 		}

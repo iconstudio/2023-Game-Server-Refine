@@ -2,12 +2,12 @@ module;
 #include <type_traits>
 #include <concepts>
 
-export module Net.Session;
+export module Core.Session;
 import Utility;
 import Utility.Constraints;
 import Utility.Atomic;
 
-namespace net
+namespace core
 {
 	namespace detail
 	{
@@ -53,7 +53,7 @@ namespace net
 	};
 }
 
-export namespace net
+export namespace core
 {
 	template<typename ID>
 	concept session_identifiers = managed_session_items<ID>;
@@ -253,7 +253,7 @@ export namespace net
 }
 
 #pragma warning(push, 1)
-namespace net::test
+namespace core::test
 {
 	enum TestIDEN1
 	{

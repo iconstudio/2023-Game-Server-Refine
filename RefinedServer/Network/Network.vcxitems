@@ -16,22 +16,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Asynchron.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CompletionPort.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Context.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Intrinsics.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IoState.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Operations.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)PacketIdentifier.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Settings.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Socket.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)UserIdentifier.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)Network.natvis" />

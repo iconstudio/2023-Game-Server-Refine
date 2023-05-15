@@ -3,8 +3,8 @@ import Utility;
 import Utility.Singleton;
 import Utility.Array;
 import Net.Socket;
-import Net.User;
-import Net.User.Basic;
+import Core.User;
+import Core.User.Basic;
 
 export namespace core
 {
@@ -21,8 +21,8 @@ export namespace core
 		void Awake();
 		void Start() noexcept;
 
-		util::Array<net::BasicUser*, maxSessions> everySession;
-		util::Array<net::User*, maxUsers> everyUser;
-		util::Array<net::BasicUser*, maxNPCs> everyNPCs;
+		util::Array<BasicUser*, maxSessions> everySession;
+		util::Array<User*, maxUsers> everyUser;
+		util::Array<BasicUser*, maxNPCs> everyNPCs;
 	};
 }
