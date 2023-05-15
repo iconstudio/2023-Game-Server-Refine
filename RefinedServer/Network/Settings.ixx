@@ -9,9 +9,7 @@ using namespace std::chrono_literals;
 
 export namespace net::constants
 {
-	inline constexpr std::string_view VERSION = "0.0.2";
-
-	inline constexpr unsigned long long BUFFSIZE = 512ULL;
+	inline constexpr std::string_view VERSION = "0.0.1";
 
 	inline constexpr unsigned long long SERVER_ID = 0xffff;
 	inline constexpr unsigned short SERVER_PORT = 54000ULL;
@@ -19,7 +17,6 @@ export namespace net::constants
 	inline constexpr unsigned short GAME_PORT_LAST = GAME_PORT_FIRST + 100;
 
 	inline constexpr int LISTEN_MAX = 1000000;
-	inline constexpr unsigned long long WORKERS_COUNT = 6ULL;
 
 	inline constexpr milliseconds UPDATE_INTERVAL = milliseconds(45);
 }
