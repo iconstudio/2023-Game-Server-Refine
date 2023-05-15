@@ -1,5 +1,6 @@
 module;
 #include <vector>
+#include <functional>
 
 export module Utility.Option;
 import Utility;
@@ -10,14 +11,14 @@ export namespace util
 	class Option
 	{
 	public:
-		using OptHandler = void(*)(const InternalOpt& option);
+		using OptHandler = std::function<void(const InternalOpt& option)>;
 
 		constexpr Option(const InternalOpt init) noexcept
 			: myOption(init)
 			, myHandlers(8)
 		{}
 
-		constexpr Option(const InternalOpt init, OptHandler handler) noexcept
+		constexpr Option(const InternalOpt init, const OptHandler handler) noexcept
 			: Option(init)
 		{
 			myHandlers.push_back(handler);
@@ -44,26 +45,6 @@ export namespace util
 			return *this;
 		}
 
-		constexpr InternalOpt& get() & noexcept
-		{
-			return myOption;
-		}
-
-		constexpr const InternalOpt& get() const& noexcept
-		{
-			return myOption;
-		}
-
-		constexpr InternalOpt&& get() && noexcept
-		{
-			return util::move(myOption);
-		}
-
-		constexpr const InternalOpt&& get() const&& noexcept
-		{
-			return util::move(myOption);
-		}
-
 		constexpr InternalOpt& operator*() & noexcept
 		{
 			return myOption;
@@ -80,6 +61,31 @@ export namespace util
 		}
 
 		constexpr const InternalOpt&& operator*() const&& noexcept
+		{
+			return util::move(myOption);
+		}
+
+		constexpr void AddListener(const OptHandler handler) noexcept
+		{
+			myHandlers.push_back(handler);
+		}
+
+		constexpr InternalOpt& Get() & noexcept
+		{
+			return myOption;
+		}
+
+		constexpr const InternalOpt& Get() const& noexcept
+		{
+			return myOption;
+		}
+
+		constexpr InternalOpt&& Get() && noexcept
+		{
+			return util::move(myOption);
+		}
+
+		constexpr const InternalOpt&& Get() const&& noexcept
 		{
 			return util::move(myOption);
 		}
