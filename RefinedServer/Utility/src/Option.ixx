@@ -16,17 +16,20 @@ export namespace util
 
 		constexpr Option() noexcept
 			: myOption()
-			, myHandlers(8ULL)
-		{}
+			, myHandlers()
+		{
+			myHandlers.reserve(4);
+		}
 
 		constexpr Option(const InternalOpt init) noexcept(nothrow_copy_constructibles<InternalOpt>)
 			: myOption(init)
-			, myHandlers(8ULL)
+			, myHandlers()
 		{}
 
 		constexpr Option(const InternalOpt init, const OptHandler handler) noexcept(nothrow_copy_constructibles<InternalOpt>)
 			: Option(init)
 		{
+			myHandlers.reserve(4);
 			myHandlers.push_back(handler);
 		}
 
@@ -114,8 +117,10 @@ export namespace util
 		using OptHandler = std::function<void(InternalOpt& option)>;
 
 		constexpr Option() noexcept
-			: myHandlers(8ULL)
-		{}
+			: myHandlers()
+		{
+			myHandlers.reserve(4);
+		}
 
 		constexpr Option(const std::initializer_list<OptHandler> handler) noexcept
 			: Option()
