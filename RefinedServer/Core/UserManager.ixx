@@ -11,8 +11,8 @@ export namespace core::service
 {
 	class UserManager : util::Singleton<UserManager>
 	{
-		static inline constexpr size_t maxSessions = 3000;
-		static inline constexpr size_t maxUsers = 1000;
+		static inline constexpr size_t maxSessions = GetMaxSessions();
+		static inline constexpr size_t maxUsers = GetMaxUsers();
 		static inline constexpr size_t maxNPCs = maxSessions - maxUsers;
 
 	public:

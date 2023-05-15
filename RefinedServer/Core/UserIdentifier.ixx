@@ -8,6 +8,15 @@ export module Core.User.Identifier;
 
 export namespace core
 {
+	inline consteval unsigned long long GetMaxSessions() noexcept
+	{
+#if _DEBUG
+		return 100;
+#else // _DEBUG
+		return 2000;
+#endif // _DEBUG
+	}
+
 	inline consteval unsigned long long GetMaxUsers() noexcept
 	{
 #if _DEBUG
@@ -19,6 +28,7 @@ export namespace core
 
 	namespace constants
 	{
+		inline constexpr size_t SESSIONS_MAX = GetMaxSessions();
 		inline constexpr size_t USERS_MAX = GetMaxUsers();
 
 		inline constexpr unsigned int USER_ID_MIN = 0;
