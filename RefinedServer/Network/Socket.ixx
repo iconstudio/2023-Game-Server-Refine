@@ -122,6 +122,10 @@ export namespace net
 			optUseLoopback.AddListener([this](const bool& flag) {
 				SetOption(SocketOptions::UseLoopback, flag);
 			});
+
+			optUpdateContext.AddListener([this](Socket& other) {
+				SetOptionByHandle(SocketOptions::UseLoopback, other);
+			});
 		}
 
 	public:
@@ -250,7 +254,7 @@ export namespace net
 				, reinterpret_cast<const char*>(&iflag), static_cast<int>(sizeof(iflag)));
 		}
 
-		inline ioError SetOptionByHandle(Socket& other, const SocketOptions& option) noexcept
+		inline ioError SetOptionByHandle(const SocketOptions& option, Socket& other) noexcept
 		{
 			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
 				, static_cast<int>(option)
@@ -348,8 +352,8 @@ export namespace net
 		util::Option<bool> optDontRoute{ false };
 		util::Option<bool> optBroadcast{ false };
 		util::Option<bool> optUseLoopback{ false };
-		util::Option<::linger> optLinger{ false };
-		util::Option<Socket&> optUpdateContext{ false };
+		util::Option<::linger> optLinger{};
+		util::Option<Socket&> optUpdateContext{};
 
 	private:
 		[[nodiscard]]
