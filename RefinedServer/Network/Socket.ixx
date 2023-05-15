@@ -40,6 +40,7 @@ export namespace net
 		Broadcast = SO_BROADCAST,
 		UseLoopback = SO_USELOOPBACK,
 		Linger = SO_LINGER,
+		NoDelay = TCP_NODELAY,
 		DontLinger = SO_DONTLINGER,
 		KeepAlive = SO_KEEPALIVE,
 		Update = SO_UPDATE_ACCEPT_CONTEXT
@@ -122,6 +123,18 @@ export namespace net
 
 			optUseLoopback.AddListener([this](const bool& flag) {
 				SetOption(SocketOptions::UseLoopback, flag);
+			});
+
+			optReuseAddress.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Recyclable, flag);
+			});
+
+			optLinger.AddListener([this](const SoLinger& linger) {
+				SetOptionByValue(SocketOptions::Linger, linger);
+			});
+
+			optNoDelay.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::NoDelay, flag);
 			});
 
 			optUpdateContext.AddListener([this](Socket& other) {
@@ -362,6 +375,8 @@ export namespace net
 		util::Option<bool> optDontRoute{ false };
 		util::Option<bool> optBroadcast{ false };
 		util::Option<bool> optUseLoopback{ false };
+		util::Option<bool> optNoDelay{ false };
+		util::Option<EndPoint> optBindAddress{};
 		util::Option<::linger> optLinger{};
 		util::Option<Socket&> optUpdateContext{};
 
