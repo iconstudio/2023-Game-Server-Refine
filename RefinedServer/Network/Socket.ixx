@@ -309,6 +309,15 @@ export namespace net
 		Socket& operator=(const Socket& other) volatile = delete;
 		Socket& operator=(const volatile Socket& other) volatile = delete;
 
+		util::Option<bool> optDebug{ false };
+		util::Option<bool> optReuseAddress{ false };
+		util::Option<bool> optKeepAlive{ false };
+		util::Option<bool> optDontRoute{ false };
+		util::Option<bool> optBroadcast{ false };
+		util::Option<bool> optUseLoopback{ false };
+		util::Option<bool> optLinger{ false };
+		util::Option<bool> optUpdateContext{ false };
+
 	private:
 		[[nodiscard]]
 		inline constexpr bool IsOut() const noexcept
