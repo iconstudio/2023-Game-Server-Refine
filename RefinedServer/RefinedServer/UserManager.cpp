@@ -2,8 +2,12 @@
 #include "UserManager.hpp"
 #include "Framework.hpp"
 
-using namespace service;
-using namespace net;
+import Utility;
+import Utility.Error;
+import Utility.Print;
+
+using namespace ::service;
+using namespace ::net;
 
 UserManager::UserManager() noexcept
 	: Singleton(this)
@@ -15,14 +19,37 @@ UserManager::~UserManager() noexcept
 
 void UserManager::Awake()
 {
-	for (auto& session : everySession)
+	size_t index = 0;
+	userid_t user_id = userid_t::begin;
+
+	try
 	{
-		session = new net::BasicUser(userid_t::begin);
+		for (auto& session : everyUser)
+		{
+			session = new net::User(user_id++);
+
+			everySession[index++] = session;
+		}
+	}
+	catch (std::exception& e)
+	{
+		util::Println("유저 생성 중에 예외가 발생했습니다. (메시지: {})", e.what());
+		util::unreachable();
 	}
 
-	for (auto& session : everyUser)
+	try
 	{
-		session = new net::User(userid_t::begin);
+		for (auto& session : everyNPCs)
+		{
+			session = new net::BasicUser(user_id++);
+
+			everySession[index++] = session;
+		}
+	}
+	catch (std::exception& e)
+	{
+		util::Println("NPC 생성 중에 예외가 발생했습니다. (메시지: {})", e.what());
+		util::unreachable();
 	}
 }
 
