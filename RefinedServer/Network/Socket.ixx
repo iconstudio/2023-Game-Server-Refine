@@ -15,6 +15,7 @@ export namespace net
 {
 	using ::UINT_PTR;
 	using ::SOCKET;
+	using CompletionRoutine = ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
 
 	enum SocketDatagram : int
 	{
@@ -94,9 +95,6 @@ export namespace net
 			return ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, NULL, type);
 		}
 	}
-
-	using ::SOCKET;
-	using CompletionRoutine = ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
 
 	class [[nodiscard]] Socket
 	{
