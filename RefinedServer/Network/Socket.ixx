@@ -4,6 +4,7 @@ module;
 
 export module Net.Socket;
 import Utility;
+import Utility.Constraints;
 import Utility.Option;
 import Net;
 import Net.EndPoint;
@@ -259,6 +260,15 @@ export namespace net
 			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
 				, static_cast<int>(option)
 				, reinterpret_cast<const char*>(&other.myHandle), static_cast<int>(sizeof(SOCKET)));
+		}
+
+		template<typename T>
+			requires (!util::same_as<bool, util::clean_t<T>> && !util::same_as<Socket, util::clean_t<T>>)
+		inline ioError SetOptionByValue(const SocketOptions& option, const T& value)
+		{
+			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
+				, static_cast<int>(option)
+				, reinterpret_cast<const char*>(&value), static_cast<int>(sizeof(T)));
 		}
 
 		[[nodiscard]]
