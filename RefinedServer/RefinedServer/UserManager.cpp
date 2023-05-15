@@ -2,16 +2,29 @@
 #include "UserManager.hpp"
 #include "Framework.hpp"
 
-service::UserManager::UserManager() noexcept
+using namespace service;
+using namespace net;
+
+UserManager::UserManager() noexcept
 	: Singleton(this)
-	, everySession(), everyUser()
+	, everySession(), everyUser(), everyNPCs()
 {}
 
-service::UserManager::~UserManager() noexcept
+UserManager::~UserManager() noexcept
 {}
 
-void service::UserManager::Awake()
-{}
+void UserManager::Awake()
+{
+	for (auto& session : everySession)
+	{
+		session = new net::BasicUser(userid_t::begin);
+	}
 
-void service::UserManager::Start() noexcept
+	for (auto& session : everyUser)
+	{
+		session = new net::User(userid_t::begin);
+	}
+}
+
+void UserManager::Start() noexcept
 {}
