@@ -20,7 +20,7 @@ export namespace net
 	class Context;
 	class SendContext;
 
-	class BasicSession;
+	class BasicUser;
 	class User;
 	class Room;
 	template<size_t Size>
