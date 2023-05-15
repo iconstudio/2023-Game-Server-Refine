@@ -22,7 +22,7 @@ export namespace core::service
 		void Awake();
 		net::ioError Start() noexcept;
 
-		net::ioError BeginAccept(const core::userid_t& start);
+		net::ioError BeginAccept(const userid_t& start);
 		void EndAccept() noexcept;
 		void EndFailedAccept() noexcept;
 
