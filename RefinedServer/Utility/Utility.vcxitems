@@ -15,11 +15,10 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Error.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Option.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Array.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Atomic.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Constraints.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Error.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Expected.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Identity.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Locks.ixx" />
@@ -27,6 +26,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Meta.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Monad.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Option.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Print.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Singleton.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Testbed.cpp" />
