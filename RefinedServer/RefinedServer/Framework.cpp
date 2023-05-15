@@ -95,7 +95,9 @@ void Framework::Start() noexcept
 		util::Println("TCP 소켓에서 수용을 대기합니다.");
 	}).else_then(OnError("수용 시작 단계가 실패했습니다."));
 
-	userManager.Start().else_then(OnError("첫번째 수용 단계가 실패했습니다."));
+	userManager.Start();
+
+	BeginAccept(userid_t::begin).else_then(OnError("첫번째 수용 단계가 실패했습니다."));
 }
 
 void Framework::Update() noexcept

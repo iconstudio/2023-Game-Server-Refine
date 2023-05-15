@@ -20,7 +20,7 @@ export namespace core::service
 		~UserManager() noexcept;
 
 		void Awake();
-		net::ioError Start() noexcept;
+		void Start() noexcept;
 
 		net::ioError BeginAccept(const userid_t& start);
 		void EndAccept() noexcept;

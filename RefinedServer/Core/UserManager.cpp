@@ -57,9 +57,8 @@ void UserManager::Awake()
 	}
 }
 
-ioError UserManager::Start() noexcept
+void UserManager::Start() noexcept
 {
-	return BeginAccept(userid_t::begin);
 }
 
 ioError UserManager::BeginAccept(const userid_t& start)
