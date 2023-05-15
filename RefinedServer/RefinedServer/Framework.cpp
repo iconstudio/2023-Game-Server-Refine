@@ -63,8 +63,19 @@ void Framework::Awake()
 		gameSocket = std::move(socket);
 	}).else_then(OnError("서버의 UDP 소켓을 생성하는데 실패했습니다."));
 
+	nameSocket.optDebug = true;
+	nameSocket.optReuseAddress = true;
+	nameSocket.optNoDelay = true;
+	nameSocket.optUseLoopback = true;
+
 	gameEndPoint = EndPoint::CreateStaticUDP(AddressFamily::IPv4, udpPort);
 	gameSocket.Bind(gameEndPoint).else_then(OnError("서버의 UDP 주소를 지정하는데 실패했습니다."));
+
+	gameSocket.optDebug = true;
+	gameSocket.optReuseAddress = true;
+	gameSocket.optUseLoopback = true;
+	gameSocket.optBroadcast = true;
+	gameSocket.optDontRoute = true;
 
 	nameSocket.Listen().if_then([]() noexcept {
 		util::Println("TCP 소켓에서 수용을 대기합니다.");
