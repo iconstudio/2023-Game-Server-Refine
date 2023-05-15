@@ -105,9 +105,25 @@ export namespace util
 		InternalOpt myOption;
 		std::vector<OptHandler> myHandlers;
 	};
+
+
+	template<typename InternalOpt>
+	class Option<InternalOpt&>
+	{
+	public:
+		using OptHandler = std::function<void(const InternalOpt& option)>;
+
+		constexpr Option() noexcept
+			: myOption()
+			, myHandlers(8ULL)
 		{}
 
-		constexpr Option(const InternalOpt init, const OptHandler handler) noexcept
+		constexpr Option(const InternalOpt init) noexcept(nothrow_copy_constructibles<InternalOpt>)
+			: myOption(init)
+			, myHandlers(8ULL)
+		{}
+
+		constexpr Option(const InternalOpt init, const OptHandler handler) noexcept(nothrow_copy_constructibles<InternalOpt>)
 			: Option(init)
 		{
 			myHandlers.push_back(handler);
