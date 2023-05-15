@@ -9,8 +9,8 @@ import Net.Context;
 import Net.Socket;
 import Net.CompletionPort;
 import Net.Intrinsics;
-
-#include "UserManager.hpp"
+import Net.User;
+import Core.UserManager;
 
 class [[nodiscard]] Framework : util::Singleton<Framework>
 {
@@ -67,5 +67,5 @@ private:
 	net::Socket gameSocket;
 	net::EndPoint gameEndPoint;
 
-	service::UserManager userManager;
+	core::UserManager userManager;
 };

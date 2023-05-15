@@ -1,14 +1,12 @@
-#pragma once
+export module Core.UserManager;
 import Utility;
 import Utility.Singleton;
 import Utility.Array;
-import Net;
 import Net.Socket;
-import Net.User.Identifier;
 import Net.User;
 import Net.User.Basic;
 
-namespace service
+export namespace core
 {
 	class UserManager : util::Singleton<UserManager>
 	{

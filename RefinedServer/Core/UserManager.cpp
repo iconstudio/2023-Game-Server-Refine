@@ -1,23 +1,23 @@
-#include "pch.hpp"
-#include "UserManager.hpp"
-#include "Framework.hpp"
+module;
+#include <exception>
 
+module Core.UserManager;
 import Utility;
 import Utility.Error;
 import Utility.Print;
+import Net.User.Identifier;
 
-using namespace ::service;
 using namespace ::net;
 
-UserManager::UserManager() noexcept
+core::UserManager::UserManager() noexcept
 	: Singleton(this)
 	, everySession(), everyUser(), everyNPCs()
 {}
 
-UserManager::~UserManager() noexcept
+core::UserManager::~UserManager() noexcept
 {}
 
-void UserManager::Awake()
+void core::UserManager::Awake()
 {
 	size_t index = 0;
 	userid_t user_id = userid_t::begin;
@@ -53,5 +53,5 @@ void UserManager::Awake()
 	}
 }
 
-void UserManager::Start() noexcept
+void core::UserManager::Start() noexcept
 {}

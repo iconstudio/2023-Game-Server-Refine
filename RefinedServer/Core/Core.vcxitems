@@ -14,4 +14,8 @@
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)UserManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)UserManager.ixx" />
+  </ItemGroup>
 </Project>
