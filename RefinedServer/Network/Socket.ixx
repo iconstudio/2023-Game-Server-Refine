@@ -240,6 +240,22 @@ export namespace net
 			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine);
 		}
 
+		inline ioError SetOption(const SocketOptions& option, const bool& flag)
+		{
+			const int iflag = flag; // BOOL
+
+			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
+				, static_cast<int>(option)
+				, reinterpret_cast<const char*>(&iflag), static_cast<int>(sizeof(iflag)));
+		}
+
+		inline ioError SetOptionByHandle(Socket& other, const SocketOptions& option) noexcept
+		{
+			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
+				, static_cast<int>(option)
+				, reinterpret_cast<const char*>(&other.myHandle), static_cast<int>(sizeof(SOCKET)));
+		}
+
 		[[nodiscard]]
 		constexpr const SOCKET& Handle() const& noexcept
 		{
