@@ -8,7 +8,7 @@ import Net.EndPoint;
 import Net.Context;
 import Net.Socket;
 import Net.CompletionPort;
-import Net.Promise;
+import Net.Intrinsics;
 
 #include "UserManager.hpp"
 
@@ -31,7 +31,7 @@ public:
 	void Update() noexcept;
 	void UpdateOnce(const float& delta_time) noexcept;
 
-	net::Proxy BeginAccept();
+	net::ioError BeginAccept(const net::userid_t& start);
 	void EndAccept() noexcept;
 	void EndFailedAccept() noexcept;
 
