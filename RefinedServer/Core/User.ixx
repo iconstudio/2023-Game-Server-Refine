@@ -14,16 +14,18 @@ export namespace core
 		static inline constexpr size_t BufferSize = 512;
 
 	public:
-		constexpr User(const userid_t& id) noexcept
+		constexpr User(const userid_t& id, net::Socket&& socket) noexcept
 			: BasicUser(id)
+			, mySocket(util::move(socket))
 		{}
 
-		constexpr ~User() noexcept
-		{}
+		~User() noexcept = default;
 
 		User(const User& other) = delete;
 		User(User&& other) = delete;
 		User& operator=(const User& other) = delete;
 		User& operator=(User&& other) = delete;
+
+		net::Socket mySocket;
 	};
 }

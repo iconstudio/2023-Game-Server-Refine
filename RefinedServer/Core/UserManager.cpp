@@ -6,6 +6,7 @@ module Core.Service.UserManager;
 import Utility;
 import Utility.Error;
 import Utility.Print;
+import Net.Socket;
 import Core.User.Identifier;
 
 using namespace ::net;
@@ -30,7 +31,13 @@ void UserManager::Awake()
 	{
 		for (auto& session : everyUser)
 		{
-			session = new User(user_id++);
+			session = Socket::CreateTCP().else_then([](int&& error_code) {
+				util::Println("유저의 소켓 생성 중에 오류 {}이(가) 발생했습니다.", error_code);
+				util::err::RaiseSystemError(util::move(error_code));
+			}).and_then(
+				[&](Socket&& socket) noexcept -> User* {
+				return new User(user_id++, util::move(socket));
+			});
 
 			everySession[index++] = session;
 		}
