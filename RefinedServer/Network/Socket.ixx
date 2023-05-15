@@ -15,6 +15,7 @@ export namespace net
 {
 	using ::UINT_PTR;
 	using ::SOCKET;
+	using SoLinger = ::linger;
 	using CompletionRoutine = ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
 
 	enum SocketDatagram : int
@@ -347,8 +348,8 @@ export namespace net
 		util::Option<bool> optDontRoute{ false };
 		util::Option<bool> optBroadcast{ false };
 		util::Option<bool> optUseLoopback{ false };
-		util::Option<bool> optLinger{ false };
-		util::Option<bool> optUpdateContext{ false };
+		util::Option<::linger> optLinger{ false };
+		util::Option<Socket&> optUpdateContext{ false };
 
 	private:
 		[[nodiscard]]
