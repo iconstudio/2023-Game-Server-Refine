@@ -2,21 +2,23 @@ module;
 #include <exception>
 #include <string_view>
 
-module Core.UserManager;
+module Core.Service.UserManager;
 import Utility;
 import Utility.Error;
 import Utility.Print;
 import Core.User.Identifier;
 
-core::UserManager::UserManager() noexcept
+using namespace ::core::service;
+
+UserManager::UserManager() noexcept
 	: Singleton(this)
 	, everySession(), everyUser(), everyNPCs()
 {}
 
-core::UserManager::~UserManager() noexcept
+UserManager::~UserManager() noexcept
 {}
 
-void core::UserManager::Awake()
+void UserManager::Awake()
 {
 	size_t index = 0;
 	userid_t user_id = userid_t::begin;
@@ -52,5 +54,5 @@ void core::UserManager::Awake()
 	}
 }
 
-void core::UserManager::Start() noexcept
+void UserManager::Start() noexcept
 {}

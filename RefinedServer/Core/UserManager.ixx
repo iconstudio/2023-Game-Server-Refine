@@ -1,4 +1,4 @@
-export module Core.UserManager;
+export module Core.Service.UserManager;
 import Utility;
 import Utility.Singleton;
 import Utility.Array;
@@ -6,7 +6,7 @@ import Net.Socket;
 import Core.User;
 import Core.User.Basic;
 
-export namespace core
+export namespace core::service
 {
 	class UserManager : util::Singleton<UserManager>
 	{
