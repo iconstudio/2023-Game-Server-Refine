@@ -16,6 +16,9 @@ class [[nodiscard]] Framework : util::Singleton<Framework>
 {
 private:
 	static inline constexpr unsigned concurrentHint = 6;
+	static inline constexpr unsigned long long serverTcpID = net::constants::SERVER_ID;
+	static inline constexpr unsigned long long serverUdpID = serverTcpID + 1;
+
 	static inline constexpr unsigned short tcpPort = 54000;
 	static inline constexpr unsigned short udpPort = 54001;
 
