@@ -20,23 +20,11 @@ export namespace net
 	class Context;
 	class SendContext;
 
-	class BasicUser;
-	class User;
-	class Room;
 	template<size_t Size>
 	class SocketStream;
 
 	namespace abi
 	{}
-
-	namespace service
-	{
-		class WorkerManager;
-		class TimerManager;
-		class SenderPool;
-		class UserManager;
-		class RoomManager;
-	}
 
 	namespace settings
 	{
