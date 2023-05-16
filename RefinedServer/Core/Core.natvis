@@ -3,4 +3,46 @@
 	<Type Name="core::service::UserManager">
 		<DisplayString>유저 관리자</DisplayString>
 	</Type>
+
+	<Type Name="core::Session&lt;*&gt;">
+		<Intrinsic Category="Property" Name="__IsTaken" Expression="isTaken._Storage._Value"/>
+		<Intrinsic Category="Property" Name="__GetID" Expression="static_cast&lt;unsigned&gt;(myID)"/>
+		
+		<DisplayString>세션 {{ ID={myID} }}</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="[식별자]">__GetID()</Item>
+			<Item Name="[확보 여부]">__IsTaken()</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="core::Asynchron&lt;*&gt;">
+		<Intrinsic Category="Property" Name="__AccUTy" Expression="&quot;$T1&quot;"/>
+		<Intrinsic Category="Property" Name="__AccITy" Expression="&quot;$T2&quot;"/>
+		<Intrinsic Category="Property" Name="__GetOp" Expression="myOperation"/>
+
+		<DisplayString>비동기 객체 &lt;{__AccUTy()}&gt; {{ ID={__GetID()} }}</DisplayString>
+
+		<Expand HideRawView="true">
+			<Synthetic Name="[세션 클래스]">
+				<DisplayString>{__AccUTy()}</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[식별자 자료형]">
+				<DisplayString>{__AccITy()}</DisplayString>
+			</Synthetic>
+
+			<Item Name="[식별자]">__GetID()</Item>
+			<Item Name="[확보 여부]">__IsTaken()</Item>
+			<Item Name="[명령]">__GetOp()</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="core::BasicUser">
+		<DisplayString>기본 유저 {{ ID={__GetID()} }}</DisplayString>
+	</Type>
+
+	<Type Name="core::User">
+		<DisplayString>유저 {{ ID={__GetID()} }</DisplayString>
+	</Type>
+
 </AutoVisualizer>
