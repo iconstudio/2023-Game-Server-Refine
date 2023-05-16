@@ -38,20 +38,18 @@ export namespace util
 			: myStorage(static_cast<rebind_base<T>&&>(other.myStorage))
 		{}
 
-		explicit constexpr Monad(nullopt_t)
+		constexpr Monad(nullopt_t)
 			noexcept(nothrow_constructibles<T>)
 			: myStorage()
 		{}
 
-		explicit(trivials<T>)
-			constexpr Monad(const T& fwd)
+		constexpr Monad(const T& fwd)
 			noexcept(nothrow_copy_constructibles<T>)
 			: myStorage(fwd)
 			, hasValue(true)
 		{}
 
-		explicit(trivials<T>)
-			constexpr Monad(T&& fwd)
+		constexpr Monad(T&& fwd)
 			noexcept(nothrow_move_constructibles<T>)
 			: myStorage(static_cast<T&&>(fwd))
 			, hasValue(true)
