@@ -134,7 +134,7 @@ export namespace util
 			myHandlers.shrink_to_fit();
 		}
 
-		constexpr Option& operator=(const InternalOpt& option) noexcept
+		constexpr Option& operator=(InternalOpt& option) noexcept
 		{
 			for (OptHandler& handler : myHandlers)
 			{
