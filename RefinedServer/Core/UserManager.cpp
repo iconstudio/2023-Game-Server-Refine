@@ -75,8 +75,7 @@ void UserManager::Awake(net::CompletionPort& port)
 }
 
 void UserManager::Start() noexcept
-{
-}
+{}
 
 ioError UserManager::BeginAccept(const userid_t& start)
 {
@@ -91,32 +90,41 @@ void UserManager::EndAccept() noexcept
 void UserManager::EndFailedAccept() noexcept
 {}
 
-util::Monad<core::BasicUser*> UserManager::SessionAt(const size_t & index) noexcept
+util::Monad<core::BasicUser*> UserManager::SessionAt(const size_t& index) noexcept
 {
-	return util::Monad<BasicUser*>();
+	if (index < maxSessions)
+		return everySession[index];
+	else
+		return util::nullopt;
 }
 
 util::Monad<core::User*> UserManager::UserAt(const size_t& index) noexcept
 {
-	return util::Monad<User*>();
+	if (index < maxUsers)
+		return everyUser[index];
+	else
+		return util::nullopt;
 }
 
 util::Monad<core::BasicUser*> UserManager::NpcAt(const size_t& index) noexcept
 {
-	return util::Monad<BasicUser*>();
+	if (index < maxNPCs)
+		return everyNPCs[index];
+	else
+		return util::nullopt;
 }
 
 util::Monad<core::BasicUser*> UserManager::SessionOf(const userid_t& id) noexcept
 {
-	return util::Monad<BasicUser*>();
+	return SessionAt(CastID(id));
 }
 
 util::Monad<core::User*> UserManager::UserOf(const userid_t& id) noexcept
 {
-	return util::Monad<User*>();
+	return UserAt(CastID(id));
 }
 
 util::Monad<core::BasicUser*> UserManager::NpcOf(const userid_t& id) noexcept
 {
-	return util::Monad<BasicUser*>();
+	return NpcAt(CastID(id));
 }
