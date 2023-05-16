@@ -84,7 +84,7 @@ void Framework::Awake()
 	gameSocket.optBroadcast = true;
 	gameSocket.optDontRoute = true;
 
-	userManager.Awake();
+	userManager.Awake(ioPort);
 }
 
 void Framework::Start() noexcept

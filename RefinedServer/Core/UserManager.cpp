@@ -7,6 +7,7 @@ import Utility;
 import Utility.Error;
 import Utility.Print;
 import Net.Socket;
+import Net.CompletionPort;
 import Core.User.Identifier;
 
 using namespace ::net;
@@ -22,7 +23,7 @@ UserManager::UserManager(Socket& listener) noexcept
 UserManager::~UserManager() noexcept
 {}
 
-void UserManager::Awake()
+void UserManager::Awake(net::CompletionPort& port)
 {
 	size_t index = 0;
 	userid_t user_id = userid_t::begin;
@@ -36,6 +37,13 @@ void UserManager::Awake()
 				util::err::RaiseSystemError(util::move(error_code));
 			}).and_then(
 				[&](Socket&& socket) noexcept -> User* {
+				socket.optKeepAlive = false;
+				socket.optReuseAddress = true;
+				socket.optNoDelay = true;
+				nameListener.optUpdateContext = socket;
+
+				port.Link(socket.Handle(), CastID(user_id));
+
 				return new User(user_id++, util::move(socket));
 			});
 

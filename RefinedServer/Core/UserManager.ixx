@@ -2,6 +2,7 @@ export module Core.Service.UserManager;
 import Utility;
 import Utility.Singleton;
 import Utility.Array;
+import Net;
 import Net.Socket;
 import Net.Intrinsics;
 import Core.User;
@@ -19,7 +20,7 @@ export namespace core::service
 		UserManager(net::Socket& listener) noexcept;
 		~UserManager() noexcept;
 
-		void Awake();
+		void Awake(net::CompletionPort& port);
 		void Start() noexcept;
 
 		net::ioError BeginAccept(const userid_t& start);
