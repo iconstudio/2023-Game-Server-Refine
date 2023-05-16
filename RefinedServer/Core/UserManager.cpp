@@ -8,6 +8,8 @@ import Utility.Error;
 import Utility.Print;
 import Net.Socket;
 import Net.CompletionPort;
+import Core.User;
+import Core.User.Basic;
 import Core.User.Identifier;
 
 using namespace ::net;
@@ -88,3 +90,33 @@ void UserManager::EndAccept() noexcept
 
 void UserManager::EndFailedAccept() noexcept
 {}
+
+util::Monad<core::BasicUser*> UserManager::SessionAt(const size_t & index) noexcept
+{
+	return util::Monad<BasicUser*>();
+}
+
+util::Monad<core::User*> UserManager::UserAt(const size_t& index) noexcept
+{
+	return util::Monad<User*>();
+}
+
+util::Monad<core::BasicUser*> UserManager::NpcAt(const size_t& index) noexcept
+{
+	return util::Monad<BasicUser*>();
+}
+
+util::Monad<core::BasicUser*> UserManager::SessionOf(const userid_t& id) noexcept
+{
+	return util::Monad<BasicUser*>();
+}
+
+util::Monad<core::User*> UserManager::UserOf(const userid_t& id) noexcept
+{
+	return util::Monad<User*>();
+}
+
+util::Monad<core::BasicUser*> UserManager::NpcOf(const userid_t& id) noexcept
+{
+	return util::Monad<BasicUser*>();
+}
