@@ -1,9 +1,11 @@
 module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
+#include <string>
+#include <string_view>
+#include <chrono>
 
 export module Net;
-export import :Setting;
 
 export namespace net
 {
@@ -23,11 +25,18 @@ export namespace net
 	template<size_t Size>
 	class SocketStream;
 
-	namespace abi
-	{}
-
-	namespace settings
+	namespace constants
 	{
+		inline constexpr std::string_view VERSION = "0.0.1";
+
+		inline constexpr unsigned long long SERVER_ID = 0xffff;
+		inline constexpr unsigned short SERVER_PORT = 54000ULL;
+		inline constexpr unsigned short GAME_PORT_FIRST = SERVER_PORT + 1;
+		inline constexpr unsigned short GAME_PORT_LAST = GAME_PORT_FIRST + 100;
+
+		inline constexpr int LISTEN_MAX = 1000000;
+
+		inline constexpr std::chrono::milliseconds UPDATE_INTERVAL = std::chrono::milliseconds(45);
 	}
 
 	using ::LPFN_DISCONNECTEX;
@@ -138,5 +147,20 @@ export namespace net
 		using ::DWORD;
 		using ::GetLastError;
 		using ::WSAGetLastError;
+	}
+
+	inline constexpr const std::string_view& (GetServerVersion)() noexcept
+	{
+		return constants::VERSION;
+	}
+
+	inline constexpr unsigned long long GetServerID() noexcept
+	{
+		return constants::SERVER_ID;
+	}
+
+	inline constexpr std::chrono::milliseconds GetFrameTime() noexcept
+	{
+		return constants::UPDATE_INTERVAL;
 	}
 }
