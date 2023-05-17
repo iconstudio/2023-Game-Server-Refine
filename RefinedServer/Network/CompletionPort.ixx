@@ -159,11 +159,11 @@ export namespace net
 	{
 		if (0 != ::PostQueuedCompletionStatus(io_port, bytes, key, overlapped))
 		{
-			return io::success;
+			return { io::make_success() };
 		}
 		else
 		{
-			return io::failure;
+			return { io::make_failure() };
 		}
 	}
 
@@ -172,11 +172,11 @@ export namespace net
 	{
 		if (0 != ::GetQueuedCompletionStatus(io_port, bytes_handle, key_handle, overlapped_handle, await_time))
 		{
-			return io::success;
+			return { io::make_success() };
 		}
 		else
 		{
-			return io::failure;
+			return { io::make_failure() };
 		}
 	}
 }
