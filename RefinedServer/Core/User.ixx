@@ -16,7 +16,7 @@ export namespace core
 	public:
 		constexpr User(const userid_t& id, net::Socket&& socket) noexcept
 			: BasicUser(id)
-			, mySocket(util::move(socket))
+			, mySocket(static_cast<net::Socket&&>(socket))
 		{}
 
 		~User() noexcept = default;
