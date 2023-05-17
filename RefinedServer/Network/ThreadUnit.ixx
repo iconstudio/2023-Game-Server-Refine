@@ -74,6 +74,11 @@ export namespace net
 			return stopToken.stop_possible();
 		}
 
+		ThreadUnit(const ThreadUnit& other) = delete;
+		ThreadUnit(ThreadUnit&& other) noexcept = default;
+		ThreadUnit& operator=(const ThreadUnit& other) = delete;
+		ThreadUnit& operator=(ThreadUnit&& other) = default;
+
 		util::thread myHandle;
 		util::CancellationToken stopToken;
 	};
