@@ -23,13 +23,16 @@ export namespace net
 		~WorkerUnit() = default;
 
 		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
-		inline void Update(CompletionPort& port, Fn&& fn) noexcept(noexcept(util::forward<Fn>(fn)()))
+		inline void Update(CompletionPort& port, Fn&& fn)
+			noexcept(noexcept(util::forward<Fn>(fn)()))
 		{
 			while (UpdateOnce(port));
 		}
 
+	private:
 		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
-		inline bool UpdateOnce(CompletionPort& port, Fn&& fn) noexcept(noexcept(util::forward<Fn>(fn)()))
+		inline bool UpdateOnce(CompletionPort& port, Fn&& fn)
+			noexcept(noexcept(util::forward<Fn>(fn)()))
 		{
 			if (myUnit.stop_requested()) [[unlikely]] {
 				// Await upto 5 seconds

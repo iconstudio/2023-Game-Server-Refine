@@ -2,7 +2,13 @@
 #include "Worker.hpp"
 #include "Framework.hpp"
 
-void Worker(util::CancellationToken cancel_token, net::CompletionPort& completion_port)
-{
+import Utility.Print;
+import Utility.Error;
+import Net.Worker;
 
+using namespace ::net;
+using namespace ::core;
+
+void Worker(util::CancellationToken cancel_token, CompletionPort& completion_port)
+{
 }
