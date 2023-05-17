@@ -2,10 +2,10 @@ export module Net.Worker;
 import Utility;
 import Utility.Constraints;
 import Utility.Concurrency.Thread;
+import Utility.Concurrency.Thread.Unit;
 import Net;
 import Net.CompletionPort;
 import Net.Context;
-import Net.ThreadUnit;
 
 export namespace net
 {
@@ -59,7 +59,7 @@ export namespace net
 			return true;
 		}
 
-		ThreadUnit myUnit;
+		util::ThreadUnit myUnit;
 		OVERLAPPED* localHandle{};
 		unsigned long long localKey{};
 		unsigned long localBytes{};

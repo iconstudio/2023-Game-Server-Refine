@@ -1,18 +1,17 @@
 module;
 #include <exception>
 
-export module Net.ThreadUnit;
+export module Utility.Concurrency.Thread.Unit;
 import Utility;
 import Utility.Constraints;
 import Utility.Concurrency.Thread;
-import Net;
 
-export namespace net
+export namespace util
 {
 	/// <summary>
 	/// Implementation of std::thread + std::stop_token
 	/// </summary>
-	class ThreadUnit
+	class [[nodiscard]] ThreadUnit
 	{
 	public:
 		template<typename Fn, typename... Args>

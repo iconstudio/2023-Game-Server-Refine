@@ -26,7 +26,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Settings.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Socket.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)ThreadUnit.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Worker.ixx" />
   </ItemGroup>
   <ItemGroup>
