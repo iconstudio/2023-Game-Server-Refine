@@ -17,6 +17,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)CompletionPort.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IoState.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Worker.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)Network.natvis" />
