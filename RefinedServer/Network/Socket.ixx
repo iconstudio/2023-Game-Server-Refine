@@ -7,6 +7,7 @@ import Utility;
 import Utility.Constraints;
 import Utility.Option;
 import Net;
+import Net.Addressing;
 import Net.EndPoint;
 import Net.Context;
 import Net.Intrinsics;
@@ -151,19 +152,18 @@ export namespace net
 			: Socket(init_t{})
 		{
 			myHandle = static_cast<::SOCKET&&>(other.myHandle);
-			myAddress = util::move(other.myAddress);
-			myEndPoint = util::move(other.myEndPoint);
+			myEndPoint = static_cast<EndPoint&&>(other.myEndPoint);
 			other.isOut = true;
 		}
 
 		explicit constexpr Socket(const SOCKET& handle) noexcept
 			: isOut(false), myHandle(handle)
-			, myAddress(), myEndPoint()
+			, myEndPoint()
 		{}
 
 		explicit constexpr Socket(SOCKET&& handle) noexcept
 			: isOut(false), myHandle(static_cast<SOCKET&&>(handle))
-			, myAddress(), myEndPoint()
+			, myEndPoint()
 		{}
 
 		constexpr Socket& operator=(Socket&& other) noexcept
@@ -395,6 +395,6 @@ export namespace net
 
 		volatile bool isOut{ false };
 		SOCKET myHandle{ abi::InvalidSocket };
-		EndPoint myAddress{}, myEndPoint{};
+		EndPoint myEndPoint{};
 	};
 }
