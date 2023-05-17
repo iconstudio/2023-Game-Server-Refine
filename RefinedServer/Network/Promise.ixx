@@ -2,7 +2,6 @@ export module Net.Promise;
 import Utility;
 import Utility.Constraints;
 import Utility.Monad.Loosen;
-export import Net;
 export import Net.IoState;
 
 export namespace net
