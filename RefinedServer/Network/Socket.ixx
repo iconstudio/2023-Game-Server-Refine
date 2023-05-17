@@ -11,6 +11,7 @@ import Net.Addressing;
 import Net.EndPoint;
 import Net.Context;
 import Net.Promise;
+import Net.Intrinsics;
 
 export namespace net
 {
@@ -182,35 +183,35 @@ export namespace net
 			}
 		}
 
-		inline auto Bind(const EndPoint& target) noexcept
+		inline ioError Bind(const EndPoint& target) noexcept
 		{
 			return io::Execute(::bind, myHandle
 				, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize());
 		}
 
-		inline auto Connect(const EndPoint& target) noexcept
+		inline ioError Connect(const EndPoint& target) noexcept
 		{
 			return io::Execute(::connect, myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()).else_then([&]() {
 				myEndPoint = target;
 			});
 		}
 
-		inline auto Connect(const ::SOCKADDR* const& address, const int& addrlen) const noexcept
+		inline ioError Connect(const ::SOCKADDR* const& address, const int& addrlen) const noexcept
 		{
 			return io::Execute(::connect, myHandle, address, addrlen);
 		}
 
-		inline auto Listen(const int& backlog = constants::LISTEN_MAX) noexcept
+		inline ioError Listen(const int& backlog = constants::LISTEN_MAX) noexcept
 		{
 			return io::Execute(::listen, myHandle, backlog);
 		}
 
-		inline auto Accept(const Socket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
+		inline ioError Accept(const Socket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
 		{
 			return Accept(client, buffer, util::addressof(context), util::addressof(result_bytes));
 		}
 
-		inline auto Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
+		inline ioError Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
 		{
 			return io::ExecuteVia(CheckBool, ::AcceptEx
 				, myHandle, client.myHandle, buffer, 0UL
@@ -218,7 +219,7 @@ export namespace net
 				, context);
 		}
 
-		inline auto Recv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
+		inline ioError Recv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
@@ -228,7 +229,7 @@ export namespace net
 			return io::Execute(::WSARecv, myHandle, util::addressof(buffer), 1UL, bytes, &flags, context, nullptr);
 		}
 
-		inline auto Send(WSABUF buffer, Context* const& context, unsigned long* bytes = nullptr, const unsigned long& flags = 0) noexcept
+		inline ioError Send(WSABUF buffer, Context* const& context, unsigned long* bytes = nullptr, const unsigned long& flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
@@ -238,7 +239,7 @@ export namespace net
 			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, bytes, flags, context, nullptr);
 		}
 
-		inline auto BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long flags = 0) noexcept
+		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
@@ -248,7 +249,7 @@ export namespace net
 			return io::Execute(::WSARecv, myHandle, util::addressof(buffer), 1UL, nullptr, &flags, context, routine);
 		}
 
-		inline auto BeginSend(WSABUF buffer, Context* const& context, CompletionRoutine routine, const unsigned long& flags = 0) noexcept
+		inline ioError BeginSend(WSABUF buffer, Context* const& context, CompletionRoutine routine, const unsigned long& flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
@@ -258,7 +259,7 @@ export namespace net
 			return io::Execute(::WSASend, myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine);
 		}
 
-		inline auto SetOption(const SocketOptions& option, const bool& flag)
+		inline ioError SetOption(const SocketOptions& option, const bool& flag)
 		{
 			const int iflag = flag; // BOOL
 
@@ -267,7 +268,7 @@ export namespace net
 				, reinterpret_cast<const char*>(&iflag), static_cast<int>(sizeof(iflag)));
 		}
 
-		inline auto SetOptionByHandle(const SocketOptions& option, Socket& other) noexcept
+		inline ioError SetOptionByHandle(const SocketOptions& option, Socket& other) noexcept
 		{
 			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
 				, static_cast<int>(option)
@@ -276,7 +277,7 @@ export namespace net
 
 		template<typename T>
 			requires (!util::same_as<bool, util::clean_t<T>> && !util::same_as<Socket, util::clean_t<T>>)
-		inline auto SetOptionByValue(const SocketOptions& option, const T& value)
+		inline ioError SetOptionByValue(const SocketOptions& option, const T& value)
 		{
 			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
 				, static_cast<int>(option)
