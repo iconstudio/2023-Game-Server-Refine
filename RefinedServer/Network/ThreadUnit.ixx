@@ -16,13 +16,13 @@ export namespace net
 	{
 	public:
 		template<typename Fn, typename... Args>
-			requires (!util::same_as<util::clean_t<Fn>, util::jthread> && !util::same_as<util::clean_t<Fn>, util::thread>&& util::invocables<Fn, Args...>)
+			requires (!util::same_as<util::clean_t<Fn>, util::thread, util::jthread>&& util::invocables<Fn, Args...>)
 		ThreadUnit(Fn&& functor, util::CancellationToken&& token, Args&&... args) noexcept
 			: ThreadUnit(util::thread{ functor, util::forward<Args>(args)... }, static_cast<util::CancellationToken&&>(token))
 		{}
 
 		template<typename Fn, typename... Args>
-			requires (!util::same_as<util::clean_t<Fn>, util::jthread> && !util::same_as<util::clean_t<Fn>, util::thread> && util::invocables<Fn, Args...>)
+			requires (!util::same_as<util::clean_t<Fn>, util::thread, util::jthread>&& util::invocables<Fn, Args...>)
 		ThreadUnit(Fn&& functor, util::CancellationSource& ssource, Args&&... args) noexcept
 			: ThreadUnit(util::thread{ functor, util::forward<Args>(args)... }, ssource.get_token())
 		{}
