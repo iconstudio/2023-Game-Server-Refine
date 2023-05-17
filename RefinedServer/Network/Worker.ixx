@@ -1,4 +1,5 @@
 export module Net.Worker;
+import Utility;
 import Utility.Concurrency.Thread;
 import Net;
 import Net.CompletionPort;
