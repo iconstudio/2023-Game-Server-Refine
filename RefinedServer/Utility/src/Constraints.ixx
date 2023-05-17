@@ -7,7 +7,7 @@ export import Utility.Traits;
 export namespace util
 {
 	template<typename Derived>
-	concept crtp = std::is_class_v<Derived> && same_as<Derived, remove_cv_t<Derived>>;
+	concept crtp = std::is_class_v<Derived> && std::same_as<Derived, remove_cv_t<Derived>>;
 
 	template<typename T>
 	using not_void = std::negation<std::is_same<clean_t<T>, void>>;
@@ -137,6 +137,23 @@ export namespace util
 
 	template <typename T>
 	concept actual_integral = is_actual_integral_v<T>;
+
+	namespace detail
+	{
+		template<typename T, typename Oty>
+		struct same_as_t : std::bool_constant<std::same_as<T, Oty>>
+		{};
+
+		template<typename T>
+		struct same_as_bind
+		{
+			template<typename Oty>
+			using result = same_as_t<T, Oty>;
+		};
+	}
+
+	template<typename T, typename... Ots>
+	concept same_as = make_conjunction<typename detail::same_as_bind<T>::template result, Ots...>;
 
 	template<typename... Ts>
 	concept specializations = is_specialization_v<clean_t<Ts>...>;

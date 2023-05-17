@@ -81,7 +81,8 @@ export namespace util
 	using ::std::is_trivially_destructible_v;
 
 	// models
-	using ::std::same_as;
+	//using ::std::same_as;
+
 	using ::std::copyable;
 	using ::std::movable;
 
@@ -198,16 +199,16 @@ export namespace util
 	using monad_result_t = clean_t<std::invoke_result_t<Fn, Args...>>;
 
 	template<typename T>
-	using make_lvalue_t = conditional_t<same_as<clean_t<T>, void>, void, add_lvalue_reference_t<remove_const_t<T>>>;
+	using make_lvalue_t = conditional_t<std::same_as<clean_t<T>, void>, void, add_lvalue_reference_t<remove_const_t<T>>>;
 
 	template<typename T>
-	using make_clvalue_t = conditional_t<same_as<clean_t<T>, void>, void, add_lvalue_reference_t<add_const_t<T>>>;
+	using make_clvalue_t = conditional_t<std::same_as<clean_t<T>, void>, void, add_lvalue_reference_t<add_const_t<T>>>;
 
 	template<typename T>
-	using make_rvalue_t = conditional_t<same_as<clean_t<T>, void>, void, add_rvalue_reference_t<remove_const_t<T>>>;
+	using make_rvalue_t = conditional_t<std::same_as<clean_t<T>, void>, void, add_rvalue_reference_t<remove_const_t<T>>>;
 
 	template<typename T>
-	using make_crvalue_t = conditional_t<same_as<clean_t<T>, void>, void, add_rvalue_reference_t<add_const_t<T>>>;
+	using make_crvalue_t = conditional_t<std::same_as<clean_t<T>, void>, void, add_rvalue_reference_t<add_const_t<T>>>;
 }
 
 #pragma warning(push, 1)
