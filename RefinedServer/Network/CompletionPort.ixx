@@ -25,6 +25,9 @@ export namespace net
 		[[nodiscard]]
 		inline Proxy
 			GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time = INFINITE) noexcept;
+
+		inline constexpr HANDLE invalidHandle = INVALID_HANDLE_VALUE;
+		inline constexpr unsigned long infinite = INFINITE;
 	}
 
 	class [[nodiscard]] alignas(ullong) CompletionPort
@@ -40,7 +43,7 @@ export namespace net
 
 	public:
 		constexpr CompletionPort() noexcept
-			: rawHandle(INVALID_HANDLE_VALUE)
+			: rawHandle(abi::invalidHandle)
 		{}
 
 		constexpr CompletionPort(CompletionPort&& handle) noexcept
@@ -65,7 +68,7 @@ export namespace net
 			ErrorHandler<CompletionPort>
 			Establish(const ulong& concurrent_hint) noexcept
 		{
-			const HANDLE handle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, concurrent_hint);
+			const HANDLE handle = ::CreateIoCompletionPort(abi::invalidHandle, nullptr, 0, concurrent_hint);
 
 			if (NULL == handle)
 			{
@@ -97,7 +100,7 @@ export namespace net
 			return abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
 		}
 
-		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = INFINITE)
+		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = abi::infinite)
 		{
 			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, overlapped_handle, await_time);
 		}
