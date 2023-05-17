@@ -7,10 +7,12 @@ import Net;
 import Net.EndPoint;
 import Net.Context;
 import Net.Socket;
+import Net.Worker;
 import Net.CompletionPort;
 import Net.Intrinsics;
 import Core.User;
 import Core.Service.UserManager;
+import Core.Service.WorkerManager;
 
 class [[nodiscard]] Framework : util::Singleton<Framework>
 {
@@ -64,4 +66,5 @@ private:
 	net::EndPoint gameEndPoint;
 
 	core::service::UserManager userManager;
+	core::service::WorkerManager workerManager;
 };

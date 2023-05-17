@@ -13,6 +13,7 @@ Framework::Framework() noexcept
 	, nameSocket(), nameEndPoint()
 	, gameSocket(), gameEndPoint()
 	, userManager(nameSocket)
+	, workerManager()
 {}
 
 class OnError
