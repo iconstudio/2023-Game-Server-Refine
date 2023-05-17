@@ -26,7 +26,7 @@ export namespace net
 		inline Proxy
 			GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time = INFINITE) noexcept;
 
-		inline constexpr HANDLE invalidHandle = INVALID_HANDLE_VALUE;
+		inline constinit HANDLE invalidHandle = INVALID_HANDLE_VALUE;
 		inline constexpr unsigned long infinite = INFINITE;
 	}
 
