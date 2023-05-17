@@ -3,6 +3,7 @@ module;
 
 export module Net.ThreadUnit;
 import Utility;
+import Utility.Constraints;
 import Utility.Concurrency.Thread;
 import Net;
 
@@ -14,6 +15,18 @@ export namespace net
 	class ThreadUnit
 	{
 	public:
+		template<typename Fn, typename... Args>
+			requires util::invocables<Fn, Args...>
+		ThreadUnit(Fn&& functor, util::CancellationToken&& token, Args&&... args) noexcept
+			: ThreadUnit(util::thread{ functor, util::forward<Args>(args)... }, static_cast<util::CancellationToken&&>(token))
+		{}
+
+		template<typename Fn, typename... Args>
+			requires util::invocables<Fn, Args...>
+		ThreadUnit(Fn&& functor, util::CancellationSource& ssource, Args&&... args) noexcept
+			: ThreadUnit(util::thread{ functor, util::forward<Args>(args)... }, ssource.get_token())
+		{}
+
 		ThreadUnit(util::thread&& thread, util::CancellationSource& ssource) noexcept
 			: ThreadUnit(static_cast<util::thread&&>(thread), ssource.get_token())
 		{}
