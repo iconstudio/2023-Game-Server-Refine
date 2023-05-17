@@ -18,7 +18,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IoState.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Worker.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Module.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ThreadUnit.ixx" />
   </ItemGroup>
   <ItemGroup>
