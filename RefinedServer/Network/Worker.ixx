@@ -1,5 +1,6 @@
 export module Net.Worker;
 import Utility;
+import Utility.Constraints;
 import Utility.Concurrency.Thread;
 import Net;
 import Net.CompletionPort;
@@ -21,12 +22,14 @@ export namespace net
 
 		~WorkerUnit() = default;
 
-		inline void Update(CompletionPort& port)
+		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
+		inline void Update(CompletionPort& port, Fn&& fn) noexcept(noexcept(util::forward<Fn>(fn)()))
 		{
 			while (UpdateOnce(port));
 		}
 
-		inline bool UpdateOnce(CompletionPort& port)
+		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
+		inline bool UpdateOnce(CompletionPort& port, Fn&& fn) noexcept(noexcept(util::forward<Fn>(fn)()))
 		{
 			if (myUnit.stop_requested()) [[unlikely]] {
 				// Await upto 5 seconds
@@ -51,6 +54,7 @@ export namespace net
 				return false;
 			};
 
+			util::forward<Fn>(fn)(context, localKey, localBytes);
 
 			return true;
 		}
