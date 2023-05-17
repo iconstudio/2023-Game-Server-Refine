@@ -21,11 +21,13 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Intrinsics.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IoState.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Module.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Network.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Operations.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Promise.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Settings.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Socket.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ThreadUnit.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Worker.ixx" />
   </ItemGroup>
   <ItemGroup>
