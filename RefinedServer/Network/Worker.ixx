@@ -12,21 +12,21 @@ export extern "C++" namespace net
 	class [[nodiscard]] WorkerUnit
 	{
 	public:
-		WorkerUnit(util::thread&& thread, util::CancellationSource& ssource) noexcept
-			: myUnit(static_cast<util::thread&&>(thread), ssource.get_token())
+		WorkerUnit(util::CancellationSource& ssource) noexcept
+			: cancelToken(ssource.get_token())
 		{}
 
-		WorkerUnit(util::thread&& thread, util::CancellationToken&& token) noexcept
-			: myUnit(static_cast<util::thread&&>(thread), static_cast<util::CancellationToken&&>(token))
+		WorkerUnit(util::CancellationToken&& token) noexcept
+			: cancelToken(static_cast<util::CancellationToken&&>(token))
 		{}
 
 		~WorkerUnit() = default;
 
 		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
-		inline void Update(CompletionPort& port, Fn&& fn)
-			noexcept(noexcept(util::forward<Fn>(fn)()))
+		inline void Start(CompletionPort& port, Fn&& fn)
+			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Context*>(), util::declval<unsigned long long>(), util::declval<unsigned long>())))
 		{
-			while (UpdateOnce(port, fn));
+			while (Update(port, util::forward<Fn>(fn)));
 		}
 
 		WorkerUnit(const WorkerUnit& handle) = delete;
@@ -34,10 +34,10 @@ export extern "C++" namespace net
 
 	private:
 		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
-		inline bool UpdateOnce(CompletionPort& port, Fn&& fn)
+		inline bool Update(CompletionPort& port, Fn&& fn)
 			noexcept(noexcept(util::forward<Fn>(fn)()))
 		{
-			if (myUnit.stop_requested()) [[unlikely]] {
+			if (cancelToken.stop_requested()) [[unlikely]] {
 				// Await upto 5 seconds
 				(void)port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes), 5000);
 
@@ -65,7 +65,7 @@ export extern "C++" namespace net
 			return true;
 		}
 
-		util::ThreadUnit myUnit;
+		util::CancellationToken cancelToken;
 		OVERLAPPED* localHandle{};
 		unsigned long long localKey{};
 		unsigned long localBytes{};
