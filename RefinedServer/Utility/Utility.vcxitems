@@ -39,6 +39,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utility.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)String.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ThreadUnit.ixx" />
   </ItemGroup>
   <ItemGroup>
