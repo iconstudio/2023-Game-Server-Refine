@@ -15,24 +15,24 @@ export namespace util
 	{
 	public:
 		template<typename Fn, typename... Args>
-			requires (!util::same_as<util::clean_t<Fn>, util::thread, util::jthread>&& util::invocables<Fn, Args...>)
-		ThreadUnit(Fn&& functor, util::CancellationToken&& token, Args&&... args) noexcept
-			: ThreadUnit(util::thread{ functor, util::forward<Args>(args)... }, static_cast<util::CancellationToken&&>(token))
+			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
+		ThreadUnit(Fn&& functor, CancellationToken&& token, Args&&... args) noexcept
+			: ThreadUnit(thread{ functor, forward<Args>(args)... }, static_cast<CancellationToken&&>(token))
 		{}
 
 		template<typename Fn, typename... Args>
-			requires (!util::same_as<util::clean_t<Fn>, util::thread, util::jthread>&& util::invocables<Fn, Args...>)
-		ThreadUnit(Fn&& functor, util::CancellationSource& ssource, Args&&... args) noexcept
-			: ThreadUnit(util::thread{ functor, util::forward<Args>(args)... }, ssource.get_token())
+			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
+		ThreadUnit(Fn&& functor, CancellationSource& ssource, Args&&... args) noexcept
+			: ThreadUnit(thread{ functor, forward<Args>(args)... }, ssource.get_token())
 		{}
 
-		ThreadUnit(util::thread&& thread, util::CancellationSource& ssource) noexcept
-			: ThreadUnit(static_cast<util::thread&&>(thread), ssource.get_token())
+		ThreadUnit(thread&& unit, CancellationSource& ssource) noexcept
+			: ThreadUnit(static_cast<thread&&>(unit), ssource.get_token())
 		{}
 
-		ThreadUnit(util::thread&& thread, util::CancellationToken&& token) noexcept
-			: myHandle(static_cast<util::thread&&>(thread))
-			, stopToken(static_cast<util::CancellationToken&&>(token))
+		ThreadUnit(thread&& unit, CancellationToken&& token) noexcept
+			: myHandle(static_cast<thread&&>(unit))
+			, stopToken(static_cast<CancellationToken&&>(token))
 		{}
 
 		~ThreadUnit()
@@ -42,6 +42,11 @@ export namespace util
 
 		inline void swap(ThreadUnit& other) noexcept
 		{
+			if (addressof(other) == this)
+			{
+				return;
+			}
+
 			myHandle.swap(other.myHandle);
 			stopToken.swap(other.stopToken);
 		}
@@ -91,7 +96,7 @@ export namespace util
 		ThreadUnit& operator=(const ThreadUnit& other) = delete;
 		ThreadUnit& operator=(ThreadUnit&& other) = default;
 
-		util::thread myHandle;
-		util::CancellationToken stopToken;
+		thread myHandle;
+		CancellationToken stopToken;
 	};
 }
