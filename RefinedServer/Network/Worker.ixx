@@ -7,7 +7,7 @@ import Net;
 import Net.CompletionPort;
 import Net.Context;
 
-export namespace net
+export extern "C++" namespace net
 {
 	class [[nodiscard]] WorkerUnit
 	{
@@ -26,8 +26,11 @@ export namespace net
 		inline void Update(CompletionPort& port, Fn&& fn)
 			noexcept(noexcept(util::forward<Fn>(fn)()))
 		{
-			while (UpdateOnce(port));
+			while (UpdateOnce(port, fn));
 		}
+
+		WorkerUnit(const WorkerUnit& handle) = delete;
+		WorkerUnit& operator=(const WorkerUnit& handle) = delete;
 
 	private:
 		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
