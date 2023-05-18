@@ -1,6 +1,7 @@
 module;
 #define NOMINMAX
 #include <winsock2.h>
+#include <chrono>
 
 export module Net.CompletionPort;
 import Net.Promise;
@@ -98,6 +99,12 @@ export namespace net
 		inline registerPromise Link(const HANDLE& handle, ullong&& unique_id) noexcept
 		{
 			return abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
+		}
+
+		template<typename Represent, typename Period>
+		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const std::chrono::duration<Represent, Period>& await_time)
+		{
+			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, overlapped_handle, std::chrono::duration_cast<std::chrono::milliseconds>(await_time).count());
 		}
 
 		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = abi::infinite)
