@@ -7,7 +7,6 @@ import Net;
 import Net.EndPoint;
 import Net.Context;
 import Net.Socket;
-import Net.Worker;
 import Net.CompletionPort;
 import Net.Intrinsics;
 import Core.User;

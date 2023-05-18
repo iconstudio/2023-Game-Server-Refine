@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "Framework.hpp"
+#include "Worker.hpp"
 
 import Utility.Print;
 import Utility.Error;
@@ -97,6 +98,10 @@ void Framework::Start() noexcept
 	}).else_then(OnError("수용 시작 단계가 실패했습니다."));
 
 	userManager.Start();
+	workerManager.Push(::Worker, ioPort);
+	workerManager.Push(::Worker, ioPort);
+	workerManager.Push(::Worker, ioPort);
+	workerManager.Push(::Worker, ioPort);
 
 	BeginAccept(userid_t::begin).else_then(OnError("첫번째 수용 단계가 실패했습니다."));
 }

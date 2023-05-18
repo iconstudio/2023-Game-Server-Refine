@@ -1,6 +1,7 @@
 #pragma once
 import Utility.Concurrency.Thread;
+import Utility.Concurrency.Thread.Unit;
 import Net;
+import Net.Worker;
 
-void Worker(util::CancellationToken&& cancel_token, net::CompletionPort& completion_port);
-
+void Worker(net::WorkerUnit&& unit, net::CompletionPort& port);
