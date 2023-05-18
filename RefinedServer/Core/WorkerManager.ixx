@@ -9,7 +9,7 @@ import Utility.Concurrency.Thread.Unit;
 import Net.Context;
 import Net.Worker;
 
-export namespace core::service
+export extern "C++" namespace core::service
 {
 	class [[nodiscard]] WorkerManager
 	{
@@ -26,30 +26,35 @@ export namespace core::service
 			myWorkers.reserve(reserved_size);
 		}
 
-		template<util::invocables Fn>
-		inline void Push(Fn&& fn) noexcept
+		~WorkerManager()
 		{
-			myWorkers.emplace_back(util::thread{ util::forward<Fn>(fn) });
+			stopSource.request_stop();
+
+			for (util::thread& thread : myWorkers)
+			{
+				thread.join();
+			}
+		}
+
+		template<typename Fn, typename... Args>
+			requires util::invocables<Fn, util::CancellationToken, Args...>
+		inline void Push(Fn&& fn, Args&&... args) noexcept
+		{
+			myWorkers.emplace_back(util::thread{ util::forward<Fn>(fn), stopSource.get_token(), util::forward<Args>(args)... });
 		}
 
 		inline void Push(util::thread&& thread) noexcept
 		{
-			myWorkers.emplace_back(static_cast<util::thread&&>(thread), stopSource.get_token());
-		}
-
-		inline void Push(net::WorkerUnit&& worker) noexcept
-		{
-			myWorkers.emplace_back(static_cast<net::WorkerUnit&&>(worker));
+			myWorkers.emplace_back(static_cast<util::thread&&>(thread));
 		}
 
 		WorkerManager(WorkerManager&&) noexcept = default;
 		WorkerManager& operator=(WorkerManager&&) noexcept = default;
 		WorkerManager(const WorkerManager&) = delete;
 		WorkerManager& operator=(const WorkerManager&) = delete;
-		~WorkerManager() = default;
 
 	private:
-		std::vector<net::WorkerUnit> myWorkers;
+		std::vector<util::thread> myWorkers;
 		util::CancellationSource stopSource;
 	};
 }
