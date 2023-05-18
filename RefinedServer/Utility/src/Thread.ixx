@@ -7,9 +7,9 @@ module;
 #include <format>
 export module Utility.Concurrency.Thread;
 
-export namespace util
+export extern "C++" namespace util
 {
-	namespace this_thread
+	extern "C++" namespace this_thread
 	{
 		using ::std::chrono::nanoseconds;
 		using ::std::chrono::microseconds;

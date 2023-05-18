@@ -7,7 +7,7 @@ module;
 #include <string_view>
 export module Utility;
 
-export namespace util
+export extern "C++" namespace util
 {
 	using ::std::type_identity;
 	using ::std::type_identity_t;
@@ -68,14 +68,14 @@ export namespace util
 	using ::std::move_if_noexcept;
 	//using ::std::addressof;
 
-	template <class _Ty>
-	[[nodiscard]] __forceinline constexpr _Ty* addressof(_Ty& _Val) noexcept
+	template <class T>
+	[[nodiscard]] __forceinline constexpr T* addressof(T& _Val) noexcept
 	{
 		return __builtin_addressof(_Val);
 	}
 
-	template <class _Ty>
-	const _Ty* addressof(const _Ty&&) = delete;
+	template <class T>
+	const T* addressof(const T&&) = delete;
 
 	using ::std::is_constant_evaluated;
 	using ::std::unreachable;
