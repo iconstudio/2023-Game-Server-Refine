@@ -35,7 +35,7 @@ export extern "C++" namespace net
 	private:
 		template<util::invocables<Context*, unsigned long long, unsigned long> Fn>
 		inline bool Update(CompletionPort& port, Fn&& fn)
-			noexcept(noexcept(util::forward<Fn>(fn)()))
+			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Context*>(), util::declval<unsigned long long>(), util::declval<unsigned long>())))
 		{
 			if (cancelToken.stop_requested()) [[unlikely]] {
 				// Await upto 5 seconds
