@@ -44,24 +44,10 @@ export extern "C++" namespace util
 	using ::std::make_optional;
 
 	using ::std::initializer_list;
-	using ::std::basic_string;
-	using ::std::basic_string_view;
 
 	using ::std::default_delete;
 	using ::std::destroying_delete_t;
 	using ::std::destroying_delete;
-
-	using string = ::std::string;
-	using wstring = ::std::wstring;
-	using u8string = ::std::u8string;
-	using u16string = ::std::u16string;
-	using u32string = ::std::u32string;
-
-	using string_view = ::std::string_view;
-	using wstring_view = ::std::wstring_view;
-	using u8string_view = ::std::u8string_view;
-	using u16string_view = ::std::u16string_view;
-	using u32string_view = ::std::u32string_view;
 
 	using ::std::move;
 	using ::std::forward;

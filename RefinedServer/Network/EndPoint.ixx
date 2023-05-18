@@ -4,6 +4,7 @@ module;
 
 export module Net.EndPoint;
 import Utility;
+import Utility.String;
 import Net;
 
 export namespace net

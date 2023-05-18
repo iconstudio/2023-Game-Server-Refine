@@ -5,8 +5,9 @@ module;
 #include <format>
 
 export module Utility.Print;
-import Utility.Concurrency.Locks;
 import Utility;
+import Utility.String;
+import Utility.Concurrency.Locks;
 
 #define FORCEIN __forceinline
 

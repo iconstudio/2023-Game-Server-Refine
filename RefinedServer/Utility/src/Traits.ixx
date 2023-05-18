@@ -1,6 +1,5 @@
 module;
 #include <utility>
-
 export module Utility.Traits;
 
 export namespace util
@@ -35,6 +34,7 @@ export namespace util
 	using ::std::remove_reference_t;
 	using ::std::remove_cvref;
 	using ::std::remove_cvref_t;
+	using ::std::unwrap_reference;
 
 	// logical meta functors
 	using ::std::negation;

@@ -1,5 +1,6 @@
 export module Net.Addressing;
 import Utility;
+import Utility.String;
 import Net;
 export import Net.EndPoint;
 

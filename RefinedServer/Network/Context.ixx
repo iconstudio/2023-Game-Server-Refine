@@ -9,6 +9,7 @@ export module Net.Context;
 #pragma warning(disable: 4005 5106)
 import Utility;
 import Utility.Atomic;
+import Utility.String;
 export import :Operations;
 
 namespace net
