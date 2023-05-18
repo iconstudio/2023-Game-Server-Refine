@@ -16,21 +16,21 @@ export namespace util
 	public:
 		template<typename Fn, typename... Args>
 			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
-		ThreadUnit(Fn&& functor, CancellationToken&& token, Args&&... args) noexcept
-			: ThreadUnit(thread{ functor, forward<Args>(args)... }, static_cast<CancellationToken&&>(token))
+		explicit ThreadUnit(Fn&& functor, CancellationToken&& token, Args&&... args) noexcept
+			: ThreadUnit(in_place, thread{ forward<Fn>(functor), forward<Args>(args)... }, static_cast<CancellationToken&&>(token))
 		{}
 
 		template<typename Fn, typename... Args>
 			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
-		ThreadUnit(Fn&& functor, CancellationSource& ssource, Args&&... args) noexcept
-			: ThreadUnit(thread{ functor, forward<Args>(args)... }, ssource.get_token())
+		explicit ThreadUnit(Fn&& functor, CancellationSource& ssource, Args&&... args) noexcept
+			: ThreadUnit(in_place, thread{ forward<Fn>(functor), forward<Args>(args)... }, ssource.get_token())
 		{}
 
-		ThreadUnit(thread&& unit, CancellationSource& ssource) noexcept
-			: ThreadUnit(static_cast<thread&&>(unit), ssource.get_token())
+		explicit ThreadUnit(in_place_t, thread&& unit, CancellationSource& ssource) noexcept
+			: ThreadUnit(in_place, static_cast<thread&&>(unit), ssource.get_token())
 		{}
 
-		ThreadUnit(thread&& unit, CancellationToken&& token) noexcept
+		ThreadUnit(in_place_t, thread&& unit, CancellationToken&& token) noexcept
 			: myHandle(static_cast<thread&&>(unit))
 			, stopToken(static_cast<CancellationToken&&>(token))
 		{}
