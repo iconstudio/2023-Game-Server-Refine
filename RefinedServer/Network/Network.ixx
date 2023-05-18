@@ -15,6 +15,7 @@ export namespace net
 	using ::SOCKET;
 
 	class CompletionPort;
+	class WorkerUnit;
 	class Address;
 	class EndPoint;
 	class Socket;
