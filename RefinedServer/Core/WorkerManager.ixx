@@ -6,6 +6,7 @@ import Utility;
 import Utility.Constraints;
 import Utility.Concurrency.Thread;
 import Utility.Concurrency.Thread.Unit;
+import Net;
 import Net.Context;
 import Net.Worker;
 
@@ -37,15 +38,18 @@ export extern "C++" namespace core::service
 		}
 
 		template<typename Fn, typename... Args>
-			requires util::invocables<Fn, util::CancellationToken, Args...>
+			requires util::invocables<Fn, net::WorkerUnit&&, Args...>
 		inline void Push(Fn&& fn, Args&&... args) noexcept
 		{
-			myWorkers.emplace_back(util::thread{ util::forward<Fn>(fn), stopSource.get_token(), util::forward<Args>(args)... });
+			net::WorkerUnit unit{ stopSource.get_token() };
+			util::thread th{ util::forward<Fn>(fn), util::move(unit), util::forward<Args>(args)... };
+
+			myWorkers.push_back(util::move(th));
 		}
 
 		inline void Push(util::thread&& thread) noexcept
 		{
-			myWorkers.emplace_back(static_cast<util::thread&&>(thread));
+			myWorkers.push_back(static_cast<util::thread&&>(thread));
 		}
 
 		WorkerManager(WorkerManager&&) noexcept = default;
