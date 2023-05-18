@@ -9,6 +9,6 @@ import Net.Worker;
 using namespace ::net;
 using namespace ::core;
 
-void Worker(util::CancellationToken cancel_token, CompletionPort& completion_port)
+void Update(Context* const& context, const unsigned long long& key, const unsigned long& bytes)
 {
 }
