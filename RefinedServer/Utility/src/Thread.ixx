@@ -33,6 +33,8 @@ export extern "C++" namespace util
 	using ::std::ref;
 	using ::std::cref;
 	using ::std::as_const;
+	using ::std::unwrap_reference;
+	using ::std::unwrap_reference_t;
 	using ::std::decay;
 	using ::std::decay_t;
 

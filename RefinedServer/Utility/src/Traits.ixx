@@ -34,7 +34,18 @@ export namespace util
 	using ::std::remove_reference_t;
 	using ::std::remove_cvref;
 	using ::std::remove_cvref_t;
+
+	using ::std::ref;
+	using ::std::cref;
+	using ::std::as_const;
 	using ::std::unwrap_reference;
+	using ::std::unwrap_reference_t;
+	using ::std::unwrap_reference;
+	using ::std::unwrap_reference_t;
+	using ::std::decay;
+	using ::std::decay_t;
+	using ::std::unwrap_ref_decay;
+	using ::std::unwrap_ref_decay_t;
 
 	// logical meta functors
 	using ::std::negation;
