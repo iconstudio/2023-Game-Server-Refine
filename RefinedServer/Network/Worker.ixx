@@ -10,8 +10,12 @@ export extern "C++" namespace net
 	class [[nodiscard]] WorkerUnit
 	{
 	public:
-		WorkerUnit(util::CancellationToken&& token) noexcept
-			: stopToken(static_cast<util::CancellationToken&&>(token))
+		WorkerUnit() noexcept
+			: myThread()
+		{}
+
+		explicit WorkerUnit(util::ThreadUnit&& unit) noexcept
+			: myThread(static_cast<util::ThreadUnit&&>(unit))
 		{}
 
 		WorkerUnit(const WorkerUnit& handle) = delete;
