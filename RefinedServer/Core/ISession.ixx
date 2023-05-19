@@ -1,64 +1,12 @@
-module;
-#include <utility>
-
 export module Core.Session;
 import Utility;
 import Utility.Constraints;
 import Utility.Atomic;
 
-namespace core
-{
-	namespace detail
-	{
-		template<typename T, typename Ty = std::remove_cvref_t<T>>
-		using SelectEn = typename std::conditional_t
-			<std::is_enum_v<std::remove_cvref_t<T>>, std::underlying_type<T>, std::type_identity<T>>::type;
-
-		template<typename T, typename Ty = std::remove_cvref_t<T>>
-		using SelectIn = typename std::enable_if_t<std::is_integral_v<std::remove_cvref_t<T>>, std::type_identity<T>>::type;
-
-		template<typename T, typename Ty = std::remove_cvref_t<T>>
-		using SelectUT = typename std::conditional_t<std::is_integral_v<Ty>, std::type_identity<Ty>, std::underlying_type<Ty>>::type;
-
-		// undefined
-		template<typename T>
-		inline SelectEn<T> declenum(T&& value) noexcept
-		{
-			static_assert(util::always_false<T>, "declenum is undefined for non-enums");
-		}
-
-		// undefined
-		template<typename T>
-		inline SelectIn<T> declintg(T&& value) noexcept
-		{
-			static_assert(util::always_false<T>, "declintg is undefined for non-integrals");
-		}
-
-		// undefined
-		template<typename T>
-		inline SelectUT<T> declitem(T&& value) noexcept
-		{
-			static_assert(util::always_false<T>, "declitem is undefined for non-qualifying identifiers");
-		}
-	}
-
-	export template<typename T>
-		concept managed_session_items = std::copyable<T>
-		&& std::equality_comparable<T>
-		&& std::is_trivial_v<T>
-		&& requires (const T id)
-	{
-		detail::declitem(id);
-	};
-}
-
 export namespace core
 {
-	template<typename ID>
-	concept session_identifiers = managed_session_items<ID>;
-
-	template<typename T, typename ID>
-	concept qualified_sessions = session_identifiers<ID>;
+	template<typename T>
+	concept session_identifiers = util::copyable<T> && util::equality_comparable<T>;
 
 	template<typename T, session_identifiers ID>
 	struct Session
@@ -207,7 +155,7 @@ export namespace core
 			return myID == other.myID;
 		}
 
-		template<typename U, session_identifiers UID>
+		template<typename U, typename UID>
 		[[nodiscard]]
 		inline constexpr bool operator==(const Session<U, UID>& other) const noexcept
 		{

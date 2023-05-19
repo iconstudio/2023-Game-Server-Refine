@@ -1,11 +1,10 @@
 export module Core.Asynchron;
-import Utility;
 import Net.Context;
 import Core.Session;
 
 export namespace core
 {
-	template<typename T, session_identifiers ID>
+	template<typename T, typename ID>
 	class Asynchron
 		: public Session<T, ID>
 		, public net::Context
@@ -20,7 +19,7 @@ export namespace core
 		{}
 
 		explicit constexpr Asynchron(ID&& id) noexcept
-			: base(util::move(id)), Context()
+			: base(static_cast<ID&&>(id)), Context()
 		{}
 
 		constexpr ~Asynchron() noexcept

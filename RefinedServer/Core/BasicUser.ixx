@@ -16,6 +16,11 @@ export namespace core
 
 		constexpr ~BasicUser() noexcept = default;
 
+		constexpr bool operator==(const BasicUser& other) const noexcept
+		{
+			return myID == other.myID;
+		}
+
 		BasicUser(const BasicUser& other) noexcept = delete;
 		BasicUser& operator=(const BasicUser& other) noexcept = delete;
 	};

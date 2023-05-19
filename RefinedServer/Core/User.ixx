@@ -1,7 +1,6 @@
 export module Core.User;
 import Net;
 import Net.Socket;
-import Core.Session;
 import Core.User.Basic;
 export import Core.User.Identifier;
 

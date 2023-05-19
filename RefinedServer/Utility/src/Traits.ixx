@@ -104,6 +104,9 @@ export namespace util
 	using ::std::convertible_to;
 	using ::std::assignable_from;
 
+	using ::std::equality_comparable;
+	using ::std::equality_comparable_with;
+
 	// placeholders
 	using ::std::in_place_t;
 	using ::std::in_place;
