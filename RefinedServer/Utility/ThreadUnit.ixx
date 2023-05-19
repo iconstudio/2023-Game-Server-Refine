@@ -73,13 +73,13 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline std::thread::id get_id() const noexcept
+		inline thread::id get_id() const noexcept
 		{
 			return myHandle.get_id();
 		}
 
 		[[nodiscard]]
-		inline std::thread::native_handle_type native_handle() noexcept
+		inline thread::native_handle_type native_handle() noexcept
 		{
 			return myHandle.native_handle();
 		}

@@ -1,7 +1,4 @@
 export module Net.Worker;
-import Utility;
-import Utility.Constraints;
-import Utility.Concurrency.Thread;
 import Utility.Concurrency.Thread.Unit;
 import Net;
 
@@ -19,13 +16,13 @@ export extern "C++" namespace net
 		{}
 
 		[[nodiscard]]
-		inline std::thread::id get_id() const noexcept
+		inline auto get_id() const noexcept
 		{
 			return myThread.get_id();
 		}
 
 		[[nodiscard]]
-		inline std::thread::native_handle_type native_handle() noexcept
+		inline auto native_handle() noexcept
 		{
 			return myThread.native_handle();
 		}
