@@ -87,14 +87,14 @@ export namespace net
 			: myState(static_cast<monad_t&&>(state))
 		{}
 
-		constexpr Promise(const succeed_t& state)
+		constexpr Promise(const succeed_t& ok)
 			noexcept(util::nothrow_copy_constructibles<succeed_t>)
-			: myState(util::in_place_type<succeed_t>, state)
+			: myState(util::in_place_type<succeed_t>, ok)
 		{}
 
-		constexpr Promise(succeed_t&& state)
+		constexpr Promise(succeed_t&& ok)
 			noexcept(util::nothrow_move_constructibles<succeed_t>)
-			: myState(util::in_place_type<succeed_t>, static_cast<succeed_t&&>(state))
+			: myState(util::in_place_type<succeed_t>, static_cast<succeed_t&&>(ok))
 		{}
 
 		constexpr Promise(const failed_t& error)
@@ -107,7 +107,7 @@ export namespace net
 			: myState(util::in_place_type<failed_t>, static_cast<failed_t&&>(error))
 		{}
 
-		constexpr Promise(defered_t) noexcept
+		constexpr Promise([[maybe_unused]] defered_t) noexcept
 			: myState(util::in_place_type<defered_t>, io::defered)
 		{}
 
@@ -120,6 +120,12 @@ export namespace net
 		constexpr Promise& operator=(Promise&& other) noexcept
 		{
 			myState = static_cast<monad_t&&>(other.myState);
+			return *this;
+		}
+
+		constexpr Promise& operator=(const succeed_t& other) noexcept
+		{
+			myState = other.myState;
 			return *this;
 		}
 
@@ -157,7 +163,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_lvalue_t>{};
 			}
 		}
 
@@ -185,7 +191,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_clvalue_t>{};
 			}
 		}
 
@@ -213,7 +219,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_rvalue_t>{};
 			}
 		}
 
@@ -241,7 +247,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_crvalue_t>{};
 			}
 		}
 
@@ -583,7 +589,7 @@ export namespace net
 			and_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_lvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -598,7 +604,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_lvalue_t>{};
 			}
 		}
 
@@ -612,7 +618,7 @@ export namespace net
 			and_then(Fn&& action) const&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_clvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -627,7 +633,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_clvalue_t>{};
 			}
 		}
 
@@ -641,7 +647,7 @@ export namespace net
 			and_then(Fn&& action) &&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_rvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -656,7 +662,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_rvalue_t>{};
 			}
 		}
 
@@ -670,7 +676,7 @@ export namespace net
 			and_then(Fn&& action) const&&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_crvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -685,7 +691,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_crvalue_t>{};
 			}
 		}
 
@@ -1292,7 +1298,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_lvalue_t>{};
 			}
 		}
 
@@ -1315,7 +1321,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_clvalue_t>{};
 			}
 		}
 
@@ -1338,7 +1344,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_rvalue_t>{};
 			}
 		}
 
@@ -1361,7 +1367,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_crvalue_t>{};
 			}
 		}
 
@@ -1491,7 +1497,7 @@ export namespace net
 			and_then(Fn&& action) &
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_lvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_lvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1506,7 +1512,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_lvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_lvalue_t>{};
 			}
 		}
 
@@ -1516,7 +1522,7 @@ export namespace net
 			and_then(Fn&& action) const&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_clvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_clvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1531,7 +1537,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_clvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_clvalue_t>{};
 			}
 		}
 
@@ -1541,7 +1547,7 @@ export namespace net
 			and_then(Fn&& action) &&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_rvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_rvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1556,7 +1562,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_rvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_rvalue_t>{};
 			}
 		}
 
@@ -1566,7 +1572,7 @@ export namespace net
 			and_then(Fn&& action) const&&
 			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
-			static_assert(!util::same_as<util::monad_result_t<Fn, util::make_crvalue_t<T>>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_crvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
@@ -1581,7 +1587,7 @@ export namespace net
 			}
 			else
 			{
-				return util::monad_result_t<Fn, util::make_crvalue_t<T>>{};
+				return util::fn_result_t<Fn, T, util::make_crvalue_t>{};
 			}
 		}
 

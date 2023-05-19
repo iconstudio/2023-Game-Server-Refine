@@ -173,7 +173,7 @@ export namespace util
 	struct avoid_void<Void>
 	{
 		template<typename Fn, typename... Args>
-		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn, Args...>) -> std::invoke_result_t<Fn, Args...>;
+		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn, Args...>)->std::invoke_result_t<Fn, Args...>;
 
 		template<typename Fn>
 		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn>)->std::invoke_result_t<Fn>;
@@ -223,6 +223,9 @@ export namespace util
 
 	template<typename T>
 	using make_crvalue_t = conditional_t<std::same_as<clean_t<T>, void>, void, add_rvalue_reference_t<add_const_t<T>>>;
+
+	template<typename Fn, typename T, template<typename> typename Wrapper>
+	using fn_result_t = util::monad_result_t<Fn, Wrapper<T>>;
 }
 
 #pragma warning(push, 1)
