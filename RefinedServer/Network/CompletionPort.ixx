@@ -102,34 +102,34 @@ export namespace net
 		}
 
 		template<typename Represent, typename Period>
-		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const std::chrono::duration<Represent, Period>& await_time)
+		inline Proxy Wait(OVERLAPPED* ctx, ullong* key_handle, ulong* bytes_handle, const std::chrono::duration<Represent, Period>& await_time)
 		{
-			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, overlapped_handle, std::chrono::duration_cast<std::chrono::milliseconds>(await_time).count());
+			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, &ctx, std::chrono::duration_cast<std::chrono::milliseconds>(await_time).count());
 		}
 
-		inline Proxy Wait(OVERLAPPED** overlapped_handle, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = abi::infinite)
+		inline Proxy Wait(OVERLAPPED* ctx, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = abi::infinite)
 		{
-			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, overlapped_handle, await_time);
+			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, &ctx, await_time);
 		}
 
-		inline Proxy Post(OVERLAPPED* context, const ullong& key, const ulong& bytes)
+		inline Proxy Post(OVERLAPPED* ctx, const ullong& key, const ulong& bytes)
 		{
-			return abi::PostIoPort(rawHandle, key, bytes, context);
+			return abi::PostIoPort(rawHandle, key, bytes, ctx);
 		}
 
-		inline Proxy Post(OVERLAPPED* context, ullong&& key, const ulong& bytes)
+		inline Proxy Post(OVERLAPPED* ctx, ullong&& key, const ulong& bytes)
 		{
-			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), bytes, context);
+			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), bytes, ctx);
 		}
 
-		inline Proxy Post(OVERLAPPED* context, const ullong& key, ulong&& bytes)
+		inline Proxy Post(OVERLAPPED* ctx, const ullong& key, ulong&& bytes)
 		{
-			return abi::PostIoPort(rawHandle, key, static_cast<ulong&&>(bytes), context);
+			return abi::PostIoPort(rawHandle, key, static_cast<ulong&&>(bytes), ctx);
 		}
 
-		inline Proxy Post(OVERLAPPED* context, ullong&& key, ulong&& bytes)
+		inline Proxy Post(OVERLAPPED* ctx, ullong&& key, ulong&& bytes)
 		{
-			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), context);
+			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), ctx);
 		}
 
 		[[nodiscard]]
