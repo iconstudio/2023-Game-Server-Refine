@@ -2,6 +2,7 @@ export module Net.Promise;
 import Utility;
 import Utility.Constraints;
 import Utility.Monad.Loosen;
+import Net;
 export import Net.IoState;
 
 export namespace net
@@ -36,9 +37,6 @@ export namespace net
 			return util::forward<Fn>(functor)(util::forward<Args>(args)...);
 		}
 	};
-
-	template<typename T, typename E = void>
-	class Promise;
 
 	template<typename T, util::copyable E>
 	class Promise<T, E> final

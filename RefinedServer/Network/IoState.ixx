@@ -1,7 +1,7 @@
 export module Net.IoState;
 import Utility;
 import Utility.Constraints;
-import Utility.Identity;
+export import Utility.Identity;
 
 export namespace net::io
 {
