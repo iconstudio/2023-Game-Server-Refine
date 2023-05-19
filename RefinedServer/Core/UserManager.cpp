@@ -81,7 +81,7 @@ ioError UserManager::BeginAccept(const userid_t& start)
 {
 	auto test_socket = Socket::CreateTCP();
 
-	return nameListener.Accept(*test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize);
+	return nameListener.Accept(test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize);
 }
 
 void UserManager::EndAccept() noexcept

@@ -61,14 +61,14 @@ export namespace net
 			requires (util::notvoids<T>&& util::same_as<util::clean_t<U>, T>)
 		constexpr Promise(U&& pass)
 			noexcept(util::nothrow_copy_constructibles<T>)
-			: myState(util::in_place_type<succeed_t>, io::make_success(util::forward<U>(pass)))
+			: myState(util::in_place_type<succeed_t>, util::forward<U>(pass))
 		{}
 
 		template<typename U>
 			requires (util::same_as<util::clean_t<U>, E>)
 		constexpr Promise(U&& fail)
 			noexcept(util::nothrow_copy_constructibles<E>)
-			: myState(util::in_place_type<failed_t>, io::make_failure(util::forward<U>(fail)))
+			: myState(util::in_place_type<failed_t>, util::forward<U>(fail))
 		{}
 
 		constexpr Promise(const Promise& other) noexcept
@@ -87,19 +87,14 @@ export namespace net
 			: myState(static_cast<monad_t&&>(state))
 		{}
 
-		constexpr Promise(const succeed_t& success)
-			noexcept(util::nothrow_copy_constructibles<succeed_t>) requires util::notvoids<T>
-			: myState(util::in_place_type<succeed_t>, success)
+		constexpr Promise(const succeed_t& state)
+			noexcept(util::nothrow_copy_constructibles<succeed_t>)
+			: myState(util::in_place_type<succeed_t>, state)
 		{}
 
-		constexpr Promise(succeed_t&& success)
-			noexcept(util::nothrow_move_constructibles<succeed_t>) requires util::notvoids<T>
-			: myState(util::in_place_type<succeed_t>, static_cast<succeed_t&&>(success))
-		{}
-
-		constexpr Promise(succeed_t)
-			noexcept requires (!util::notvoids<T>)
-			: myState(util::in_place_type<succeed_t>, succeed_t{})
+		constexpr Promise(succeed_t&& state)
+			noexcept(util::nothrow_move_constructibles<succeed_t>)
+			: myState(util::in_place_type<succeed_t>, static_cast<succeed_t&&>(state))
 		{}
 
 		constexpr Promise(const failed_t& error)
@@ -113,7 +108,7 @@ export namespace net
 		{}
 
 		constexpr Promise(defered_t) noexcept
-			: myState(util::in_place_type<defered_t>, defered_t{})
+			: myState(util::in_place_type<defered_t>, io::defered)
 		{}
 
 		constexpr Promise& operator=(const Promise& other) noexcept
@@ -1208,7 +1203,7 @@ export namespace net
 			requires util::notvoids<T>
 		constexpr Promise(U&& successor)
 			noexcept(util::nothrow_copy_constructibles<T>)
-			: myState(util::in_place_type<succeed_t>, io::make_success(util::forward<U>(successor)))
+			: myState(util::in_place_type<succeed_t>, util::forward<U>(successor))
 		{}
 
 		constexpr Promise(const Promise& other)

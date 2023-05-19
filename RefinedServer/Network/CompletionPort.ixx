@@ -157,7 +157,7 @@ export namespace net
 		}
 		else
 		{
-			return registerPromise{ io::make_success() };
+			return registerPromise{ io::success };
 		}
 	}
 
@@ -166,11 +166,11 @@ export namespace net
 	{
 		if (0 != ::PostQueuedCompletionStatus(io_port, bytes, key, overlapped))
 		{
-			return Proxy{ io::make_success() };
+			return Proxy{ io::success };
 		}
 		else
 		{
-			return Proxy{ io::make_failure() };
+			return Proxy{ io::failure };
 		}
 	}
 
@@ -179,11 +179,11 @@ export namespace net
 	{
 		if (0 != ::GetQueuedCompletionStatus(io_port, bytes_handle, key_handle, overlapped_handle, await_time))
 		{
-			return Proxy{ io::make_success() };
+			return Proxy{ io::success };
 		}
 		else
 		{
-			return Proxy{ io::make_failure() };
+			return Proxy{ io::failure };
 		}
 	}
 }

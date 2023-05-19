@@ -14,7 +14,7 @@ export namespace core
 	public:
 		constexpr User(const userid_t& id, net::Socket&& socket) noexcept
 			: BasicUser(id)
-			, mySocket(static_cast<net::Socket&&>(socket))
+			//, mySocket(static_cast<net::Socket&&>(socket))
 		{}
 
 		~User() noexcept = default;
@@ -24,6 +24,6 @@ export namespace core
 		User& operator=(const User& other) = delete;
 		User& operator=(User&& other) = delete;
 
-		net::Socket mySocket;
+		//net::Socket mySocket;
 	};
 }

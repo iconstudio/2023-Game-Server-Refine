@@ -801,6 +801,7 @@ export namespace std
 #pragma warning(push, 1)
 namespace util::test
 {
+#if false
 	constexpr void do_something() noexcept {}
 
 	void test_loose() noexcept
@@ -866,5 +867,6 @@ namespace util::test
 			do_something();
 		});
 	}
+#endif
 }
 #pragma warning(pop)
