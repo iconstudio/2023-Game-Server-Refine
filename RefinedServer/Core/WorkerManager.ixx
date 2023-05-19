@@ -41,15 +41,13 @@ export extern "C++" namespace core::service
 			requires util::invocables<Fn, net::WorkerUnit&, Args...>
 		inline void Push(Fn&& fn, Args&&... args) noexcept
 		{
-			net::WorkerUnit unit{ stopSource.get_token() };
-			util::thread th{ util::forward<Fn>(fn), util::move(unit), util::forward<Args>(args)... };
+			net::WorkerUnit* unit = new net::WorkerUnit{};
 
-			myWorkers.push_back(util::move(th));
-		}
+			util::ThreadUnit thread_unit = util::ThreadUnit{ util::forward<Fn>(fn), stopSource, util::ref(*unit), util::forward<Args>(args)... };
 
-		inline void Push(util::thread&& thread) noexcept
-		{
-			myWorkers.push_back(static_cast<util::thread&&>(thread));
+			*unit = net::WorkerUnit{ static_cast<util::ThreadUnit&&>(thread_unit) };
+
+			myWorkers.push_back(unit);
 		}
 
 		WorkerManager(WorkerManager&&) noexcept = default;
