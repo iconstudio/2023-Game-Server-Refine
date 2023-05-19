@@ -19,29 +19,36 @@ export namespace util
 		{}
 
 		template<typename Fn, typename... Args>
-			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
-		explicit ThreadUnit(Fn&& functor, CancellationToken&& token, Args&&... args) noexcept
+			requires (!same_as<clean_t<Fn>, thread, jthread, in_place_t>&& invocables<Fn, unwrap_ref_decay_t<Args>...>)
+		explicit(0 < sizeof...(Args))
+			ThreadUnit(Fn&& functor, CancellationToken&& token, Args&&... args) noexcept
 			: ThreadUnit(in_place, thread{ forward<Fn>(functor), forward<Args>(args)... }, static_cast<CancellationToken&&>(token))
 		{}
 
 		template<typename Fn, typename... Args>
-			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
-		explicit ThreadUnit(Fn&& functor, CancellationSource& ssource, Args&&... args) noexcept
+			requires (!same_as<clean_t<Fn>, thread, jthread, in_place_t>&& invocables<Fn, unwrap_ref_decay_t<Args>...>)
+		explicit(0 < sizeof...(Args))
+			ThreadUnit(Fn&& functor, CancellationSource& ssource, Args&&... args) noexcept
 			: ThreadUnit(in_place, thread{ forward<Fn>(functor), forward<Args>(args)... }, ssource.get_token())
 		{}
 
-		explicit ThreadUnit(in_place_t, thread&& unit, CancellationSource& ssource) noexcept
+		explicit ThreadUnit([[maybe_unused]] in_place_t, thread&& unit, CancellationSource& ssource)
+			noexcept
 			: ThreadUnit(in_place, static_cast<thread&&>(unit), ssource.get_token())
 		{}
 
-		ThreadUnit(in_place_t, thread&& unit, CancellationToken&& token) noexcept
+		explicit ThreadUnit([[maybe_unused]] in_place_t, thread&& unit, CancellationToken&& token)
+			noexcept
 			: myHandle(static_cast<thread&&>(unit))
 			, stopToken(static_cast<CancellationToken&&>(token))
 		{}
 
 		~ThreadUnit()
 		{
-			join();
+			if (myHandle.joinable())
+			{
+				join();
+			}
 		}
 
 		inline void swap(ThreadUnit& other) noexcept
