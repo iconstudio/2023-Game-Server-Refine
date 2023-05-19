@@ -14,6 +14,10 @@ export namespace util
 	class [[nodiscard]] ThreadUnit
 	{
 	public:
+		ThreadUnit() noexcept
+			: myHandle(), stopToken()
+		{}
+
 		template<typename Fn, typename... Args>
 			requires (!same_as<clean_t<Fn>, thread, jthread>&& invocables<Fn, Args...>)
 		explicit ThreadUnit(Fn&& functor, CancellationToken&& token, Args&&... args) noexcept
