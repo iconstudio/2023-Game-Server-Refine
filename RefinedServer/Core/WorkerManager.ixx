@@ -31,9 +31,9 @@ export extern "C++" namespace core::service
 		{
 			stopSource.request_stop();
 
-			for (util::thread& thread : myWorkers)
+			for (auto* worker : myWorkers)
 			{
-				thread.join();
+				delete worker;
 			}
 		}
 
