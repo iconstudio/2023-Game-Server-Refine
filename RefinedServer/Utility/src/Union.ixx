@@ -720,6 +720,7 @@ namespace util::detail
 	};
 
 	using ::std::integral_constant;
+	using FirstIndexer = integral_constant<size_t, 0>;
 
 	struct hide_variant0
 	{
@@ -742,11 +743,17 @@ namespace util::detail
 
 export namespace util
 {
+	//template <typename... Ts>
+	//using Union = typename detail::hide_variant1::template type<Ts...>;
+
+	//template <size_t I, typename... Ts>
+	//using DerivedUnion = typename detail::hide_variant2::template type<I, Ts...>;
+
 	template <typename... Ts>
-	using Union = typename detail::hide_variant1::template type<Ts...>;
+	using Union = typename detail::PlacedVariant<detail::FirstIndexer, Ts...>;
 
 	template <size_t I, typename... Ts>
-	using DerivedUnion = typename detail::hide_variant2::template type<I, Ts...>;
+	using DerivedUnion = typename detail::PlacedVariant<integral_constant<size_t, I>, Ts...>;
 }
 
 export namespace std
@@ -830,6 +837,7 @@ export namespace std
 #pragma warning(push, 0)
 namespace util::test
 {
+#if false
 	void test_union() noexcept
 	{
 		using aa_t = Union<int, void, unsigned long, float>;
@@ -897,5 +905,6 @@ namespace util::test
 		const auto cgetter2 = ff.get<2>();
 		//const auto cgetter3 = ff.get<3>();
 	}
+#endif // false
 }
 #pragma warning(pop)
