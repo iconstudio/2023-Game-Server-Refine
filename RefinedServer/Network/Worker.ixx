@@ -1,8 +1,12 @@
 export module Net.Worker;
+import Utility;
+import Utility.Constraints;
 import Utility.Concurrency.Thread.Unit;
 import Net;
+import Net.CompletionPort;
+import Net.Context;
 
-export extern "C++" namespace net
+export namespace net
 {
 	class [[nodiscard]] WorkerUnit
 	{
@@ -14,6 +18,40 @@ export extern "C++" namespace net
 		explicit WorkerUnit(util::ThreadUnit&& unit) noexcept
 			: myThread(static_cast<util::ThreadUnit&&>(unit))
 		{}
+
+		template<typename Fn>
+			//requires (util::invocables<Fn, Context*, unsigned long long, unsigned long>)
+		inline void Start(Fn&& fn, CompletionPort& port)
+			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Context*>(), util::declval<unsigned long long>(), util::declval<unsigned long>())))
+		{
+			while (true)
+			{
+				if (myThread.stop_requested()) [[unlikely]] {
+					// Await upto 5 seconds
+					(void)port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes), 5000);
+
+					return;
+				};
+
+				// Await infinitely
+				const auto success = port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes));
+
+				if (!success.IsSuccess()) [[unlikely]] {
+					return;
+				};
+
+				if (nullptr == localHandle) [[unlikely]] {
+					return;
+				};
+
+				Context* const& context = static_cast<Context*>(localHandle);
+				if (!context) [[unlikely]] {
+					return;
+				};
+
+				util::forward<Fn>(fn)(context, localKey, localBytes);
+			}
+		}
 
 		[[nodiscard]]
 		inline auto get_id() const noexcept
@@ -47,7 +85,7 @@ export extern "C++" namespace net
 	private:
 		util::ThreadUnit myThread;
 
-		OVERLAPPED* localHandle{};
+		Context* localHandle{};
 		unsigned long long localKey{};
 		unsigned long localBytes{};
 	};
