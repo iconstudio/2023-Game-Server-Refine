@@ -1,5 +1,4 @@
 export module Core.User.Basic;
-import Core.Session;
 import Core.Asynchron;
 export import Core.User.Identifier;
 
