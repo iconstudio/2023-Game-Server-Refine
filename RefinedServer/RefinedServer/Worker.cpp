@@ -47,6 +47,10 @@ void Update(Context* const& context, const unsigned long long& key, const unsign
 
 void Worker(net::WorkerUnit& unit, net::CompletionPort& port)
 {
+	const auto id = unit.get_id();
+
+	util::Println("작업자 스레드 {}을(를) 시작합니다.", *reinterpret_cast<const unsigned long*>(&id));
+
 	if (stopToken.stop_requested()) [[unlikely]] {
 		// Await upto 5 seconds
 		(void)port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes), 5000);
