@@ -14,11 +14,6 @@ import Net.Worker;
 using namespace ::net;
 using namespace ::core;
 
-thread_local util::CancellationToken stopToken;
-thread_local OVERLAPPED* localHandle{};
-thread_local unsigned long long localKey{};
-thread_local unsigned long localBytes{};
-
 void Update(Context* const& context, const unsigned long long& key, const unsigned long& bytes)
 {
 	switch (context->GetOperation())
@@ -48,31 +43,11 @@ void Update(Context* const& context, const unsigned long long& key, const unsign
 void Worker(net::WorkerUnit& unit, net::CompletionPort& port)
 {
 	const auto id = unit.get_id();
+	const unsigned long raw_id = *reinterpret_cast<const unsigned long*>(&id);
 
-	util::Println("작업자 스레드 {}을(를) 시작합니다.", *reinterpret_cast<const unsigned long*>(&id));
+	util::Println("작업자 스레드 {}을(를) 시작합니다.", raw_id);
 
-	if (stopToken.stop_requested()) [[unlikely]] {
-		// Await upto 5 seconds
-		(void)port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes), 5000);
+	unit.Start(::Update, port);
 
-		//return false;
-	};
-
-	// Await infinitely
-	const auto success = port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes));
-
-	if (!success.IsSuccess()) [[unlikely]] {
-		//return false;
-	};
-
-	if (nullptr == localHandle) [[unlikely]] {
-		//return false;
-	};
-
-	Context* const& context = static_cast<Context*>(localHandle);
-	if (!context) [[unlikely]] {
-		//return false;
-	};
-
-	//util::forward<Fn>(fn)(context, localKey, localBytes);
+	util::Println("작업자 스레드 {}을(를) 종료합니다.", raw_id);
 }
