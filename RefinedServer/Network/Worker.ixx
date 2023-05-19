@@ -6,7 +6,7 @@ import Net;
 import Net.CompletionPort;
 import Net.Context;
 
-export namespace net
+export extern "C++" namespace net
 {
 	class [[nodiscard]] WorkerUnit
 	{
@@ -20,7 +20,7 @@ export namespace net
 		{}
 
 		template<typename Fn>
-			//requires (util::invocables<Fn, Context*, unsigned long long, unsigned long>)
+			requires (util::invocables<Fn, Context*, unsigned long long, unsigned long>)
 		inline void Start(Fn&& fn, CompletionPort& port)
 			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Context*>(), util::declval<unsigned long long>(), util::declval<unsigned long>())))
 		{
