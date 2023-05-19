@@ -19,7 +19,9 @@ export extern "C++" namespace net
 		{}
 
 		WorkerUnit(const WorkerUnit& handle) = delete;
+		WorkerUnit(WorkerUnit&& handle) = default;
 		WorkerUnit& operator=(const WorkerUnit& handle) = delete;
+		WorkerUnit& operator=(WorkerUnit&& handle) = default;
 
 	private:
 		util::CancellationToken stopToken;
