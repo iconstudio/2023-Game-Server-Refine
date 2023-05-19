@@ -37,19 +37,11 @@ export namespace net::io
 	inline constexpr just_defered_t defered{ };
 
 	template<typename T>
-		requires(util::notvoids<T>)
-	constexpr success_t<T> make_success(const T& value)
-		noexcept(util::nothrow_copy_constructibles<T>)
+	constexpr auto make_success(T&& value)
+		noexcept(util::nothrow_constructibles<success_t<T>, util::add_rvalue_reference_t<T>>)
+		-> success_t<util::clean_t<T>>
 	{
-		return success_t<T>{ value };
-	}
-
-	template<typename T>
-		requires(util::notvoids<T>)
-	constexpr success_t<T> make_success(T&& value)
-		noexcept(util::nothrow_copy_constructibles<T>)
-	{
-		return success_t<T>{ static_cast<T&&>(value) };
+		return success_t<util::clean_t<T>>{ util::forward<T>(value) };
 	}
 
 	constexpr just_success_t make_success()
@@ -59,19 +51,11 @@ export namespace net::io
 	}
 
 	template<typename T>
-		requires(util::notvoids<T>)
-	constexpr defer_t<T> make_defered(const T& value)
-		noexcept(util::nothrow_copy_constructibles<T>)
+	constexpr auto make_defered(T&& value)
+		noexcept(util::nothrow_constructibles<defer_t<T>, util::add_rvalue_reference_t<T>>)
+		-> defer_t<util::clean_t<T>>
 	{
-		return defer_t<T>{ value };
-	}
-
-	template<typename T>
-		requires(util::notvoids<T>)
-	constexpr defer_t<T> make_defered(T&& value)
-		noexcept(util::nothrow_copy_constructibles<T>)
-	{
-		return defer_t<T>{ static_cast<T&&>(value) };
+		return defer_t<util::clean_t<T>>{ util::forward<T>(value) };
 	}
 
 	constexpr just_defered_t make_defered()
@@ -81,19 +65,11 @@ export namespace net::io
 	}
 
 	template<typename T>
-		requires(util::notvoids<T>)
-	constexpr failure_t<T> make_failure(const T& value)
-		noexcept(util::nothrow_copy_constructibles<T>)
+	constexpr auto make_failure(T&& value)
+		noexcept(util::nothrow_constructibles<failure_t<T>, util::add_rvalue_reference_t<T>>)
+		-> failure_t<util::clean_t<T>>
 	{
-		return failure_t<T>{ value };
-	}
-
-	template<typename T>
-		requires(util::notvoids<T>)
-	constexpr failure_t<T> make_failure(T&& value)
-		noexcept(util::nothrow_copy_constructibles<T>)
-	{
-		return failure_t<T>{ static_cast<T&&>(value) };
+		return failure_t<util::clean_t<T>>{ util::forward<T>(value) };
 	}
 
 	constexpr just_failure_t make_failure()
