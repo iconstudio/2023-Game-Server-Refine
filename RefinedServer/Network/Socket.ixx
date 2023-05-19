@@ -4,13 +4,11 @@ module;
 
 export module Net.Socket;
 import Utility;
-import Utility.Constraints;
 import Utility.Option;
 import Net;
 import Net.Addressing;
 import Net.EndPoint;
 import Net.Context;
-import Net.Promise;
 import Net.Intrinsics;
 
 export namespace net
@@ -276,7 +274,6 @@ export namespace net
 		}
 
 		template<typename T>
-			requires (!util::same_as<bool, util::clean_t<T>> && !util::same_as<Socket, util::clean_t<T>>)
 		inline ioError SetOptionByValue(const SocketOptions& option, const T& value)
 		{
 			return io::Execute(::setsockopt, myHandle, SOL_SOCKET
