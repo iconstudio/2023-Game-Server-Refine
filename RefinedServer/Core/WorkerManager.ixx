@@ -58,7 +58,7 @@ export extern "C++" namespace core::service
 		WorkerManager& operator=(const WorkerManager&) = delete;
 
 	private:
-		std::vector<util::thread> myWorkers;
+		std::vector<net::WorkerUnit*> myWorkers;
 		util::CancellationSource stopSource;
 	};
 }
