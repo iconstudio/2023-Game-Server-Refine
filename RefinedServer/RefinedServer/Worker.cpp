@@ -45,7 +45,7 @@ void Update(Context* const& context, const unsigned long long& key, const unsign
 	}
 }
 
-void Worker(net::WorkerUnit&& unit, net::CompletionPort& port)
+void Worker(net::WorkerUnit& unit, net::CompletionPort& port)
 {
 	if (stopToken.stop_requested()) [[unlikely]] {
 		// Await upto 5 seconds
