@@ -18,13 +18,38 @@ export extern "C++" namespace net
 			: myThread(static_cast<util::ThreadUnit&&>(unit))
 		{}
 
+		[[nodiscard]]
+		inline std::thread::id get_id() const noexcept
+		{
+			return myThread.get_id();
+		}
+
+		[[nodiscard]]
+		inline std::thread::native_handle_type native_handle() noexcept
+		{
+			return myThread.native_handle();
+		}
+
+		[[nodiscard]]
+		inline bool stop_requested() const noexcept
+		{
+			return myThread.stop_requested();
+		}
+
+		[[nodiscard]]
+		inline bool stop_possible() const noexcept
+		{
+			return myThread.stop_possible();
+		}
+
 		WorkerUnit(const WorkerUnit& handle) = delete;
 		WorkerUnit(WorkerUnit&& handle) = default;
 		WorkerUnit& operator=(const WorkerUnit& handle) = delete;
 		WorkerUnit& operator=(WorkerUnit&& handle) = default;
 
 	private:
-		util::CancellationToken stopToken;
+		util::ThreadUnit myThread;
+
 		OVERLAPPED* localHandle{};
 		unsigned long long localKey{};
 		unsigned long localBytes{};
