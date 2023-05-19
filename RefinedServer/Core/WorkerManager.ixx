@@ -38,7 +38,7 @@ export extern "C++" namespace core::service
 		}
 
 		template<typename Fn, typename... Args>
-			requires util::invocables<Fn, net::WorkerUnit&&, Args...>
+			requires util::invocables<Fn, net::WorkerUnit&, Args...>
 		inline void Push(Fn&& fn, Args&&... args) noexcept
 		{
 			net::WorkerUnit unit{ stopSource.get_token() };
