@@ -28,13 +28,13 @@ export namespace net
 			{
 				if (myThread.stop_requested()) [[unlikely]] {
 					// Await upto 5 seconds
-					(void)port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes), 5000);
+					(void)port.Wait(localHandle, util::addressof(localKey), util::addressof(localBytes), 5000);
 
 					return;
 				};
 
 				// Await infinitely
-				const auto success = port.Wait(util::addressof(localHandle), util::addressof(localKey), util::addressof(localBytes));
+				const auto success = port.Wait(localHandle, util::addressof(localKey), util::addressof(localBytes));
 
 				if (!success.IsSuccess()) [[unlikely]] {
 					return;
