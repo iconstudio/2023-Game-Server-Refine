@@ -300,28 +300,11 @@ export namespace net
 			);
 		}
 
+		/// <returns>SOCKET</returns>
 		[[nodiscard]]
-		constexpr const SOCKET& Handle() const& noexcept
+		constexpr unsigned long long Handle() const noexcept
 		{
 			return myHandle;
-		}
-
-		[[nodiscard]]
-		constexpr const volatile SOCKET& Handle() const volatile& noexcept
-		{
-			return myHandle;
-		}
-
-		[[nodiscard]]
-		constexpr SOCKET&& Handle() && noexcept
-		{
-			return static_cast<SOCKET&&>(myHandle);
-		}
-
-		[[nodiscard]]
-		constexpr volatile SOCKET&& Handle() volatile&& noexcept
-		{
-			return static_cast<volatile SOCKET&&>(myHandle);
 		}
 
 		[[nodiscard]]

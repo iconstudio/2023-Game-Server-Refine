@@ -63,7 +63,7 @@ void Framework::Awake()
 	nameSocket.Bind(nameEndPoint)
 		.else_then(OnError("서버의 주소를 지정하는데 실패했습니다."));
 
-	ioPort.Link(nameSocket.Handle(), serverTcpID)
+	ioPort.Link(nameSocket, serverTcpID)
 		.else_then(OnError("서버의 TCP 소켓을 IOCP에 연결하는데 실패했습니다."));
 
 	Socket::CreateUDP().if_then([this](Socket&& socket) noexcept {
@@ -78,7 +78,7 @@ void Framework::Awake()
 	gameEndPoint = EndPoint::CreateStaticUDP(AddressFamily::IPv4, udpPort);
 	gameSocket.Bind(gameEndPoint).else_then(OnError("서버의 UDP 주소를 지정하는데 실패했습니다."));
 
-	ioPort.Link(gameSocket.Handle(), serverUdpID)
+	ioPort.Link(gameSocket, serverUdpID)
 		.else_then(OnError("서버의 UDP 소켓을 IOCP에 연결하는데 실패했습니다."));
 
 	gameSocket.optDebug = true;

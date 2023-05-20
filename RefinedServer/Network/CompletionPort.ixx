@@ -6,9 +6,13 @@ module;
 export module Net.CompletionPort;
 import Net;
 import Net.Promise;
+import Net.Socket;
 
 using ulong = unsigned long;
 using ullong = unsigned long long;
+
+export using ::UINT_PTR;
+export using ::SOCKET;
 
 export namespace net
 {
@@ -82,24 +86,14 @@ export namespace net
 			}
 		}
 
-		inline registerPromise Link(const SOCKET& target, const ullong& unique_id) noexcept
+		inline registerPromise Link(Socket& socket, const ullong& unique_id) noexcept
 		{
-			return Link(reinterpret_cast<HANDLE>(target), unique_id);
+			return _Link(socket.Handle(), unique_id);
 		}
 
-		inline registerPromise Link(const SOCKET& target, ullong&& unique_id) noexcept
+		inline registerPromise Link(Socket& socket, ullong&& unique_id) noexcept
 		{
-			return Link(reinterpret_cast<HANDLE>(target), static_cast<ullong&&>(unique_id));
-		}
-
-		inline registerPromise Link(const HANDLE& handle, const ullong& unique_id) noexcept
-		{
-			return abi::RegisterIoPort(rawHandle, handle, unique_id);
-		}
-
-		inline registerPromise Link(const HANDLE& handle, ullong&& unique_id) noexcept
-		{
-			return abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
+			return _Link(socket.Handle(), static_cast<ullong&&>(unique_id));
 		}
 
 		template<typename Represent, typename Period>
@@ -143,6 +137,26 @@ export namespace net
 		CompletionPort& operator=(const CompletionPort& handle) = delete;
 
 	private:
+		inline registerPromise _Link(const SOCKET& target, const ullong& unique_id) noexcept
+		{
+			return _Link(reinterpret_cast<HANDLE>(target), unique_id);
+		}
+
+		inline registerPromise _Link(const SOCKET& target, ullong&& unique_id) noexcept
+		{
+			return _Link(reinterpret_cast<HANDLE>(target), static_cast<ullong&&>(unique_id));
+		}
+
+		inline registerPromise _Link(const HANDLE& handle, const ullong& unique_id) noexcept
+		{
+			return abi::RegisterIoPort(rawHandle, handle, unique_id);
+		}
+
+		inline registerPromise _Link(const HANDLE& handle, ullong&& unique_id) noexcept
+		{
+			return abi::RegisterIoPort(rawHandle, handle, static_cast<ullong&&>(unique_id));
+		}
+
 		HANDLE rawHandle;
 	};
 

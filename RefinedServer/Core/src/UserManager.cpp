@@ -44,7 +44,7 @@ void UserManager::Awake(net::CompletionPort& port)
 				socket.optNoDelay = true;
 				nameListener.optUpdateContext = socket;
 
-				port.Link(socket.Handle(), CastID(user_id));
+				port.Link(socket, CastID(user_id));
 
 				return new User(user_id++, util::move(socket));
 			});
