@@ -614,6 +614,27 @@ export namespace util
 			}
 		}
 
+		template<typename Uty>
+		constexpr void set(Uty&& value)
+			noexcept(noexcept(myStorage.set(util::forward<Uty>(value))))
+		{
+			myStorage.set(util::forward<Uty>(value));
+		}
+
+		template <size_t Index, typename Uty>
+		constexpr decltype(auto) try_set(Uty&& value)
+			noexcept(noexcept(myStorage.template try_set<Index>(util::forward<Uty>(value))))
+		{
+			return myStorage.template try_set<Index>(util::forward<Uty>(value));
+		}
+
+		template <typename... Args>
+		constexpr decltype(auto) emplace(Args&&... args)
+			noexcept(noexcept(myStorage.emplace(util::forward<Args>(args)...)))
+		{
+			return myStorage.emplace(util::forward<Args>(args)...);
+		}
+
 		template <size_t Index>
 			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
