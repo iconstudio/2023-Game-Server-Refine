@@ -31,6 +31,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+out/
+cmake-build-debug/
+cmake-build-debug-event-trace/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -396,9 +399,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/.idea/workspace.xml
-/.idea/misc.xml
-/RefinedServer/Utility/cmake-build-debug
-/RefinedServer/Utility/.idea
-/RefinedServer/Utility/cmake-build-debug-event-trace
-/RefinedServer/Core/cmake-build-debug
+.idea/

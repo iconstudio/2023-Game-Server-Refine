@@ -15,17 +15,17 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Asynchron.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)BasicUser.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)ISession.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)PacketIdentifier.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)User.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)UserIdentifier.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)UserManager.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)UserManager.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)WorkerManager.ixx" />
+    <Natvis Include="$(MSBuildThisFileDirectory)Core.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="$(MSBuildThisFileDirectory)Core.natvis" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Asynchron.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\BasicUser.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\ISession.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\PacketIdentifier.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\User.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\UserIdentifier.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\UserManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\UserManager.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\WorkerManager.ixx" />
   </ItemGroup>
 </Project>

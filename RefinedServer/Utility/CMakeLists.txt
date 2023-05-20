@@ -26,9 +26,9 @@ ADD_EXECUTABLE(Utility "src/Testbed.cpp"
                src/Option.ixx
                src/Print.ixx
                src/Singleton.ixx
-               src/String.ixx
+               "src/String.ixx"
                src/
-               src/Thread.ixx
+               "src/Thread.ixx"
                src/ThreadUnit.ixx
                src/Traits.ixx
                src/Union.ixx
