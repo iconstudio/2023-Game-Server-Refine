@@ -401,3 +401,4 @@ FodyWeavers.xsd
 /RefinedServer/Utility/cmake-build-debug
 /RefinedServer/Utility/.idea
 /RefinedServer/Utility/cmake-build-debug-event-trace
+/RefinedServer/Core/cmake-build-debug
