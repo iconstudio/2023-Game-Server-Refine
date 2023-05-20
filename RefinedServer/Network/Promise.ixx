@@ -1276,9 +1276,6 @@ export namespace net
 	};
 
 	using Proxy = Promise<void, void>;
-	template<typename T>
-	using ErrorHandler = Promise<T, int>;
-	using PointerHandler = ErrorHandler<void*>;
 
 	template<typename T>
 	Promise(T) -> Promise<T, void>;
@@ -1290,7 +1287,8 @@ export namespace net
 #pragma warning(push, 1)
 namespace net::test
 {
-	static void test_promise() noexcept
+#if false
+	void test_promise() noexcept
 	{
 		constexpr auto fnl0 = [](const int& v) -> int {
 			return 300;
@@ -1310,5 +1308,6 @@ namespace net::test
 
 		constexpr Proxy proxy0{};
 	}
+#endif // false
 }
 #pragma warning(pop)

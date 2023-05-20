@@ -3,8 +3,8 @@ import Utility;
 import Utility.Constraints;
 import Utility.Traits;
 import Net;
-export import Net.IoState;
-export import Net.Promise;
+import Net.IoState;
+import Net.Promise;
 
 export namespace net
 {
@@ -60,6 +60,7 @@ export namespace net
 		}
 	}
 
+#if true
 	export namespace io
 	{
 		template<typename Fn, typename... Args>
@@ -117,4 +118,5 @@ export namespace net
 			return CheckIO(static_cast<int&&>(result));
 		}
 	}
+#endif // false
 }

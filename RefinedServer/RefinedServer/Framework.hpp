@@ -8,7 +8,6 @@ import Net.EndPoint;
 import Net.Context;
 import Net.Socket;
 import Net.CompletionPort;
-import Net.Intrinsics;
 import Core.User;
 import Core.Service.UserManager;
 import Core.Service.WorkerManager;
