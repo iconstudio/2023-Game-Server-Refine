@@ -1,5 +1,7 @@
+module;
+#include <utility>
+
 export module Net.Worker;
-import Utility;
 import Utility.Constraints;
 import Utility.Concurrency.Thread.Unit;
 import Net;
@@ -22,19 +24,19 @@ export extern "C++" namespace net
 		template<typename Fn>
 			requires (util::invocables<Fn, Context*, unsigned long long, unsigned long>)
 		inline void Start(Fn&& fn, CompletionPort& port)
-			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Context*>(), util::declval<unsigned long long>(), util::declval<unsigned long>())))
+			noexcept(noexcept(std::forward<Fn>(fn)(std::declval<Context*>(), std::declval<unsigned long long>(), std::declval<unsigned long>())))
 		{
 			while (true)
 			{
 				if (myThread.stop_requested()) [[unlikely]] {
 					// Await upto 5 seconds
-					(void)port.Wait(localHandle, util::addressof(localKey), util::addressof(localBytes), 5000);
+					(void)port.Wait(localHandle, std::addressof(localKey), std::addressof(localBytes), 5000);
 
 					return;
 				};
 
 				// Await infinitely
-				const auto success = port.Wait(localHandle, util::addressof(localKey), util::addressof(localBytes));
+				const auto success = port.Wait(localHandle, std::addressof(localKey), std::addressof(localBytes));
 
 				if (!success.IsSuccess()) [[unlikely]] {
 					return;
@@ -49,7 +51,7 @@ export extern "C++" namespace net
 					return;
 				};
 
-				util::forward<Fn>(fn)(context, localKey, localBytes);
+				std::forward<Fn>(fn)(context, localKey, localBytes);
 			}
 		}
 

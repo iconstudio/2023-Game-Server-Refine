@@ -225,6 +225,9 @@
     <ClCompile Update="D:\yoyof\Documents\Git\iconstudio\2023-Game-Server-Refine\RefinedServer\Network\ISession.ixx">
       <FileType>Document</FileType>
     </ClCompile>
+    <ClCompile Update="D:\yoyof\Documents\Git\iconstudio\2023-Game-Server-Refine\RefinedServer\Utility\_Promise.ixx">
+      <FileType>Document</FileType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Core\Core.natvis">
