@@ -23,6 +23,8 @@ export namespace net
 	class Context;
 	class SendContext;
 
+	template<typename T, typename E, typename C>
+	class Promise;
 	template<size_t Size>
 	class SocketStream;
 

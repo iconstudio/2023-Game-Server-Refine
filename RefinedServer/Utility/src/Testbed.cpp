@@ -1,870 +1,414 @@
+#include <WS2tcpip.h>
+#include <MSWSock.h>
 
-#include <variant>
-
-//module Utility.Monad.Loosen;
 import Utility;
-import Utility.Constraints;
-import Utility.Meta;
-import Utility.Union;
+import Utility.Option;
+import Net;
+import Net.Addressing;
+import Net.EndPoint;
+import Net.Context;
+import Net.Promise;
 
-namespace util
+namespace net
 {
-	template<typename... Ts>
-	class [[nodiscard]] LooseMonad
+	using ::UINT_PTR;
+	using ::SOCKET;
+	using SoLinger = ::linger;
+	using CompletionRoutine = ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
+
+	enum SocketDatagram : int
 	{
+		Datagram = SOCK_DGRAM,
+		Stream = SOCK_STREAM,
+	};
+
+	enum SocketType : unsigned long
+	{
+		SoFlagNone = 0,
+		SoFlagOverlapped = WSA_FLAG_OVERLAPPED,
+		SoFlagRIO = WSA_FLAG_REGISTERED_IO,
+	};
+
+	enum class SocketOptions : int
+	{
+		Debug = SO_DEBUG,
+		Recyclable = SO_REUSEADDR,
+		DontRoute = SO_DONTROUTE,
+		Broadcast = SO_BROADCAST,
+		UseLoopback = SO_USELOOPBACK,
+		Linger = SO_LINGER,
+		NoDelay = TCP_NODELAY,
+		DontLinger = SO_DONTLINGER,
+		KeepAlive = SO_KEEPALIVE,
+		Update = SO_UPDATE_ACCEPT_CONTEXT
+	};
+
+	enum SocketIos : unsigned long
+	{
+		SocketIoForGettingFunction = SIO_GET_EXTENSION_FUNCTION_POINTER,
+	};
+
+	enum class SocketTasks : unsigned long
+	{
+		Disconnect = TF_DISCONNECT,
+		Reuse = TF_REUSE_SOCKET,
+	};
+
+	namespace abi
+	{
+		inline constexpr unsigned long DEFAULT_ACCEPT_SIZE = sizeof(SOCKADDR_IN) + 16UL;
+		inline constexpr ::SOCKET InvalidSocket = INVALID_SOCKET;
+
+		[[nodiscard]]
+		inline SOCKET CreateRawTCP(const SocketType& type) noexcept
+		{
+			return ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, NULL, type);
+		}
+
+		[[nodiscard]]
+		inline SOCKET CreateRawUDP(const SocketType& type) noexcept
+		{
+			return ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, NULL, type);
+		}
+	}
+
+	inline ioError CheckIO(const int& socket_fn_result) noexcept
+	{
+		if (debug::CheckError(socket_fn_result))
+		{
+			int error = ::WSAGetLastError();
+			if (debug::CheckPending(error))
+			{
+				return io::defered;
+			}
+			else
+			{
+				return static_cast<int&&>(error);
+			}
+		}
+		else
+		{
+			return io::success;
+		}
+	}
+
+	inline ioError CheckBool(const int& bool_fn_result) noexcept
+	{
+		if (0 == bool_fn_result)
+		{
+			int error = ::WSAGetLastError();
+			if (debug::CheckPending(error))
+			{
+				return io::defered;
+			}
+			else
+			{
+				return static_cast<int&&>(error);
+			}
+		}
+		else
+		{
+			return io::success;
+		}
+	}
+
+	class [[nodiscard]] Socket
+	{
+		struct init_t {};
+
+		constexpr Socket(init_t) noexcept
+		{
+			optDebug.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Debug, flag);
+			});
+
+			optReuseAddress.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Recyclable, flag);
+			});
+
+			optDontRoute.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::DontRoute, flag);
+			});
+
+			optBroadcast.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Broadcast, flag);
+			});
+
+			optUseLoopback.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::UseLoopback, flag);
+			});
+
+			optReuseAddress.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Recyclable, flag);
+			});
+
+			optLinger.AddListener([this](const SoLinger& linger) {
+				SetOptionByValue(SocketOptions::Linger, linger);
+			});
+
+			optNoDelay.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::NoDelay, flag);
+			});
+
+			optUpdateContext.AddListener([this](Socket& other) {
+				SetOptionByHandle(SocketOptions::UseLoopback, other);
+			});
+		}
+
 	public:
-		using base_type = Union<Ts...>;
-
-		template<size_t Index>
-		using element_type = base_type::template element_type<Index>;
-		template<size_t Index>
-		using reference_type = element_type<Index>&;
-		template<size_t Index>
-		using const_reference_type = const element_type<Index>&;
-		template<size_t Index>
-		using rvalue_type = element_type<Index>&&;
-		template<size_t Index>
-		using const_rvalue_type = const element_type<Index>&&;
-
-		constexpr LooseMonad() noexcept
-			: myStorage()
+		constexpr Socket() noexcept
+			: Socket(init_t{})
 		{}
 
-		constexpr LooseMonad(nullopt_t) noexcept
-			: myStorage()
+		constexpr Socket(Socket&& other) noexcept
+			: Socket(init_t{})
+		{
+			myHandle = static_cast<::SOCKET&&>(other.myHandle);
+			myEndPoint = static_cast<EndPoint&&>(other.myEndPoint);
+			other.isOut = true;
+		}
+
+		explicit constexpr Socket(const SOCKET& handle) noexcept
+			: isOut(false), myHandle(handle)
+			, myEndPoint()
 		{}
 
-		constexpr LooseMonad(const LooseMonad& other)
-			noexcept(nothrow_copy_constructibles<Ts...>) requires(copy_constructibles<Ts...>)
-			: myStorage(other.myStorage)
+		explicit constexpr Socket(SOCKET&& handle) noexcept
+			: isOut(false), myHandle(static_cast<SOCKET&&>(handle))
+			, myEndPoint()
 		{}
 
-		constexpr LooseMonad(LooseMonad&& other)
-			noexcept(nothrow_move_constructibles<Ts...>) requires(move_constructibles<Ts...>)
-			: myStorage(static_cast<base_type&&>(other.myStorage))
-		{}
-
-		constexpr LooseMonad& operator=(const LooseMonad& other)
-			noexcept(nothrow_copy_assignables<Ts...>) requires(copy_assignables<Ts...>)
+		constexpr Socket& operator=(Socket&& other) noexcept
 		{
-			myStorage = other.myStorage;
-			return *this;
-		}
-
-		constexpr LooseMonad& operator=(LooseMonad&& other)
-			noexcept(nothrow_move_assignables<Ts...>) requires(move_assignables<Ts...>)
-		{
-			myStorage = static_cast<base_type&&>(other.myStorage);
-			return *this;
-		}
-
-		template <typename T>
-			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !is_specialization_v<clean_t<T>, in_place_type_t> && !is_indexed_v<clean_t<T>, in_place_index_t>)
-		explicit(util::is_explicit_constructible_v<T>)
-			constexpr
-			LooseMonad(T&& object) noexcept
-			: myStorage(in_place_type<clean_t<T>>, static_cast<T&&>(object))
-		{}
-
-		template <size_t Index, typename... Args>
-			requires (Index < sizeof...(Ts))
-		explicit
-			constexpr
-			LooseMonad(in_place_index_t<Index>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, in_place_index_t<Index>, Args...>)
-			: myStorage(in_place_index<Index>, static_cast<Args&&>(args)...)
-		{}
-
-		template <typename T, typename... Args>
-			requires (meta::included_v<T, Ts...>)
-		explicit(is_explicit_constructible_v<T>)
-			constexpr
-			LooseMonad(in_place_type_t<T>, Args&&... args)
-			noexcept(nothrow_constructibles<base_type, in_place_type_t<T>, Args...>)
-			: myStorage(in_place_type<T>, static_cast<Args&&>(args)...)
-		{}
-
-		constexpr ~LooseMonad()
-			noexcept(nothrow_destructibles<Ts...>)
-			requires(trivially_destructibles<Ts...>)
-		= default;
-
-		constexpr ~LooseMonad()
-			noexcept(nothrow_destructibles<Ts...>)
-			requires(not trivially_destructibles<Ts...>)
-		{}
-
-		template<size_t Index, invocables<reference_type<Index>> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
-		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(myStorage.template get<Index>());
-			}
+			myHandle = static_cast<SOCKET&&>(other.myHandle);
+			other.isOut = true;
 
 			return *this;
 		}
 
-		template<size_t Index, invocables<const_reference_type<Index>> Fn>
-		inline constexpr
-			const LooseMonad&
-			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
+		~Socket() noexcept
 		{
-			if (has_value<Index>())
+			if (!isOut && IsValid())
 			{
-				forward<Fn>(action)(myStorage.template get<Index>());
-			}
-
-			return *this;
-		}
-
-		template<size_t Index, invocables<rvalue_type<Index>> Fn>
-		inline constexpr
-			LooseMonad&&
-			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
-		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
-		inline constexpr
-			const LooseMonad&&
-			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
-		{
-			if (has_value<Index>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables<T&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(myStorage.template get<T>());
-			}
-
-			return *this;
-		}
-
-		template<typename T, invocables<const T&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(myStorage.template get<T>());
-			}
-
-			return *this;
-		}
-
-		template<typename T, invocables<T&&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables<const T&&> Fn>
-		inline constexpr
-			LooseMonad&
-			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
-		{
-			if (has_value<T>())
-			{
-				forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables<reference_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, reference_type<Index>>
-			and_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<reference_type<Index>>())))
-		{
-			static_assert(!same_as<monad_result_t<Fn, reference_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(myStorage.template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, reference_type<Index>>{ nullopt };
+				::closesocket(myHandle);
+				myHandle = abi::InvalidSocket;
 			}
 		}
 
-		template<size_t Index, invocables<const_reference_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, const_reference_type<Index>>
-			and_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_reference_type<Index>>())))
+		inline ioError Bind(const EndPoint& target) noexcept
 		{
-			static_assert(!same_as<monad_result_t<Fn, const_reference_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(myStorage.template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const_reference_type<Index>>{ nullopt };
-			}
+			return CheckIO(::bind(myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()));
 		}
 
-		template<size_t Index, invocables<rvalue_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, rvalue_type<Index>>
-			and_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<rvalue_type<Index>>())))
+		inline ioError Connect(const EndPoint& target) noexcept
 		{
-			static_assert(!same_as<monad_result_t<Fn, rvalue_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, rvalue_type<Index>>{ nullopt };
-			}
+			return CheckIO(::connect(myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize())).else_then([&]() {
+				myEndPoint = target;
+			});
 		}
 
-		template<size_t Index, invocables<const_rvalue_type<Index>> Fn>
-		inline constexpr
-			monad_result_t<Fn, const_rvalue_type<Index>>
-			and_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const_rvalue_type<Index>>())))
+		inline ioError Connect(const ::SOCKADDR* const& address, const int& addrlen) const noexcept
 		{
-			static_assert(!same_as<monad_result_t<Fn, const_rvalue_type<Index>>, void>, "Monadic result cannot be void.");
-
-			if (has_value<Index>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<Index>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const_rvalue_type<Index>>{ nullopt };
-			}
+			return CheckIO(::connect(myHandle, address, addrlen));
 		}
 
-		template<typename T, invocables<T&> Fn>
-		inline constexpr
-			monad_result_t<Fn, T&>
-			and_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)(declval<T&>())))
+		inline ioError Listen(const int& backlog = constants::LISTEN_MAX) noexcept
 		{
-			static_assert(!same_as<monad_result_t<Fn, T&>, void>, "Monadic result cannot be void.");
-
-			if (has_value<T>())
-			{
-				return forward<Fn>(action)(myStorage.template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, T&>{ nullopt };
-			}
+			return CheckIO(::listen(myHandle, backlog));
 		}
 
-		template<typename T, invocables<const T&> Fn>
-		inline constexpr
-			monad_result_t<Fn, const T&>
-			and_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&>())))
+		inline ioError Accept(const Socket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
 		{
-			static_assert(!same_as<monad_result_t<Fn, const T&>, void>, "Monadic result cannot be void.");
-
-			if (has_value<T>())
-			{
-				return forward<Fn>(action)(myStorage.template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const T&>{ nullopt };
-			}
+			return Accept(client, buffer, util::addressof(context), util::addressof(result_bytes));
 		}
 
-		template<typename T, invocables<T&&> Fn>
-		inline constexpr
-			monad_result_t<Fn, T&&>
-			and_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
+		inline ioError Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
 		{
-			static_assert(!same_as<monad_result_t<Fn, T&&>, void>, "Monadic result cannot be void.");
-
-			if (has_value<T>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, T&&>{ nullopt };
-			}
+			return CheckBool(
+				::AcceptEx(myHandle, client.myHandle, buffer, 0UL
+				, abi::DEFAULT_ACCEPT_SIZE, abi::DEFAULT_ACCEPT_SIZE, result_bytes
+				, context)
+			);
 		}
 
-		template<typename T, invocables<const T&&> Fn>
-		inline constexpr
-			monad_result_t<Fn, const T&&>
-			and_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
+		inline ioError Recv(WSABUF& buffer, Context* const& context, unsigned long* bytes = nullptr, unsigned long flags = 0) noexcept
 		{
-			static_assert(!same_as<monad_result_t<Fn, const T&&>, void>, "Monadic result cannot be void.");
+			if (buffer.len <= 0)
+			{
+				return -1;
+			}
 
-			if (myStorage.template has_value<T>())
-			{
-				return forward<Fn>(action)(move(myStorage).template get<T>());
-			}
-			else
-			{
-				return monad_result_t<Fn, const T&&>{ nullopt };
-			}
+			return CheckIO(::WSARecv(myHandle, util::addressof(buffer), 1UL, bytes, &flags, context, nullptr));
 		}
 
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			LooseMonad&
-			else_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
+		inline ioError Send(WSABUF buffer, Context* const& context, unsigned long* bytes = nullptr, const unsigned long& flags = 0) noexcept
 		{
-			if (!has_value<Index>())
+			if (buffer.len <= 0)
 			{
-				forward<Fn>(action)();
+				return -1;
 			}
 
-			return *this;
+			return CheckIO(::WSASend(myHandle, util::addressof(buffer), 1UL, bytes, flags, context, nullptr));
 		}
 
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			const LooseMonad&
-			else_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
+		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long flags = 0) noexcept
 		{
-			if (!has_value<Index>())
+			if (buffer.len <= 0)
 			{
-				forward<Fn>(action)();
+				return -1;
 			}
 
-			return *this;
+			return CheckIO(::WSARecv(myHandle, util::addressof(buffer), 1UL, nullptr, &flags, context, routine));
 		}
 
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			LooseMonad&&
-			else_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
+		inline ioError BeginSend(WSABUF buffer, Context* const& context, CompletionRoutine routine, const unsigned long& flags = 0) noexcept
 		{
-			if (!has_value<Index>())
+			if (buffer.len <= 0)
 			{
-				forward<Fn>(action)();
+				return -1;
 			}
 
-			return move(*this);
+			return CheckIO(::WSASend(myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine));
 		}
 
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			const LooseMonad&&
-			else_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
+		inline ioError SetOption(const SocketOptions& option, const bool& flag)
 		{
-			if (!has_value<Index>())
-			{
-				forward<Fn>(action)();
-			}
+			const int iflag = flag; // BOOL
 
-			return move(*this);
+			return CheckIO(::setsockopt(myHandle, SOL_SOCKET
+				, static_cast<int>(option)
+				, reinterpret_cast<const char*>(&iflag), static_cast<int>(sizeof(iflag)))
+			);
 		}
 
-		template<typename T, invocables Fn>
-		inline constexpr
-			LooseMonad&
-			else_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
+		inline ioError SetOptionByHandle(const SocketOptions& option, Socket& other) noexcept
 		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
+			return CheckIO(::setsockopt(myHandle, SOL_SOCKET
+				, static_cast<int>(option)
+				, reinterpret_cast<const char*>(&other.myHandle), static_cast<int>(sizeof(SOCKET)))
+			);
 		}
 
-		template<typename T, invocables Fn>
-		inline constexpr
-			const LooseMonad&
-			else_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
+		template<typename T>
+		inline ioError SetOptionByValue(const SocketOptions& option, const T& value)
 		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return *this;
+			return CheckIO(::setsockopt(myHandle, SOL_SOCKET
+				, static_cast<int>(option)
+				, reinterpret_cast<const char*>(&value), static_cast<int>(sizeof(T)))
+			);
 		}
 
-		template<typename T, invocables Fn>
-		inline constexpr
-			LooseMonad&&
-			else_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return move(*this);
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			const LooseMonad&&
-			else_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			if (!has_value<T>())
-			{
-				forward<Fn>(action)();
-			}
-
-			return move(*this);
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<size_t Index, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!is_same_v<fwd_result_t, void>, "Result cannot be void.");
-
-			if (!has_value<Index>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template<typename T, invocables Fn>
-		inline constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			static_assert(!is_same_v<monad_result_t<Fn>, void>, "Result cannot be void.");
-
-			if (!has_value<T>())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return monad_result_t<Fn>{ nullopt };
-			}
-		}
-
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr reference_type<Index>
-			get()&
+		constexpr const SOCKET& Handle() const& noexcept
 		{
-			return myStorage.template get<Index>();
+			return myHandle;
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr const_reference_type<Index>
-			get() const&
+		constexpr const volatile SOCKET& Handle() const volatile& noexcept
 		{
-			return myStorage.template get<Index>();
+			return myHandle;
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr rvalue_type<Index>
-			get()&&
+		constexpr SOCKET&& Handle() && noexcept
 		{
-			return move(myStorage).template get<Index>();
+			return static_cast<SOCKET&&>(myHandle);
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
 		[[nodiscard]]
-		constexpr const_rvalue_type<Index>
-			get() const&&
+		constexpr volatile SOCKET&& Handle() volatile&& noexcept
 		{
-			return move(myStorage).template get<Index>();
+			return static_cast<volatile SOCKET&&>(myHandle);
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr auto&
-			get()&
+		constexpr bool IsValid() const noexcept
 		{
-			return myStorage.template get<T>();
+			return myHandle != abi::InvalidSocket;
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr const auto&
-			get() const&
+		constexpr bool IsValid() const volatile noexcept
 		{
-			return myStorage.template get<T>();
+			return myHandle != abi::InvalidSocket;
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr auto&&
-			get()&&
+		static inline
+			Promise<Socket, int>
+			CreateTCP(SocketType type = SocketType::SoFlagOverlapped)
 		{
-			return move(myStorage).template get<T>();
+#if _DEBUG
+			SOCKET socket = abi::CreateRawTCP(type);
+			if (socket == abi::InvalidSocket)
+			{
+				return WSAGetLastError();
+			}
+
+			BOOL option = TRUE;
+			::setsockopt(socket, SOL_SOCKET, SO_DEBUG, reinterpret_cast<char*>(&option), sizeof(option));
+
+			return Socket{ socket };
+#else // _DEBUG
+			return Socket{ abi::CreateRawTCP(type) };
+#endif // !_DEBUG
 		}
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
 		[[nodiscard]]
-		constexpr const auto&&
-			get() const&&
+		static inline
+			Promise<Socket, int>
+			CreateUDP(SocketType type = SocketType::SoFlagOverlapped)
 		{
-			return move(myStorage).template get<T>();
+#if _DEBUG
+			SOCKET socket = abi::CreateRawUDP(type);
+			if (socket == abi::InvalidSocket)
+			{
+				return WSAGetLastError();
+			}
+
+			BOOL option = TRUE;
+			::setsockopt(socket, SOL_SOCKET, SO_DEBUG, reinterpret_cast<char*>(&option), sizeof(option));
+
+			return Socket{ socket };
+#else // _DEBUG
+			return Socket{ abi::CreateRawUDP(type) };
+#endif // !_DEBUG
 		}
 
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
-		[[nodiscard]]
-		constexpr bool has_value() const noexcept
-		{
-			return myStorage.template has_value<Index>();
-		}
+		Socket(const Socket& other) = delete;
+		Socket(const volatile Socket& other) = delete;
+		Socket& operator=(const Socket& other) = delete;
+		Socket& operator=(const volatile Socket& other) = delete;
+		Socket& operator=(const Socket& other) volatile = delete;
+		Socket& operator=(const volatile Socket& other) volatile = delete;
 
-		template <typename T>
-			requires meta::included_range_v<T, base_type>
-		[[nodiscard]]
-		constexpr bool has_value() const noexcept
-		{
-			return myStorage.template has_value<T>();
-		}
-
-		template <size_t Index>
-			requires (Index < sizeof...(Ts))
-		[[nodiscard]]
-		constexpr bool is_valueless() const noexcept
-		{
-			return myStorage.template is_valueless<Index>();
-		}
+		util::Option<bool> optDebug{ false };
+		util::Option<bool> optReuseAddress{ false };
+		util::Option<bool> optKeepAlive{ false };
+		util::Option<bool> optDontRoute{ false };
+		util::Option<bool> optBroadcast{ false };
+		util::Option<bool> optUseLoopback{ false };
+		util::Option<bool> optNoDelay{ false };
+		util::Option<EndPoint> optBindAddress{};
+		util::Option<::linger> optLinger{};
+		util::Option<Socket&> optUpdateContext{};
 
 	private:
-		base_type myStorage;
+		[[nodiscard]]
+		inline constexpr bool IsOut() const noexcept
+		{
+			return isOut;
+		}
+
+		[[nodiscard]]
+		inline constexpr bool IsOut() const volatile noexcept
+		{
+			return isOut;
+		}
+
+		volatile bool isOut{ false };
+		SOCKET myHandle{ abi::InvalidSocket };
+		EndPoint myEndPoint{};
 	};
-
-	template<typename T, typename E>
-	using Expected = LooseMonad<T, E>;
 }
-
-namespace std
-{
-	template<size_t Index, typename... Ts>
-	struct variant_alternative<Index, util::LooseMonad<Ts...>>
-	{
-		static_assert(Index < sizeof...(Ts), "Loosen index out of bounds.");
-
-		using type = meta::at<util::LooseMonad<Ts...>, Index>;
-	};
-
-	template<typename... Ts>
-	struct variant_size<util::LooseMonad<Ts...>>
-		: integral_constant<size_t, 1 + sizeof...(Ts)>
-	{};
-
-	template<size_t Index, typename... Ts>
-	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>& monad)
-		noexcept(noexcept(monad.template get<Index>()))
-	{
-		return monad.template get<Index>();
-	}
-
-	template<size_t Index, typename... Ts>
-	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>& monad)
-		noexcept(noexcept(monad.template get<Index>()))
-	{
-		return monad.template get<Index>();
-	}
-
-	template<size_t Index, typename... Ts>
-	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>&& monad)
-		noexcept(noexcept(move(monad).template get<Index>()))
-	{
-		return move(monad).template get<Index>();
-	}
-
-	template<size_t Index, typename... Ts>
-	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>&& monad)
-		noexcept(noexcept(move(monad).template get<Index>()))
-	{
-		return move(monad).template get<Index>();
-	}
-
-	template<typename T, typename... Ts>
-	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>& monad)
-		noexcept(noexcept(monad.template get<T>()))
-	{
-		return monad.template get<T>();
-	}
-
-	template<typename T, typename... Ts>
-	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>& monad)
-		noexcept(noexcept(monad.template get<T>()))
-	{
-		return monad.template get<T>();
-	}
-
-	template<typename T, typename... Ts>
-	constexpr decltype(auto)
-		get(util::LooseMonad<Ts...>&& monad)
-		noexcept(noexcept(move(monad).template get<T>()))
-	{
-		return move(monad).template get<T>();
-	}
-
-	template<typename T, typename... Ts>
-	constexpr decltype(auto)
-		get(const util::LooseMonad<Ts...>&& monad)
-		noexcept(noexcept(move(monad).template get<T>()))
-	{
-		return move(monad).template get<T>();
-	}
-}
-
-#pragma warning(push, 1)
-namespace util::test
-{
-	constexpr void do_something() noexcept {}
-
-	void test_loose() noexcept
-	{
-		const LooseMonad<int, float> a0{};
-		const LooseMonad<int, float> b0{ std::in_place_index<0>, 1 };
-		const LooseMonad<int, float> c0{ std::in_place_index<1>, 1.0f };
-
-		constexpr LooseMonad<int, float> a1{};
-		constexpr LooseMonad<int, float> b1{ std::in_place_index<0>, 1 };
-		constexpr LooseMonad<int, float> c1{ std::in_place_index<1>, 1.0f };
-
-		const LooseMonad<int, float> b2{ std::in_place_type<int>, 500 };
-		const LooseMonad<int, float> c2{ std::in_place_type<float>, 500.0f };
-
-		constexpr LooseMonad<int, float> b3{ std::in_place_type<int>, 500 };
-		constexpr LooseMonad<int, float> c3{ std::in_place_type<float>, 500.0f };
-
-		const LooseMonad<int, float, float> d2{ std::in_place_index<1>, 500.0f };
-		const LooseMonad<int, float, int> e2{ std::in_place_index<2>, 500 };
-		const LooseMonad<int, float, float> f2{ std::in_place_type<float>, 500.0f };
-		const LooseMonad<int, float, int> g2{ std::in_place_type<float>, 500.0f };
-
-		//LooseMonad<int, float, int>::storage_pop;
-		//constexpr size_t seek = LooseMonad<int, float, int>::seek<int>;
-		//LooseMonad<int, float, int>::pop<int>;
-
-		constexpr LooseMonad<int, float, float> d3{ std::in_place_index<1>, 500.0f };
-		constexpr bool has_d3_0 = d3.has_value<0>();
-		constexpr bool has_d3_1 = d3.has_value<1>();
-		constexpr bool has_d3_2 = d3.has_value<2>();
-		constexpr bool less_d3_0 = d3.is_valueless<0>();
-		constexpr bool less_d3_1 = d3.is_valueless<1>();
-		constexpr bool less_d3_2 = d3.is_valueless<2>();
-		//constexpr int get_d3_i32 = d3.get<int>();
-		constexpr float get_d3_f32 = d3.get<float>();
-		//constexpr double get_d3_f64 = d3.get<double>();
-		constexpr LooseMonad<int, float, int> e3{ std::in_place_index<2>, 500 };
-		constexpr bool has_e3_0 = e3.has_value<0>();
-		constexpr bool has_e3_1 = e3.has_value<1>();
-		constexpr bool has_e3_2 = e3.has_value<2>();
-		constexpr bool less_e3_0 = e3.is_valueless<0>();
-		constexpr bool less_e3_1 = e3.is_valueless<1>();
-		constexpr bool less_e3_2 = e3.is_valueless<2>();
-		constexpr auto get_e3_2 = e3.get<2>();
-		constexpr LooseMonad<int, float, float> f3{ std::in_place_type<float>, 500.0f };
-		//constexpr auto get_f3_0 = f3.get<0>();
-		constexpr auto get_f3_1 = f3.get<1>();
-		//constexpr auto get_f3_2 = f3.get<2>();
-		constexpr LooseMonad<int, float, int> g3{ std::in_place_type<float>, 500.0f };
-
-		constexpr size_t sz0 = sizeof(LooseMonad<int>);
-		constexpr size_t sz1 = sizeof(LooseMonad<int, float>);
-		constexpr size_t sz2 = sizeof(LooseMonad<int, float>);
-		constexpr size_t sz3 = sizeof(LooseMonad<int, float, float>);
-		constexpr size_t sz4 = sizeof(LooseMonad<int, float, int>);
-
-		constexpr auto& fn1 = c1.if_then<0>([](const int& v) {
-			do_something();
-		});
-
-		constexpr auto& fn2 = b1.if_then<0>([](const int& v) {
-			do_something();
-		});
-	}
-}
-#pragma warning(pop)

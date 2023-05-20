@@ -3,6 +3,7 @@ import Utility;
 import Utility.Constraints;
 import Utility.Traits;
 import Net;
+import Net.IoState;
 import Net.Promise;
 
 export namespace net

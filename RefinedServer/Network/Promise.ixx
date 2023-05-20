@@ -1,69 +1,11 @@
 export module Net.Promise;
 import Utility;
 import Utility.Constraints;
-
-using namespace util;
+import Net;
+export import Net.IoState;
 
 export namespace net
 {
-	namespace io
-	{
-		namespace tags
-		{
-			enum class io_success {};
-			enum class io_failure {};
-			enum class io_defered {};
-		}
-
-		namespace detail
-		{
-			template<typename T> // T: Success Handle
-			struct success : util::type_identity<T>
-			{};
-
-			template<>
-			struct success<void>
-			{
-				using type = tags::io_success;
-			};
-
-			template<typename E> // E: Error
-			struct failure : util::type_identity<E>
-			{};
-
-			template<>
-			struct failure<void>
-			{
-				using type = tags::io_failure;
-			};
-
-			template<typename C> // C: Cause of Defer
-			struct defered : util::type_identity<C>
-			{};
-
-			template<>
-			struct defered<void>
-			{
-				using type = tags::io_defered;
-			};
-		}
-
-		template<typename T> // T: Success Handle
-		using success_t = typename detail::template success<T>::type;
-		template<typename E> // E: Error
-		using failure_t = typename detail::template failure<E>::type;
-		template<typename C> // C: Cause of Defer
-		using defered_t = typename detail::template defered<C>::type;
-
-		using just_success_t = success_t<void>;
-		using just_failure_t = failure_t<void>;
-		using just_defered_t = defered_t<void>;
-
-		inline constexpr just_success_t success{ };
-		inline constexpr just_failure_t failure{ };
-		inline constexpr just_defered_t defered{ };
-	}
-
 	template<typename Fn, typename U>
 	struct noexcept_t
 	{
@@ -112,28 +54,28 @@ export namespace net
 		constexpr Promise() noexcept
 		{}
 
-		constexpr Promise(nullopt_t) noexcept
+		constexpr Promise(util::nullopt_t) noexcept
 		{}
 
 		template<typename U>
-			requires (notvoids<T>&& same_as<clean_t<U>, T>)
+			requires (util::notvoids<T>&& util::same_as<util::clean_t<U>, T>)
 		constexpr Promise(U&& pass)
-			noexcept(nothrow_constructibles<T, U&&>)
-			: mySucceed(forward<U>(pass))
+			noexcept(util::nothrow_constructibles<T, U&&>)
+			: mySucceed(util::forward<U>(pass))
 		{}
 
 		template<typename U>
-			requires (notvoids<E>&& same_as<clean_t<U>, E>)
+			requires (util::notvoids<E>&& util::same_as<util::clean_t<U>, E>)
 		constexpr Promise(U&& fail)
-			noexcept(nothrow_constructibles<E, U&&>)
-			: myFailure(forward<U>(fail))
+			noexcept(util::nothrow_constructibles<E, U&&>)
+			: myFailure(util::forward<U>(fail))
 		{}
 
 		template<typename U>
-			requires (notvoids<C>&& same_as<clean_t<U>, C>)
+			requires (util::notvoids<C>&& util::same_as<util::clean_t<U>, C>)
 		constexpr Promise(U&& cause)
-			noexcept(nothrow_constructibles<C, U&&>)
-			: myDefered(forward<U>(cause))
+			noexcept(util::nothrow_constructibles<C, U&&>)
+			: myDefered(util::forward<U>(cause))
 		{}
 
 		constexpr Promise(const Promise& other) noexcept
@@ -183,42 +125,43 @@ export namespace net
 		}
 
 		constexpr Promise(const succeed_t& ok)
-			noexcept(nothrow_copy_constructibles<T>)
+			noexcept(util::nothrow_copy_constructibles<T>)
 			: mySucceed(ok), myIndex(1)
 		{}
 
 		constexpr Promise(succeed_t&& ok)
-			noexcept(nothrow_move_constructibles<T>)
+			noexcept(util::nothrow_move_constructibles<T>)
 			: mySucceed(static_cast<succeed_t&&>(ok)), myIndex(1)
 		{}
 
 		constexpr Promise(const failure_t& error)
-			noexcept(nothrow_copy_constructibles<E>)
+			noexcept(util::nothrow_copy_constructibles<E>)
 			: myFailure(error), myIndex(2)
 		{}
 
 		constexpr Promise(failure_t&& error)
-			noexcept(nothrow_move_constructibles<E>)
+			noexcept(util::nothrow_move_constructibles<E>)
 			: myFailure(static_cast<failure_t&&>(error)), myIndex(2)
 		{}
 
 		constexpr Promise(const defered_t& cause)
-			noexcept(nothrow_copy_constructibles<C>)
+			noexcept(util::nothrow_copy_constructibles<C>)
 			: myDefered(cause), myIndex(3)
 		{}
 
 		constexpr Promise(defered_t&& cause)
-			noexcept(nothrow_move_constructibles<C>)
+			noexcept(util::nothrow_move_constructibles<C>)
 			: myDefered(static_cast<failure_t&&>(cause)), myIndex(3)
 		{}
 
-		constexpr Promise& operator=(nullopt_t) noexcept
+		constexpr Promise& operator=(util::nullopt_t) noexcept
 		{
 			myIndex = 0;
 			return *this;
 		}
 
-		constexpr Promise& operator=(const succeed_t& ok) noexcept
+		constexpr Promise& operator=(const succeed_t& ok)
+			noexcept(util::nothrow_copy_constructibles<T>)
 		{
 			if (0 == myIndex || IsSuccess())
 			{
@@ -228,7 +171,8 @@ export namespace net
 			return *this;
 		}
 
-		constexpr Promise& operator=(succeed_t&& ok) noexcept
+		constexpr Promise& operator=(succeed_t&& ok)
+			noexcept(util::nothrow_move_constructibles<T>)
 		{
 			if (0 == myIndex || IsSuccess())
 			{
@@ -238,7 +182,8 @@ export namespace net
 			return *this;
 		}
 
-		constexpr Promise& operator=(const failure_t& error) noexcept
+		constexpr Promise& operator=(const failure_t& error)
+			noexcept(util::nothrow_copy_constructibles<E>)
 		{
 			if (0 == myIndex || IsFailed())
 			{
@@ -248,7 +193,8 @@ export namespace net
 			return *this;
 		}
 
-		constexpr Promise& operator=(failure_t&& error) noexcept
+		constexpr Promise& operator=(failure_t&& error)
+			noexcept(util::nothrow_move_constructibles<E>)
 		{
 			if (0 == myIndex || IsFailed())
 			{
@@ -258,7 +204,8 @@ export namespace net
 			return *this;
 		}
 
-		constexpr Promise& operator=(const defered_t& cause) noexcept
+		constexpr Promise& operator=(const defered_t& cause)
+			noexcept(util::nothrow_copy_constructibles<C>)
 		{
 			if (0 == myIndex || IsDefered())
 			{
@@ -268,7 +215,8 @@ export namespace net
 			return *this;
 		}
 
-		constexpr Promise& operator=(defered_t&& cause) noexcept
+		constexpr Promise& operator=(defered_t&& cause)
+			noexcept(util::nothrow_move_constructibles<C>)
 		{
 			if (0 == myIndex || IsDefered())
 			{
@@ -279,7 +227,7 @@ export namespace net
 		}
 
 		constexpr ~Promise()
-			noexcept(nothrow_destructibles<T, E, C>)
+			noexcept(util::nothrow_destructibles<T, E, C>)
 		{}
 
 		/// <summary>
@@ -287,26 +235,26 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<lv_invocable<T> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator>>(Promise& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_lvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(promise.GetResult());
+					return util::forward<Fn>(action)(promise.GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_lvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_lvalue_t>{};
 			}
 		}
 
@@ -315,26 +263,26 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<cl_invocable<T> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator>>(const Promise& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_clvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(promise.GetResult());
+					return util::forward<Fn>(action)(promise.GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_clvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_clvalue_t>{};
 			}
 		}
 
@@ -343,26 +291,26 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<rv_invocable<T> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator>>(Promise&& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_rvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(move(promise).GetResult());
+					return util::forward<Fn>(action)(util::move(promise).GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_rvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_rvalue_t>{};
 			}
 		}
 
@@ -371,26 +319,26 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<cr_invocable<T> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator>>(const Promise&& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_crvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			if (promise.IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(move(promise).GetResult());
+					return util::forward<Fn>(action)(util::move(promise).GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_crvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_crvalue_t>{};
 			}
 		}
 
@@ -399,19 +347,19 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		inline friend constexpr
 			auto
 			operator>>(Promise& promise, Fn&& action)
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!promise.IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -420,19 +368,19 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		inline friend constexpr
 			auto
 			operator>>(const Promise& promise, Fn&& action)
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!promise.IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -441,19 +389,19 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		inline friend constexpr
 			auto
 			operator>>(Promise&& promise, Fn&& action)
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!promise.IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -462,119 +410,119 @@ export namespace net
 		/// </summary>
 		/// <param name="promise"></param>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		inline friend constexpr
 			auto
 			operator>>(const Promise&& promise, Fn&& action)
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!promise.IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
-		template<lv_invocable<E> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator<<(Promise& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_lvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_lvalue_t<E>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, E, make_lvalue_t>, void>, "Error monadic result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, E, util::make_lvalue_t>, void>, "Error monadic result cannot be void.");
 
 			if (promise.IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(promise.GetError());
+					return util::forward<Fn>(action)(promise.GetError());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, E, make_lvalue_t>{};
+				return util::fn_result_t<Fn, E, util::make_lvalue_t>{};
 			}
 		}
 
-		template<cl_invocable<E> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator<<(const Promise& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_clvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_clvalue_t<E>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, E, make_clvalue_t>, void>, "Error monadic result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, E, util::make_clvalue_t>, void>, "Error monadic result cannot be void.");
 
 			if (promise.IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(promise.GetError());
+					return util::forward<Fn>(action)(promise.GetError());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, E, make_clvalue_t>{};
+				return util::fn_result_t<Fn, E, util::make_clvalue_t>{};
 			}
 		}
 
-		template<rv_invocable<E> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator<<(Promise&& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_rvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_rvalue_t<E>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, E, make_rvalue_t>, void>, "Error monadic result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, E, util::make_rvalue_t>, void>, "Error monadic result cannot be void.");
 
 			if (promise.IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(static_cast<Promise&&>(promise).GetError());
+					return util::forward<Fn>(action)(static_cast<Promise&&>(promise).GetError());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, E, make_rvalue_t>{};
+				return util::fn_result_t<Fn, E, util::make_rvalue_t>{};
 			}
 		}
 
-		template<cr_invocable<E> Fn>
+		template<typename Fn>
 		inline friend constexpr
 			auto
 			operator<<(const Promise&& promise, Fn&& action)
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_crvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_crvalue_t<E>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, E, make_crvalue_t>, void>, "Error monadic result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, E, util::make_crvalue_t>, void>, "Error monadic result cannot be void.");
 
 			if (promise.IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(static_cast<const Promise&&>(promise).GetError());
+					return util::forward<Fn>(action)(static_cast<const Promise&&>(promise).GetError());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, E, make_crvalue_t>{};
+				return util::fn_result_t<Fn, E, util::make_crvalue_t>{};
 			}
 		}
 
@@ -582,21 +530,21 @@ export namespace net
 		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<lv_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			Promise&
 			if_then(Fn&& action) &
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_lvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(GetResult());
+					util::forward<Fn>(action)(GetResult());
 				}
 			}
 
@@ -607,21 +555,21 @@ export namespace net
 		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cl_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_clvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(GetResult());
+					util::forward<Fn>(action)(GetResult());
 				}
 			}
 
@@ -632,65 +580,65 @@ export namespace net
 		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<rv_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_rvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(move(*this).GetResult());
+					util::forward<Fn>(action)(util::move(*this).GetResult());
 				}
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// if_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cr_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_crvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(move(*this).GetResult());
+					util::forward<Fn>(action)(util::move(*this).GetResult());
 				}
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			Promise&
 			if_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsFailed())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
 			return *this;
@@ -700,15 +648,15 @@ export namespace net
 		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			const Promise&
 			if_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsFailed())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
 			return *this;
@@ -718,64 +666,64 @@ export namespace net
 		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			Promise&&
 			if_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsFailed())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// if_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			const Promise&&
 			if_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsFailed())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<lv_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) &
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_lvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_lvalue_t<T>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, T, make_lvalue_t>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_lvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(GetResult());
+					return util::forward<Fn>(action)(GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_lvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_lvalue_t>{};
 			}
 		}
 
@@ -783,28 +731,28 @@ export namespace net
 		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cl_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) const&
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_clvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_clvalue_t<T>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, T, make_clvalue_t>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_clvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(GetResult());
+					return util::forward<Fn>(action)(GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_clvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_clvalue_t>{};
 			}
 		}
 
@@ -812,28 +760,28 @@ export namespace net
 		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<rv_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) &&
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_rvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_rvalue_t<T>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, T, make_rvalue_t>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_rvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(move(*this).GetResult());
+					return util::forward<Fn>(action)(util::move(*this).GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_rvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_rvalue_t>{};
 			}
 		}
 
@@ -841,28 +789,28 @@ export namespace net
 		/// and_then, parameter T (on succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cr_invocable<T> Fn>
+		template<typename Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) const&&
-			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<make_crvalue_t<T>>()))
+			noexcept(noexcept(noexcept_t<Fn, T>::template Eval<util::make_crvalue_t<T>>()))
 		{
-			static_assert(!same_as<fn_result_t<Fn, T, make_crvalue_t>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::fn_result_t<Fn, T, util::make_crvalue_t>, void>, "Promise result cannot be void.");
 
 			if (IsSuccess())
 			{
-				if constexpr (same_as<T, void>)
+				if constexpr (util::same_as<T, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(move(*this).GetResult());
+					return util::forward<Fn>(action)(util::move(*this).GetResult());
 				}
 			}
 			else
 			{
-				return fn_result_t<Fn, T, make_crvalue_t>{};
+				return util::fn_result_t<Fn, T, util::make_crvalue_t>{};
 			}
 		}
 
@@ -870,21 +818,21 @@ export namespace net
 		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			static_assert(!same_as<monad_result_t<Fn>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
 
 			if (!IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -892,21 +840,21 @@ export namespace net
 		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			static_assert(!same_as<monad_result_t<Fn>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
 
 			if (!IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -914,21 +862,21 @@ export namespace net
 		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			static_assert(!same_as<monad_result_t<Fn>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
 
 			if (!IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -936,21 +884,21 @@ export namespace net
 		/// and_then, no parameter (not failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			and_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			static_assert(!same_as<monad_result_t<Fn>, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<util::monad_result_t<Fn>, void>, "Promise result cannot be void.");
 
 			if (!IsFailed())
 			{
-				return forward<Fn>(action)();
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
-				return monad_result_t<Fn>{};
+				return util::monad_result_t<Fn>{};
 			}
 		}
 
@@ -958,15 +906,15 @@ export namespace net
 		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			Promise&
 			else_then(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsSuccess())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
 			return *this;
@@ -976,15 +924,15 @@ export namespace net
 		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			const Promise&
 			else_then(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsSuccess())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
 			return *this;
@@ -994,57 +942,57 @@ export namespace net
 		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			Promise&&
 			else_then(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsSuccess())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// else_then, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
+		template<util::invocables Fn>
 		constexpr
 			const Promise&&
 			else_then(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
 			if (!IsSuccess())
 			{
-				forward<Fn>(action)();
+				util::forward<Fn>(action)();
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// else_then, parameter E (on failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<lv_invocable<E> Fn>
+		template<util::lv_invocable<E> Fn>
 		constexpr
 			Promise&
 			else_then(Fn&& action) &
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_lvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_lvalue_t<E>>()))
 		{
 			if (IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(GetError());
+					util::forward<Fn>(action)(GetError());
 				}
 			}
 
@@ -1055,21 +1003,21 @@ export namespace net
 		/// else_then, parameter E (on failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cl_invocable<E> Fn>
+		template<util::cl_invocable<E> Fn>
 		constexpr
 			const Promise&
 			else_then(Fn&& action) const&
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_clvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_clvalue_t<E>>()))
 		{
 			if (IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(GetError());
+					util::forward<Fn>(action)(GetError());
 				}
 			}
 
@@ -1080,165 +1028,69 @@ export namespace net
 		/// else_then, parameter E (on failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<rv_invocable<E> Fn>
+		template<util::rv_invocable<E> Fn>
 		constexpr
 			Promise&&
 			else_then(Fn&& action) &&
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_rvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_rvalue_t<E>>()))
 		{
 			if (IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(move(*this).GetError());
+					util::forward<Fn>(action)(util::move(*this).GetError());
 				}
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// else_then, parameter E (on failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cr_invocable<E> Fn>
+		template<util::cr_invocable<E> Fn>
 		constexpr
 			const Promise&&
 			else_then(Fn&& action) const&&
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_crvalue_t<E>>()))
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_crvalue_t<E>>()))
 		{
 			if (IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				if constexpr (util::same_as<E, void>)
 				{
-					forward<Fn>(action)();
+					util::forward<Fn>(action)();
 				}
 				else
 				{
-					forward<Fn>(action)(move(*this).GetError());
+					util::forward<Fn>(action)(util::move(*this).GetError());
 				}
 			}
 
-			return move(*this);
+			return util::move(*this);
 		}
 
 		/// <summary>
 		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<invocables Fn>
-		constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
-
-			if (!IsSuccess())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{};
-			}
-		}
-
-		/// <summary>
-		/// or_else, no parameter (not succeed)
-		/// </summary>
-		/// <param name="action"></param>
-		template<invocables Fn>
-		constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
-
-			if (!IsSuccess())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{};
-			}
-		}
-
-		/// <summary>
-		/// or_else, no parameter (not succeed)
-		/// </summary>
-		/// <param name="action"></param>
-		template<invocables Fn>
-		constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) &&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
-
-			if (!IsSuccess())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{};
-			}
-		}
-
-		/// <summary>
-		/// or_else, no parameter (not succeed)
-		/// </summary>
-		/// <param name="action"></param>
-		template<invocables Fn>
-		constexpr
-			monad_result_t<Fn>
-			or_else(Fn&& action) const&&
-			noexcept(noexcept(forward<Fn>(action)()))
-		{
-			using fwd_result_t = monad_result_t<Fn>;
-
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
-
-			if (!IsSuccess())
-			{
-				return forward<Fn>(action)();
-			}
-			else
-			{
-				return fwd_result_t{};
-			}
-		}
-
-		/// <summary>
-		/// or_else, parameter E (on failed)
-		/// </summary>
-		/// <param name="action"></param>
-		template<lv_invocable<E> Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			or_else(Fn&& action) &
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_lvalue_t<E>>()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			using fwd_result_t = fn_result_t<Fn, E, make_lvalue_t>;
+			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
-			if (IsFailed())
+			if (!IsSuccess())
 			{
-				return forward<Fn>(action)(GetError());
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
@@ -1247,22 +1099,22 @@ export namespace net
 		}
 
 		/// <summary>
-		/// or_else, parameter E (on failed)
+		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cl_invocable<E> Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			or_else(Fn&& action) const&
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_clvalue_t<E>>()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			using fwd_result_t = fn_result_t<Fn, E, make_clvalue_t>;
+			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
-			if (IsFailed())
+			if (!IsSuccess())
 			{
-				return forward<Fn>(action)(GetError());
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
@@ -1271,22 +1123,46 @@ export namespace net
 		}
 
 		/// <summary>
-		/// or_else, parameter E (on failed)
+		/// or_else, no parameter (not succeed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<rv_invocable<E> Fn>
+		template<util::invocables Fn>
 		constexpr
 			auto
 			or_else(Fn&& action) &&
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_rvalue_t<E>>()))
+			noexcept(noexcept(util::forward<Fn>(action)()))
 		{
-			using fwd_result_t = fn_result_t<Fn, E, make_rvalue_t>;
+			using fwd_result_t = util::monad_result_t<Fn>;
 
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
-			if (IsFailed())
+			if (!IsSuccess())
 			{
-				return forward<Fn>(action)(move(*this).GetError());
+				return util::forward<Fn>(action)();
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, no parameter (not succeed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::invocables Fn>
+		constexpr
+			auto
+			or_else(Fn&& action) const&&
+			noexcept(noexcept(util::forward<Fn>(action)()))
+		{
+			using fwd_result_t = util::monad_result_t<Fn>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
+
+			if (!IsSuccess())
+			{
+				return util::forward<Fn>(action)();
 			}
 			else
 			{
@@ -1298,25 +1174,97 @@ export namespace net
 		/// or_else, parameter E (on failed)
 		/// </summary>
 		/// <param name="action"></param>
-		template<cr_invocable<E> Fn>
+		template<util::lv_invocable<E> Fn>
 		constexpr
 			auto
-			or_else(Fn&& action) const&&
-			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<make_crvalue_t<E>>()))
+			or_else(Fn&& action) &
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_lvalue_t<E>>()))
 		{
-			using fwd_result_t = fn_result_t<Fn, E, make_crvalue_t>;
+			using fwd_result_t = util::fn_result_t<Fn, E, util::make_lvalue_t>;
 
-			static_assert(!same_as<fwd_result_t, void>, "Promise result cannot be void.");
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
 
 			if (IsFailed())
 			{
-				if constexpr (same_as<E, void>)
+				return util::forward<Fn>(action)(GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::cl_invocable<E> Fn>
+		constexpr
+			auto
+			or_else(Fn&& action) const&
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_clvalue_t<E>>()))
+		{
+			using fwd_result_t = util::fn_result_t<Fn, E, util::make_clvalue_t>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
+
+			if (IsFailed())
+			{
+				return util::forward<Fn>(action)(GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::rv_invocable<E> Fn>
+		constexpr
+			auto
+			or_else(Fn&& action) &&
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_rvalue_t<E>>()))
+		{
+			using fwd_result_t = util::fn_result_t<Fn, E, util::make_rvalue_t>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
+
+			if (IsFailed())
+			{
+				return util::forward<Fn>(action)(util::move(*this).GetError());
+			}
+			else
+			{
+				return fwd_result_t{};
+			}
+		}
+
+		/// <summary>
+		/// or_else, parameter E (on failed)
+		/// </summary>
+		/// <param name="action"></param>
+		template<util::cr_invocable<E> Fn>
+		constexpr
+			auto
+			or_else(Fn&& action) const&&
+			noexcept(noexcept(noexcept_t<Fn, E>::template Eval<util::make_crvalue_t<E>>()))
+		{
+			using fwd_result_t = util::fn_result_t<Fn, E, util::make_crvalue_t>;
+
+			static_assert(!util::same_as<fwd_result_t, void>, "Promise result cannot be void.");
+
+			if (IsFailed())
+			{
+				if constexpr (util::same_as<E, void>)
 				{
-					return forward<Fn>(action)();
+					return util::forward<Fn>(action)();
 				}
 				else
 				{
-					return forward<Fn>(action)(move(*this).GetError());
+					return util::forward<Fn>(action)(util::move(*this).GetError());
 				}
 			}
 			else
@@ -1326,63 +1274,63 @@ export namespace net
 		}
 
 		constexpr succeed_t& GetResult() & noexcept
-			requires notvoids<T>
+			requires util::notvoids<T>
 		{
 			return mySucceed;
 		}
 
 		constexpr const succeed_t& GetResult() const& noexcept
-			requires notvoids<T>
+			requires util::notvoids<T>
 		{
 			return mySucceed;
 		}
 
 		constexpr succeed_t&& GetResult() && noexcept
-			requires notvoids<T>
+			requires util::notvoids<T>
 		{
 			return static_cast<succeed_t&&>(mySucceed);
 		}
 
 		constexpr const succeed_t&& GetResult() const&& noexcept
-			requires notvoids<T>
+			requires util::notvoids<T>
 		{
 			return static_cast<const succeed_t&&>(mySucceed);
 		}
 
 		constexpr void GetResult() const noexcept
-			requires (!notvoids<T>)
+			requires (!util::notvoids<T>)
 		{
-			static_assert(always_false<T>, "T is void.");
+			static_assert(util::always_false<T>, "T is void.");
 		}
 
 		constexpr failure_t& GetError() & noexcept
-			requires notvoids<E>
+			requires util::notvoids<E>
 		{
 			return myFailure;
 		}
 
 		constexpr const failure_t& GetError() const& noexcept
-			requires notvoids<E>
+			requires util::notvoids<E>
 		{
 			return myFailure;
 		}
 
 		constexpr failure_t&& GetError() && noexcept
-			requires notvoids<E>
+			requires util::notvoids<E>
 		{
 			return static_cast<failure_t&&>(myFailure);
 		}
 
 		constexpr const failure_t&& GetError() const&& noexcept
-			requires notvoids<E>
+			requires util::notvoids<E>
 		{
 			return static_cast<const failure_t&&>(myFailure);
 		}
 
 		constexpr void GetError() const noexcept
-			requires (!notvoids<E>)
+			requires (!util::notvoids<E>)
 		{
-			static_assert(always_false<E>, "E is void.");
+			static_assert(util::always_false<E>, "E is void.");
 		}
 
 		constexpr bool IsSuccess() const noexcept
