@@ -1277,6 +1277,8 @@ export namespace net
 
 	using Proxy = Promise<void, void>;
 
+	using ioError = Promise<void, int>;
+
 	template<typename T>
 	Promise(T) -> Promise<T, void>;
 

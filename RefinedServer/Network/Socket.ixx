@@ -59,30 +59,6 @@ export namespace net
 
 	namespace abi
 	{
-		using ::SOCKET;
-		using ::OVERLAPPED;
-		using ::OVERLAPPED_ENTRY;
-		using ::LPOVERLAPPED_COMPLETION_ROUTINE;
-		using ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
-
-		using ::RIO_NOTIFICATION_COMPLETION_TYPE;
-		using ::RIORESULT;
-		using ::PRIORESULT;
-
-		using ::RIO_BUF;
-		using ::PRIO_BUF;
-
-		using ::RIO_BUFFERID_t;
-		using ::RIO_BUFFERID;
-		using ::PRIO_BUFFERID;
-
-		using ::RIO_CQ_t;
-		using ::RIO_CQ;
-		using ::PRIO_CQ;
-		using ::RIO_RQ_t;
-		using ::RIO_RQ;
-		using ::PRIO_RQ;
-
 		inline constexpr unsigned long DEFAULT_ACCEPT_SIZE = sizeof(SOCKADDR_IN) + 16UL;
 		inline constexpr ::SOCKET InvalidSocket = INVALID_SOCKET;
 
@@ -98,8 +74,6 @@ export namespace net
 			return ::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, nullptr, NULL, type);
 		}
 	}
-
-	using ioError = Promise<void, int>;
 
 	inline ioError CheckIO(const int& socket_fn_result) noexcept
 	{
