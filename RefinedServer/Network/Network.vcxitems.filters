@@ -7,7 +7,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Intrinsics.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Settings.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Context.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EndPoint.ixx" />
