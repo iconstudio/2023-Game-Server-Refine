@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Network", "Network\Network.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utility", "Utility\Utility.vcxitems", "{2B6D212A-90B7-4295-AC9D-7ADB96C265D1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestClient", "TestClient\TestClient.vcxproj", "{66BE34FF-EF60-4B87-9FD0-567E6486BC27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -25,6 +27,14 @@ Global
 		{D64513C7-DA16-431A-BA60-51D12683F0D8}.Release|x64.ActiveCfg = Release|x64
 		{D64513C7-DA16-431A-BA60-51D12683F0D8}.Release|x64.Build.0 = Release|x64
 		{D64513C7-DA16-431A-BA60-51D12683F0D8}.Release|x86.ActiveCfg = Release|Win32
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Debug|x64.ActiveCfg = Debug|x64
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Debug|x64.Build.0 = Debug|x64
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Debug|x86.ActiveCfg = Debug|Win32
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Debug|x86.Build.0 = Debug|Win32
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Release|x64.ActiveCfg = Release|x64
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Release|x64.Build.0 = Release|x64
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Release|x86.ActiveCfg = Release|Win32
+		{66BE34FF-EF60-4B87-9FD0-567E6486BC27}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
