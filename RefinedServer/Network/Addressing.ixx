@@ -1,7 +1,9 @@
+module;
+#include <utility>
+#include <string>
+#include <string_view>
+
 export module Net.Addressing;
-import Utility;
-import Utility.String;
-import Net;
 export import Net.EndPoint;
 
 export namespace net
@@ -12,15 +14,15 @@ export namespace net
 		explicit constexpr Address(const AddressFamily& family, const char(&ip)[16], const unsigned short& port) noexcept
 			: isStatic(true)
 			, addressFamily(family), protocolType(IProtocolTypes::TCP)
-			, myIP(), myPort(util::move(port))
+			, myIP(), myPort(std::move(port))
 		{
-			if (util::is_constant_evaluated())
+			if (std::is_constant_evaluated())
 			{
-				util::copy(ip, ip + sizeof(myIP), myIP);
+				std::copy(ip, ip + sizeof(myIP), myIP);
 			}
 			else
 			{
-				util::memcpy(myIP, ip, sizeof(myIP));
+				std::memcpy(myIP, ip, sizeof(myIP));
 			}
 		}
 
@@ -57,7 +59,7 @@ export namespace net
 			return protocolType;
 		}
 
-		inline constexpr util::string_view GetIP() const noexcept
+		inline constexpr std::string_view GetIP() const noexcept
 		{
 			return myIP;
 		}

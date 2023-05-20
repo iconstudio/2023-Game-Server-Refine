@@ -1,11 +1,9 @@
 module;
 #define NOMINMAX
 #include <WS2tcpip.h>
-
+#include <utility>
+#include <string_view>
 export module Net.EndPoint;
-import Utility;
-import Utility.String;
-import Net;
 
 export namespace net
 {
@@ -39,7 +37,7 @@ export namespace net
 		{}
 
 		constexpr EndPoint(::SOCKADDR_IN&& address) noexcept
-			: endPoint(util::move(address))
+			: endPoint(std::move(address))
 		{}
 
 		constexpr EndPoint(const AddressFamily& family, const ::IN_ADDR& adress, const unsigned short& network_port) noexcept
@@ -54,7 +52,7 @@ export namespace net
 			: EndPoint()
 		{
 			endPoint.sin_family = static_cast<unsigned short>(family);
-			endPoint.sin_addr = util::move(adress);
+			endPoint.sin_addr = std::move(adress);
 			endPoint.sin_port = network_port;
 		}
 
@@ -67,7 +65,7 @@ export namespace net
 		}
 
 		constexpr EndPoint(const AddressFamily& family, const unsigned long& network_serialized_adress, const unsigned short& network_port) noexcept
-			: EndPoint(family, util::move(network_serialized_adress), util::move(network_port))
+			: EndPoint(family, std::move(network_serialized_adress), std::move(network_port))
 		{}
 
 		inline constexpr ::SOCKADDR_IN& operator*() & noexcept
@@ -82,22 +80,22 @@ export namespace net
 
 		inline constexpr ::SOCKADDR_IN&& operator*() && noexcept
 		{
-			return util::move(endPoint);
+			return std::move(endPoint);
 		}
 
 		inline constexpr const ::SOCKADDR_IN&& operator*() const&& noexcept
 		{
-			return util::move(endPoint);
+			return std::move(endPoint);
 		}
 
 		inline constexpr ::SOCKADDR_IN* GetAddress() & noexcept
 		{
-			return util::addressof(endPoint);
+			return std::addressof(endPoint);
 		}
 
 		inline constexpr const ::SOCKADDR_IN* GetAddress() const& noexcept
 		{
-			return util::addressof(endPoint);
+			return std::addressof(endPoint);
 		}
 
 		inline constexpr size_t GetSize() const noexcept
@@ -120,12 +118,12 @@ export namespace net
 			return EndPoint{ family, ::htonl(INADDR_LOOPBACK), ::htons(port) };
 		}
 
-		static inline EndPoint Create(const AddressFamily& family, const util::string_view ip, const unsigned short& port) noexcept
+		static inline EndPoint Create(const AddressFamily& family, const std::string_view ip, const unsigned short& port) noexcept
 		{
 			::IN_ADDR sr_address{};
-			::inet_pton(static_cast<int>(family), ip.data(), util::addressof(sr_address));
+			::inet_pton(static_cast<int>(family), ip.data(), std::addressof(sr_address));
 
-			return EndPoint{ family, util::move(sr_address), ::htons(port) };
+			return EndPoint{ family, std::move(sr_address), ::htons(port) };
 		}
 
 	protected:

@@ -1,7 +1,6 @@
+module;
+#include <type_traits>
 export module Net.IoState;
-import Utility;
-import Utility.Constraints;
-export import Utility.Identity;
 
 export namespace net::io
 {
@@ -15,7 +14,7 @@ export namespace net::io
 	namespace detail
 	{
 		template<typename T> // T: Success Handle
-		struct success : util::type_identity<T>
+		struct success : std::type_identity<T>
 		{};
 
 		template<>
@@ -25,7 +24,7 @@ export namespace net::io
 		};
 
 		template<typename E> // E: Error
-		struct failure : util::type_identity<E>
+		struct failure : std::type_identity<E>
 		{};
 
 		template<>
@@ -35,7 +34,7 @@ export namespace net::io
 		};
 
 		template<typename C> // C: Cause of Defer
-		struct defered : util::type_identity<C>
+		struct defered : std::type_identity<C>
 		{};
 
 		template<>
