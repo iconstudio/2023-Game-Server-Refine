@@ -15,9 +15,6 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="$(MSBuildThisFileDirectory)Core.natvis" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Asynchron.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\BasicUser.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\ISession.ixx" />
@@ -27,5 +24,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\UserManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\UserManager.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\WorkerManager.ixx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)Core.natvis" />
   </ItemGroup>
 </Project>
