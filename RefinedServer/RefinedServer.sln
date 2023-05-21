@@ -45,6 +45,9 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Utility\Utility.vcxitems*{2b6d212a-90b7-4295-ac9d-7adb96c265d1}*SharedItemsImports = 9
 		Network\Network.vcxitems*{36e8bd54-1dbb-4fd1-a304-8d22721b85a6}*SharedItemsImports = 9
+		Core\Core.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
+		Network\Network.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
+		Utility\Utility.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Core\Core.vcxitems*{74c59b3a-a02f-4e4e-9e1e-afce7a7cb14b}*SharedItemsImports = 9
 		Core\Core.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
 		Network\Network.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
