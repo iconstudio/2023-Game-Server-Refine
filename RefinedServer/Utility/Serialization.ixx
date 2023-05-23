@@ -53,7 +53,7 @@ export namespace util
 	template<typename T, size_t Length>
 		requires (!serializables<clean_t<T>[]>)
 	constexpr
-		auto
+		Array<char, sizeof(T)* Length>
 		Serialize(const T(&buffer)[Length])
 		noexcept(noexcept(Serializer<clean_t<T>>::template Parse(declval<clean_t<T>>())))
 	{
