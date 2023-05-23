@@ -528,6 +528,19 @@ util::Serializer<float>
 };
 
 export template<> struct
+util::Serializer<float[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 4> Parse(const float(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<double>
 {
 	[[nodiscard]]
@@ -544,6 +557,19 @@ util::Serializer<double>
 };
 
 export template<> struct
+util::Serializer<double[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 8> Parse(const double(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<long double>
 {
 	[[nodiscard]]
@@ -556,6 +582,19 @@ util::Serializer<long double>
 	static constexpr util::Array<char, 8> Parse(long double&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<long double&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<long double[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 8> Parse(const long double(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
@@ -656,9 +695,11 @@ namespace util::test
 
 		constexpr int arr1[] = { 1, 2, 3, 4, 5 };
 		constexpr float arr2[] = { 400.0591012f, 30.0951234f, 60841.0915f, 206167.013133f };
+		constexpr double arr3[] = { 034909588321004938.10344953894192120303958, 40286231204.063489153 };
 
 		constexpr auto fs1 = util::Serialize(arr1);
 		constexpr auto fs2 = util::Serialize(arr2);
+		constexpr auto fs3 = util::Serialize(arr3);
 	}
 #endif // false
 }
