@@ -280,4 +280,82 @@ namespace util::serialization
 	{
 		return Serialize(std::bit_cast<unsigned long long>(value));
 	}
+
+	template<size_t Length>
+	constexpr Array<char, Length> Serialize(const char(&buffer)[Length]) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ buffer };
+	}
+
+	template<size_t Length>
+	constexpr Array<char, Length> Serialize(const unsigned char(&buffer)[Length]) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ from_range, buffer };
+	}
+
+	template<size_t Length>
+	constexpr Array<char, Length> Serialize(const char8_t(&buffer)[Length]) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ from_range, buffer };
+	}
+
+	/// <summary>
+	/// 비트 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	constexpr auto Serialize(const bool(&buffer)[Length]) noexcept(0 < Length)
+	{
+		constexpr size_t bytes_count = std::max(1ULL, Length / 8);
+
+		Array<char, bytes_count> result{};
+		for (size_t i = 0; i < bytes_count; ++i)
+		{
+			char& element = result[i];
+			for (size_t j = 0; j < 8; ++j)
+			{
+				const bool& bit = buffer[i * 8 + j];
+				element |= static_cast<char>(bit) << j;
+			}
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 와이드 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	constexpr Array<char, Length * 2> Serialize(const wchar_t(&buffer)[Length])
+	{
+		Array<char, Length * 2> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const wchar_t& element = buffer[i];
+			const char& [high, low] = Serialize(element);
+			result[i * 2] = high;
+			result[i * 2 + 1] = low;
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// UTF-16 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	constexpr Array<char, Length * 2> Serialize(const char16_t(&buffer)[Length])
+	{
+		Array<char, Length * 2> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const char16_t& element = buffer[i];
+			const char& [high, low] = Serialize(element);
+			result[i * 2] = high;
+			result[i * 2 + 1] = low;
+		}
+
+		return result;
+	}
 }
