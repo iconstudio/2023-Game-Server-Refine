@@ -38,7 +38,8 @@ export namespace util
 	};
 }
 
-export struct util::Serializer<int>
+export template<>
+struct util::Serializer<int>
 {
 	[[nodiscard]]
 	static constexpr util::Array<char, 4> Parse(const int& value) noexcept
@@ -53,9 +54,26 @@ export struct util::Serializer<int>
 
 		return result;
 	}
+
+	template<size_t Offset, size_t Length>
+	static constexpr void ParseTo(const int& value, util::Array<char, Length>& dest)
+		noexcept(Offset + sizeof(int) <= Length)
+	{
+		if constexpr (Length < Offset + sizeof(int))
+		{
+			static_assert(util::always_false<util::Array<char, Length>>, "The buffer is too small to contain an int.");
+		}
+
+		const auto result = Parse(value);
+		dest[Offset] = result[0];
+		dest[Offset + 1] = result[1];
+		dest[Offset + 2] = result[2];
+		dest[Offset + 3] = result[3];
+	}
 };
 
-export struct util::Deserializer<int>
+export template<>
+struct util::Deserializer<int>
 {
 	template<size_t Offset, size_t Length>
 	[[nodiscard]]
@@ -64,13 +82,13 @@ export struct util::Deserializer<int>
 	{
 		if constexpr (Length < Offset + sizeof(int))
 		{
-			static_assert(util::always_false<util::Array<char, Length>>, "The buffer is too small to contain an int.")
+			static_assert(util::always_false<util::Array<char, Length>>, "The buffer is too small to contain an int.");
 		}
 
-		const unsigned int result = (static_cast<unsigned>(buffer[offset]) << 24)
-			| (static_cast<unsigned>(buffer[offset + 1]) << 16)
-			| (static_cast<unsigned>(buffer[offset + 2]) << 8)
-			| static_cast<unsigned>(buffer[offset + 3]);
+		const unsigned int result = (static_cast<unsigned>(buffer[Offset]) << 24)
+			| (static_cast<unsigned>(buffer[Offset + 1]) << 16)
+			| (static_cast<unsigned>(buffer[Offset + 2]) << 8)
+			| static_cast<unsigned>(buffer[Offset + 3]);
 
 		return static_cast<int>(result);
 	}
@@ -82,7 +100,7 @@ export struct util::Deserializer<int>
 	{
 		if constexpr (Length < sizeof(int))
 		{
-			static_assert(util::always_false<util::Array<char, Length>>, "The buffer is too small to contain an int.")
+			static_assert(util::always_false<util::Array<char, Length>>, "The buffer is too small to contain an int.");
 		}
 
 		const unsigned int result = (static_cast<unsigned>(buffer[0]) << 24)
@@ -120,34 +138,35 @@ namespace util::test
 		int b;
 		int c;
 	};
+}
 
-	struct util::Serializer<test_struct>
+template<>
+struct util::Serializer<util::test::test_struct>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 12> Parse(const util::test::test_struct& value) noexcept
 	{
-		[[nodiscard]]
-		static constexpr util::Array<char, 12> Parse(const test_struct& value) noexcept
-		{
-			util::Array<char, 12> result{};
+		util::Array<char, 12> result{};
 
-			const auto a = util::Serializer<int>::Parse(value.a);
-			const auto b = util::Serializer<int>::Parse(value.b);
-			const auto c = util::Serializer<int>::Parse(value.c);
+		util::Serializer<int>::ParseTo<0>(value.a, result);
+		util::Serializer<int>::ParseTo<4>(value.b, result);
+		util::Serializer<int>::ParseTo<8>(value.c, result);
 
-			result[0] = a[0];
-			result[1] = a[1];
-			result[2] = a[2];
+		return result;
+	}
+};
 
-
-
-
-
-			return result;
-		}
-	};
-
+namespace util::test
+{
 	void test_serializer() noexcept
 	{
 		static_assert(util::Serializable<test_struct>);
 
+		constexpr test_struct test{ 1, 2, 3 };
+
+		constexpr auto result = util::Serializer<test_struct>::Parse(test);
+
+		static_assert(result[0] == 0);
 	}
 #endif // false
 }
