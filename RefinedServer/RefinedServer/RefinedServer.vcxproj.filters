@@ -46,16 +46,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\Utility\Utility.natvis">
-      <Filter>리소스 파일</Filter>
-    </Natvis>
-    <Natvis Include="..\Network\Network.natvis">
-      <Filter>리소스 파일</Filter>
-    </Natvis>
     <Natvis Include="Server.natvis">
-      <Filter>리소스 파일</Filter>
-    </Natvis>
-    <Natvis Include="..\Core\Core.natvis">
       <Filter>리소스 파일</Filter>
     </Natvis>
   </ItemGroup>

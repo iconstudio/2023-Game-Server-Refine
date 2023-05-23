@@ -43,6 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Deserialization.inl" />
-    <None Include="$(MSBuildThisFileDirectory)Serialiazation.inl" />
+    <None Include="$(MSBuildThisFileDirectory)Serialization.inl" />
   </ItemGroup>
 </Project>

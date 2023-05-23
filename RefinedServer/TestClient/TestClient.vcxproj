@@ -192,6 +192,11 @@
   <ItemGroup>
     <Natvis Include="TestClient.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="C:\Users\yoyof\Documents\2023-Game-Server-Refine\RefinedServer\Utility\Serialization.inl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\glm.0.9.9.800\build\native\glm.targets" Condition="Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" />

@@ -1,5 +1,5 @@
 module;
-#include "Serialiazation.inl"
+#include "Serialization.inl"
 #include "Deserialization.inl"
 
 export module Utility.Serialization;
