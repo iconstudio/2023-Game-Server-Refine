@@ -37,7 +37,7 @@ export namespace util
 	{
 		static_assert(serializables<clean_t<T>>, "T Cannot be serialized.");
 
-		return typename Serializer<clean_t<T>>::template Parse(value);
+		return Serializer<clean_t<T>>::template Parse(value);
 	}
 
 	template<typename T, size_t Length>
@@ -47,7 +47,7 @@ export namespace util
 		Serialize(const T(&buffer)[Length])
 		noexcept(noexcept(Serializer<clean_t<T>[]>::template Parse(declval<clean_t<T>[Length]>())))
 	{
-		return typename Serializer<clean_t<T>[]>::template Parse(buffer);
+		return Serializer<clean_t<T>[]>::template Parse(buffer);
 	}
 
 	template<typename T, size_t Length>
@@ -85,7 +85,7 @@ export namespace util
 		decltype(Serializer<underlying_type_t<clean_t<E>>>::Parse(declval<underlying_type_t<clean_t<E>>>()))
 		Serialize(const E& value) noexcept
 	{
-		return typename Serializer<underlying_type_t<E>>::template Parse(static_cast<underlying_type_t<clean_t<E>>>(value));
+		return Serializer<underlying_type_t<E>>::template Parse(static_cast<underlying_type_t<clean_t<E>>>(value));
 	}
 }
 
