@@ -78,7 +78,7 @@ export namespace net
 	{
 		if (debug::CheckError(socket_fn_result))
 		{
-			int error = ::WSAGetLastError();
+			int error = WSAGetLastError();
 			if (debug::CheckPending(error))
 			{
 				return io::defered;
@@ -98,7 +98,7 @@ export namespace net
 	{
 		if (0 == bool_fn_result)
 		{
-			int error = ::WSAGetLastError();
+			int error = WSAGetLastError();
 			if (debug::CheckPending(error))
 			{
 				return io::defered;

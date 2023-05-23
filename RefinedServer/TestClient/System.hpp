@@ -1,4 +1,7 @@
 #pragma once
+import Net;
+import Net.Socket;
+import Net.EndPoint;
 
 // @brief Class representing a camera orbiting around its target.
 // @ingroup gl_utils
