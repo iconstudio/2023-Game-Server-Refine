@@ -270,6 +270,28 @@ namespace util::serialization
 		return result;
 	}
 
+	/// <summary>
+	/// UTF-32 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> Serialize(const char32_t(&buffer)[Length])
+	{
+		Array<char, Length * 4> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const char32_t& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+			result[i * 2 + 2] = mid[2];
+			result[i * 2 + 3] = mid[3];
+		}
+
+		return result;
+	}
+
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
@@ -346,6 +368,26 @@ namespace util::serialization
 			const auto mid = Serialize(element);
 			result[i * 2] = mid[0];
 			result[i * 2 + 1] = mid[1];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> SerializeArray(const char32_t* const& buffer)
+	{
+		Array<char, Length * 4> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const char32_t& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+			result[i * 2 + 2] = mid[2];
+			result[i * 2 + 3] = mid[3];
 		}
 
 		return result;

@@ -318,6 +318,35 @@ util::Serializer<unsigned long>
 };
 
 export template<> struct
+util::Serializer<char32_t>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(const char32_t& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(char32_t&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<char32_t&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<char32_t[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 4> Parse(const char32_t(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<long long>
 {
 	[[nodiscard]]
