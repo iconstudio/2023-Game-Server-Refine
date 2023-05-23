@@ -24,8 +24,7 @@ export namespace util
 	};
 
 	template<typename T>
-	concept serializables = std::is_object_v<T>
-		&& requires(const T & value, Serializer<T>&parser)
+	concept serializables = requires(const T & value, Serializer<T>&parser)
 	{
 		parser.Parse(value);
 	};
