@@ -3,6 +3,7 @@ module;
 
 export module Net.Worker;
 import Utility.Constraints;
+import Utility.Concurrency.Thread;
 import Utility.Concurrency.Thread.Unit;
 import Net;
 import Net.CompletionPort;
@@ -10,6 +11,8 @@ import Net.Context;
 
 export extern "C++" namespace net
 {
+	using ThreadID = util::thread::id;
+
 	class [[nodiscard]] WorkerUnit
 	{
 	public:
@@ -56,13 +59,13 @@ export extern "C++" namespace net
 		}
 
 		[[nodiscard]]
-		inline auto get_id() const noexcept
+		inline util::thread::id get_id() const noexcept
 		{
 			return myThread.get_id();
 		}
 
 		[[nodiscard]]
-		inline auto native_handle() noexcept
+		inline void* native_handle() noexcept
 		{
 			return myThread.native_handle();
 		}
