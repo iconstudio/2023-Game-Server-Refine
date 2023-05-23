@@ -1,169 +1,140 @@
 module;
 #include <system_error>
 #include <utility>
-#include <type_traits>
-#include <initializer_list>
-#include <memory>
 #include <array>
 #include <algorithm>
 #include <ranges>
+
 export module Utility.Array;
+import Utility;
+import Utility.Constraints;
 
 export namespace util
 {
 	using std::initializer_list;
 
-	template<typename Elem, size_t Length>
-	using array_iterator = std::_Array_iterator<Elem, Length>;
+	template<typename T, size_t Length>
+	using array_iterator = std::_Array_iterator<T, Length>;
 
-	template<typename Elem, size_t Length>
-	using array_const_iterator = std::_Array_const_iterator<Elem, Length>;
+	template<typename T, size_t Length>
+	using array_const_iterator = std::_Array_const_iterator<T, Length>;
 
 	struct empty_array_elemement { constexpr explicit empty_array_elemement() = default; };
 
-	template<typename Elem, size_t Length>
+	template<typename T, size_t Length>
 	class Array
 	{
 	public:
-		using value_type = Elem;
-		using const_value_type = const Elem;
-		using pointer = Elem*;
-		using const_pointer = const Elem*;
-		using reference = Elem&;
-		using const_reference = const Elem&;
+		static_assert(!std::same_as<T, void>, "Cannot use void type as array element.");
+
+		using value_type = T;
+		using const_value_type = const T;
+		using pointer = T*;
+		using const_pointer = const T*;
+		using reference = T&;
+		using const_reference = const T&;
 
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
-		using iterator = array_iterator<Elem, Length>;
-		using const_iterator = array_const_iterator<Elem, Length>;
+		using iterator = array_iterator<value_type, Length>;
+		using const_iterator = array_const_iterator<value_type, Length>;
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-		static inline constexpr bool NothrowInitializable = std::is_nothrow_default_constructible_v<Elem>;
-		static inline constexpr bool NothrowDestructible = std::is_nothrow_destructible_v<Elem>;
+		constexpr Array()
+			noexcept(nothrow_constructibles<value_type>) requires(default_initializable<value_type>) = default;
+		constexpr ~Array()
+			noexcept(nothrow_destructibles<value_type>) = default;
+		constexpr Array(const Array& other)
+			noexcept(nothrow_copy_assignables<value_type>) requires copyable<value_type> = default;
+		constexpr Array(Array&& other)
+			noexcept(nothrow_move_assignables<value_type>) requires movable<value_type> = default;
 
-		constexpr Array() noexcept(NothrowInitializable) = default;
-		constexpr ~Array() noexcept(NothrowDestructible) = default;
-
-		explicit constexpr Array(const Elem(&raw_data)[Length])
-			noexcept(std::is_nothrow_copy_assignable_v<Elem>)
-			requires std::copyable<Elem>
+		template<size_t L2>
+			requires (0 < L2)
+		explicit constexpr Array(const value_type(&buffer)[L2])
+			noexcept(nothrow_copy_assignables<value_type>)
+			requires copyable<value_type>
 		{
-			if (std::is_constant_evaluated())
+			iterator it = begin();
+
+			for (const value_type& elemement : buffer)
 			{
-				std::copy(std::cbegin(raw_data), std::cend(raw_data), begin());
-			}
-			else
-			{
-				std::memcpy(myData, raw_data, Length * sizeof(Elem));
+				*it = elemement;
+
+				if (++it == end())
+					break;
 			}
 		}
 
-		template<size_t OLength>
-		explicit constexpr Array(const Elem(&raw_data)[OLength])
-			noexcept(std::is_nothrow_copy_assignable_v<Elem>)
-			requires (std::copyable<Elem>&& OLength <= Length)
+		template<size_t L2>
+			requires (0 < L2)
+		explicit constexpr Array(value_type(&& buffer)[L2])
+			noexcept(nothrow_move_assignables<value_type>)
+			requires movable<value_type>
 		{
-			if (std::is_constant_evaluated())
+			iterator it = begin();
+
+			for (value_type& elemement : buffer)
 			{
-				std::copy(std::cbegin(raw_data), std::cend(raw_data), begin());
-			}
-			else
-			{
-				std::memcpy(myData, raw_data, Length * sizeof(Elem));
+				*it = static_cast<value_type&&>(elemement);
+
+				if (++it == end())
+					break;
 			}
 		}
 
-		template<std::convertible_to<Elem> Elem2>
-		constexpr Array(const std::initializer_list<Elem2> elements)
-			noexcept(std::is_nothrow_copy_assignable_v<Elem>&& std::is_nothrow_copy_assignable_v<Elem2>)
+		constexpr Array(const initializer_list<value_type> elements)
+			noexcept(nothrow_copy_assignables<value_type>) requires copyable<value_type>
 		{
 			std::copy(elements.begin(), elements.end(), begin());
 		}
 
-		constexpr Array(const Array& other) noexcept(std::is_nothrow_copy_assignable_v<Elem>)
-			requires std::copyable<Elem>: Array()
-		{
-			if (std::is_constant_evaluated())
-			{
-				std::copy(other.cbegin(), other.cend(), begin());
-			}
-			else
-			{
-				std::memcpy(myData, other.data(), Length);
-			}
-		}
-
-		constexpr Array(Array&& other) noexcept(std::is_nothrow_move_assignable_v<Elem>)
-			requires std::movable<Elem> : Array()
-		{
-			if (std::is_constant_evaluated())
-			{
-				std::move(other.cbegin(), other.cend(), begin());
-			}
-			else
-			{
-				std::memcpy(myData, other.data(), Length);
-			}
-		}
-
-		inline constexpr Array& operator=(const Array& other)
-			noexcept(std::is_nothrow_move_assignable_v<Elem>) requires std::movable<Elem>
+		constexpr Array& operator=(const Array& other)
+			noexcept(nothrow_copy_assignables<value_type>) requires std::movable<value_type>
 		{
 			if (&other == static_cast<const Array* const&>(this))
 			{
 				return *this;
 			}
 
-			if (std::is_constant_evaluated())
-			{
-				std::copy(other.cbegin(), other.cend(), begin());
-			}
-			else
-			{
-				std::memcpy(myData, other.data(), Length);
-			}
+			std::copy(other.cbegin(), other.cend(), begin());
 
 			return *this;
 		}
 
-		inline constexpr Array& operator=(Array&& other)
-			noexcept(std::is_nothrow_move_assignable_v<Elem>)
-			requires std::movable<Elem>
+		constexpr Array& operator=(Array&& other)
+			noexcept(nothrow_move_assignables<value_type>) requires std::movable<value_type>
 		{
-			if (std::is_constant_evaluated())
-			{
-				std::move(other.cbegin(), other.cend(), begin());
-			}
-			else
-			{
-				std::memcpy(myData, other.data(), Length);
-			}
+			std::move(other.cbegin(), other.cend(), begin());
 
 			return *this;
 		}
 
-		template<std::invocable<value_type&> Fn>
-		inline constexpr void apply(Fn&& function) noexcept
+		template<invocables<reference> Fn>
+		constexpr void apply(Fn&& function)
+			noexcept(noexcept(forward<Fn>(function)(declval<reference>())))
 		{
-			for (value_type& elem : *this)
+			for (reference elem : *this)
 			{
 				std::forward<Fn>(function)(elem);
 			}
 		}
 
-		template<std::invocable<const_value_type&> Fn>
-		inline constexpr void apply(Fn&& function) const noexcept
+		template<invocables<const_reference> Fn>
+		constexpr void apply(Fn&& function) const
+			noexcept(noexcept(forward<Fn>(function)(declval<const_reference>())))
 		{
-			for (const_value_type& elem : *this)
+			for (const_reference elem : *this)
 			{
 				std::forward<Fn>(function)(elem);
 			}
 		}
 
-		template<std::convertible_to<value_type> OElem, size_t OLength>
-			requires (0 < OLength)
-		inline constexpr void assign(const Array<OElem, OLength>& other) noexcept(std::is_nothrow_assignable_v<value_type, OElem>)
+		template<convertible_to<value_type> Uty, size_t L2>
+			requires (0 < L2)
+		constexpr void assign(const Array<Uty, L2>& other)
+			noexcept(nothrow_assignables<value_type, Uty>)
 		{
 			auto src = other.cbegin();
 
@@ -173,32 +144,29 @@ export namespace util
 			}
 		}
 
-		template<std::convertible_to<value_type> OElem, size_t OLength>
-			requires (0 < OLength)
-		inline constexpr void assign(Array<OElem, OLength>&& other) noexcept(std::is_nothrow_assignable_v<value_type, OElem>)
+		template<convertible_to<value_type> Uty, size_t L2>
+			requires (0 < L2)
+		constexpr void assign(Array<Uty, L2>&& other)
+			noexcept(nothrow_assignables<value_type, Uty>)
 		{
-			auto src = other.cbegin();
+			auto src = other.begin();
 
-			for (iterator it = begin(); it != end() && src != other.cend(); (void) ++it)
+			for (iterator it = begin(); it != end() && src != other.end(); (void) ++it)
 			{
-				*it = std::move(*(src++));
+				*it = static_cast<Uty&&>(*(src++));
 			}
 		}
 
-		inline constexpr void fill(const value_type& fill_value) noexcept(std::is_nothrow_copy_assignable_v<value_type>)
+		constexpr void fill(const value_type& fill_value)
+			noexcept(nothrow_copy_assignables<value_type>)
 		{
 			std::fill_n(myData, Length, fill_value);
 		}
 
-		inline constexpr void fill(value_type&& fill_value) noexcept(std::is_nothrow_move_assignable_v<value_type>)
+		constexpr void swap(std::array<value_type, Length>& other_data)
+			noexcept(nothrow_swappables<value_type>)
 		{
-			const auto& value = std::move(fill_value);
-			std::fill_n(myData, Length, value);
-		}
-
-		inline constexpr void swap(std::array<Elem, Length>& other_data) noexcept(std::is_nothrow_swappable_v<std::array<Elem, Length>>)
-		{
-			auto oit = other_data.cbegin();
+			auto oit = other_data.begin();
 
 			for (iterator it = begin(); it != end(); ++it, (void) ++oit)
 			{
@@ -206,7 +174,8 @@ export namespace util
 			}
 		}
 
-		inline constexpr void swap(Array& other) noexcept(std::is_nothrow_swappable_v<Elem>)
+		constexpr void swap(Array& other)
+			noexcept(nothrow_swappables<value_type>)
 		{
 			auto oit = other.begin();
 
@@ -217,79 +186,79 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr iterator begin() noexcept
+		constexpr iterator begin() noexcept
 		{
 			return iterator{ myData, 0 };
 		}
 
 		[[nodiscard]]
-		inline constexpr iterator end() noexcept
+		constexpr iterator end() noexcept
 		{
 			return iterator{ myData, Length };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator begin() const noexcept
+		constexpr const_iterator begin() const noexcept
 		{
 			return const_iterator{ myData, 0 };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator end() const noexcept
+		constexpr const_iterator end() const noexcept
 		{
 			return const_iterator{ myData, Length };
 		}
 
 		[[nodiscard]]
-		inline constexpr reverse_iterator rbegin() noexcept
+		constexpr reverse_iterator rbegin() noexcept
 		{
 			return reverse_iterator{ end() };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator rbegin() const noexcept
+		constexpr const_reverse_iterator rbegin() const noexcept
 		{
 			return const_reverse_iterator{ end() };
 		}
 
 		[[nodiscard]]
-		inline constexpr reverse_iterator rend() noexcept
+		constexpr reverse_iterator rend() noexcept
 		{
 			return reverse_iterator{ begin() };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator rend() const noexcept
+		constexpr const_reverse_iterator rend() const noexcept
 		{
 			return const_reverse_iterator{ begin() };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator cbegin() const noexcept
+		constexpr const_iterator cbegin() const noexcept
 		{
 			return begin();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator cend() const noexcept
+		constexpr const_iterator cend() const noexcept
 		{
 			return end();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator crbegin() const noexcept
+		constexpr const_reverse_iterator crbegin() const noexcept
 		{
 			return rbegin();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator crend() const noexcept
+		constexpr const_reverse_iterator crend() const noexcept
 		{
 			return rend();
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			reference
 			at(const size_type& index)&
 		{
@@ -302,7 +271,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_reference
 			at(const size_type& index) const&
 		{
@@ -315,7 +284,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			value_type&&
 			at(const size_type& index)&&
 		{
@@ -328,7 +297,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_value_type&&
 			at(const size_type& index) const&&
 		{
@@ -341,14 +310,14 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr reference
+		constexpr reference
 			operator[](_In_range_(0, Length - 1) const size_type& index) & noexcept
 		{
 			return myData[index];
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_reference
 			operator[](_In_range_(0, Length - 1) const size_type& index) const& noexcept
 		{
@@ -356,7 +325,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			value_type&&
 			operator[](_In_range_(0, Length - 1) const size_type& index) && noexcept
 		{
@@ -364,7 +333,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_value_type&&
 			operator[](_In_range_(0, Length - 1) const size_type& index) const&& noexcept
 		{
@@ -372,73 +341,73 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr reference front() & noexcept
+		constexpr reference front() & noexcept
 		{
 			return myData[0];
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reference front() const& noexcept
+		constexpr const_reference front() const& noexcept
 		{
 			return myData[0];
 		}
 
 		[[nodiscard]]
-		inline constexpr value_type&& front() && noexcept
+		constexpr value_type&& front() && noexcept
 		{
 			return std::move(myData[0]);
 		}
 
 		[[nodiscard]]
-		inline constexpr const value_type&& front() const&& noexcept
+		constexpr const value_type&& front() const&& noexcept
 		{
 			return std::move(myData[0]);
 		}
 
 		[[nodiscard]]
-		inline constexpr reference back() & noexcept
+		constexpr reference back() & noexcept
 		{
 			return myData[Length - 1];
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reference back() const& noexcept
+		constexpr const_reference back() const& noexcept
 		{
 			return myData[Length - 1];
 		}
 
 		[[nodiscard]]
-		inline constexpr value_type&& back() && noexcept
+		constexpr value_type&& back() && noexcept
 		{
 			return std::move(myData[Length - 1]);
 		}
 
 		[[nodiscard]]
-		inline constexpr const value_type&& back() const&& noexcept
+		constexpr const value_type&& back() const&& noexcept
 		{
 			return std::move(myData[Length - 1]);
 		}
 
 		[[nodiscard]]
-		inline constexpr pointer data() & noexcept
+		constexpr pointer data() & noexcept
 		{
 			return myData;
 		}
 
 		[[nodiscard]]
-		inline constexpr const_pointer data() const& noexcept
+		constexpr const_pointer data() const& noexcept
 		{
 			return myData;
 		}
 
 		[[nodiscard]]
-		inline constexpr pointer&& data() && noexcept
+		constexpr pointer&& data() && noexcept
 		{
 			return std::move(myData);
 		}
 
 		[[nodiscard]]
-		inline constexpr size_type size() const noexcept
+		constexpr size_type size() const noexcept
 		{
 			return Length;
 		}
@@ -456,24 +425,24 @@ export namespace util
 		}
 
 	private:
-		Elem myData[Length];
+		T myData[Length];
 	};
 
-	template<typename Elem>
-	class Array<Elem, 0>
+	template<typename T>
+	class Array<T, 0>
 	{
 	public:
-		using value_type = Elem;
-		using const_value_type = const Elem;
-		using pointer = Elem*;
-		using const_pointer = const Elem*;
-		using reference = Elem&;
-		using const_reference = const Elem&;
+		using value_type = T;
+		using const_value_type = const T;
+		using pointer = T*;
+		using const_pointer = const T*;
+		using reference = T&;
+		using const_reference = const T&;
 
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
-		using iterator = array_iterator<Elem, 0>;
-		using const_iterator = array_const_iterator<Elem, 0>;
+		using iterator = array_iterator<T, 0>;
+		using const_iterator = array_const_iterator<T, 0>;
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -481,117 +450,117 @@ export namespace util
 		constexpr ~Array() noexcept = default;
 
 		template<size_t OLength>
-		constexpr Array([[maybe_unused]] const Elem(&raw_data)[OLength]) noexcept
+		constexpr Array([[maybe_unused]] const T(&raw_data)[OLength]) noexcept
 		{}
 
-		template<std::convertible_to<Elem> Elem2>
+		template<std::convertible_to<T> Elem2>
 		explicit constexpr Array([[maybe_unused]] const std::initializer_list<Elem2> elements) noexcept
 		{}
 
 		constexpr Array(const Array& other) noexcept = default;
 		constexpr Array(Array&& other) noexcept = default;
-		inline constexpr Array& operator=(const Array& other) noexcept = default;
-		inline constexpr Array& operator=(Array&& other) noexcept = default;
+		constexpr Array& operator=(const Array& other) noexcept = default;
+		constexpr Array& operator=(Array&& other) noexcept = default;
 
 		template<std::invocable<value_type&> Fn>
-		inline constexpr void apply([[maybe_unused]] Fn&& function) noexcept
+		constexpr void apply([[maybe_unused]] Fn&& function) noexcept
 		{}
 
 		template<std::invocable<const_value_type&> Fn>
-		inline constexpr void apply([[maybe_unused]] Fn&& function) const noexcept
+		constexpr void apply([[maybe_unused]] Fn&& function) const noexcept
 		{}
 
 		template<std::convertible_to<value_type> OElem, size_t OLength>
-		inline constexpr void assign([[maybe_unused]] const Array<OElem, OLength>& other) noexcept
+		constexpr void assign([[maybe_unused]] const Array<OElem, OLength>& other) noexcept
 		{}
 
 		template<std::convertible_to<value_type> OElem, size_t OLength>
-		inline constexpr void assign([[maybe_unused]] Array<OElem, OLength>&& other) noexcept
+		constexpr void assign([[maybe_unused]] Array<OElem, OLength>&& other) noexcept
 		{}
 
-		inline constexpr void fill([[maybe_unused]] const value_type& fill_value) noexcept
+		constexpr void fill([[maybe_unused]] const value_type& fill_value) noexcept
 		{}
 
-		inline constexpr void fill([[maybe_unused]] value_type&& fill_value) noexcept
+		constexpr void fill([[maybe_unused]] value_type&& fill_value) noexcept
 		{}
 
-		inline constexpr void swap([[maybe_unused]] Array& other) noexcept
+		constexpr void swap([[maybe_unused]] Array& other) noexcept
 		{}
 
 		[[nodiscard]]
-		inline constexpr iterator begin() noexcept
+		constexpr iterator begin() noexcept
 		{
 			return iterator{ nullptr, 0 };
 		}
 
 		[[nodiscard]]
-		inline constexpr iterator end() noexcept
+		constexpr iterator end() noexcept
 		{
 			return iterator{ nullptr, 1 };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator begin() const noexcept
+		constexpr const_iterator begin() const noexcept
 		{
 			return const_iterator{ nullptr, 0 };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator end() const noexcept
+		constexpr const_iterator end() const noexcept
 		{
 			return const_iterator{ nullptr, 1 };
 		}
 
 		[[nodiscard]]
-		inline constexpr reverse_iterator rbegin() noexcept
+		constexpr reverse_iterator rbegin() noexcept
 		{
 			return reverse_iterator{ end() };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator rbegin() const noexcept
+		constexpr const_reverse_iterator rbegin() const noexcept
 		{
 			return const_reverse_iterator{ end() };
 		}
 
 		[[nodiscard]]
-		inline constexpr reverse_iterator rend() noexcept
+		constexpr reverse_iterator rend() noexcept
 		{
 			return reverse_iterator{ begin() };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator rend() const noexcept
+		constexpr const_reverse_iterator rend() const noexcept
 		{
 			return const_reverse_iterator{ begin() };
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator cbegin() const noexcept
+		constexpr const_iterator cbegin() const noexcept
 		{
 			return begin();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_iterator cend() const noexcept
+		constexpr const_iterator cend() const noexcept
 		{
 			return end();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator crbegin() const noexcept
+		constexpr const_reverse_iterator crbegin() const noexcept
 		{
 			return rbegin();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reverse_iterator crend() const noexcept
+		constexpr const_reverse_iterator crend() const noexcept
 		{
 			return rend();
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			reference
 			at([[maybe_unused]] const size_type& index)&
 		{
@@ -599,7 +568,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_reference
 			at([[maybe_unused]] const size_type& index) const&
 		{
@@ -607,7 +576,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			value_type&&
 			at([[maybe_unused]] const size_type& index)&&
 		{
@@ -615,7 +584,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_value_type&&
 			at([[maybe_unused]] const size_type& index) const&&
 		{
@@ -623,14 +592,14 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr reference
+		constexpr reference
 			operator[]([[maybe_unused]] const size_type& index) & noexcept
 		{
 			return *begin();
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_reference
 			operator[]([[maybe_unused]] const size_type& index) const& noexcept
 		{
@@ -638,7 +607,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			value_type&&
 			operator[]([[maybe_unused]] const size_type& index) && noexcept
 		{
@@ -646,7 +615,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr
+		constexpr
 			const_value_type&&
 			operator[]([[maybe_unused]] const size_type& index) const&& noexcept
 		{
@@ -654,73 +623,73 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		inline constexpr reference front() & noexcept
+		constexpr reference front() & noexcept
 		{
 			return *begin();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reference front() const& noexcept
+		constexpr const_reference front() const& noexcept
 		{
 			return *cbegin();
 		}
 
 		[[nodiscard]]
-		inline constexpr value_type&& front() && noexcept
+		constexpr value_type&& front() && noexcept
 		{
 			return std::move(*begin());
 		}
 
 		[[nodiscard]]
-		inline constexpr const value_type&& front() const&& noexcept
+		constexpr const value_type&& front() const&& noexcept
 		{
 			return std::move(*cbegin());
 		}
 
 		[[nodiscard]]
-		inline constexpr reference back() & noexcept
+		constexpr reference back() & noexcept
 		{
 			return *begin();
 		}
 
 		[[nodiscard]]
-		inline constexpr const_reference back() const& noexcept
+		constexpr const_reference back() const& noexcept
 		{
 			return *begin();
 		}
 
 		[[nodiscard]]
-		inline constexpr value_type&& back() && noexcept
+		constexpr value_type&& back() && noexcept
 		{
 			return std::move(*begin());
 		}
 
 		[[nodiscard]]
-		inline constexpr const value_type&& back() const&& noexcept
+		constexpr const value_type&& back() const&& noexcept
 		{
 			return std::move(*cbegin());
 		}
 
 		[[nodiscard]]
-		inline constexpr pointer data() & noexcept
+		constexpr pointer data() & noexcept
 		{
 			return nullptr;
 		}
 
 		[[nodiscard]]
-		inline constexpr const_pointer data() const& noexcept
+		constexpr const_pointer data() const& noexcept
 		{
 			return nullptr;
 		}
 
 		[[nodiscard]]
-		inline constexpr pointer&& data() && noexcept
+		constexpr pointer&& data() && noexcept
 		{
 			return nullptr;
 		}
 
 		[[nodiscard]]
-		inline constexpr size_type size() const noexcept
+		constexpr size_type size() const noexcept
 		{
 			return 0;
 		}
@@ -746,13 +715,13 @@ export namespace util
 	using ::std::swap;
 }
 
-export template<typename Elem, size_t Length>
-inline constexpr bool std::ranges::enable_borrowed_range<util::Array<Elem, Length>> = true;
+export template<typename T, size_t Length>
+constexpr bool std::ranges::enable_borrowed_range<util::Array<T, Length>> = true;
 
 export namespace std
 {
-	template<typename Elem, size_t Length>
-	inline constexpr void swap(::util::Array<Elem, Length>& lhs, ::util::Array<Elem, Length>& rhs) noexcept
+	template<typename T, size_t Length>
+	constexpr void swap(::util::Array<T, Length>& lhs, ::util::Array<T, Length>& rhs) noexcept
 	{
 		lhs.swap(rhs);
 	}
