@@ -11,7 +11,9 @@ import Utility.Constraints;
 
 export namespace util
 {
-	using std::initializer_list;
+	using ::std::from_range_t;
+	using ::std::from_range;
+	using ::std::initializer_list;
 
 	template<typename T, size_t Length>
 	using array_iterator = std::_Array_iterator<T, Length>;
@@ -50,6 +52,13 @@ export namespace util
 		constexpr Array(Array&& other)
 			noexcept(nothrow_move_assignables<value_type>) requires movable<value_type> = default;
 
+		explicit(!trivials<value_type>)
+			constexpr Array(const initializer_list<value_type> elements)
+			noexcept(nothrow_copy_assignables<value_type>) requires copyable<value_type>
+		{
+			std::copy(elements.begin(), elements.end(), begin());
+		}
+
 		template<size_t L2>
 			requires (0 < L2)
 		explicit constexpr Array(const value_type(&buffer)[L2])
@@ -84,10 +93,18 @@ export namespace util
 			}
 		}
 
-		constexpr Array(const initializer_list<value_type> elements)
-			noexcept(nothrow_copy_assignables<value_type>) requires copyable<value_type>
+		template<std::ranges::input_range R>
+		explicit constexpr Array(std::from_range_t, R&& range)
+			noexcept(nothrow_convertibles<std::iter_value_t<std::ranges::iterator_t<R>>, value_type>)
 		{
-			std::copy(elements.begin(), elements.end(), begin());
+			std::copy(range.begin(), range.end(), begin());
+		}
+
+		template<std::input_iterator It, std::sentinel_for<It> Guard>
+		explicit constexpr Array(It ibegin, const Guard iend)
+			noexcept(nothrow_convertibles<std::iter_value_t<It>, value_type>)
+		{
+			std::copy(ibegin, iend, begin());
 		}
 
 		constexpr Array& operator=(const Array& other)
