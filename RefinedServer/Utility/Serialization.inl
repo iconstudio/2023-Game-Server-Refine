@@ -201,6 +201,210 @@ namespace util::serialization
 	}
 
 	/// <summary>
+	/// 16비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 2> Serialize(const short(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 2> result{};
+
+		size_t index = 0;
+		for (short& item : buffer)
+		{
+			const Array<char, 2> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+
+			index += sizeof(short);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 부호 없는 16비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 2> Serialize(const unsigned short(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 2> result{};
+
+		size_t index = 0;
+		for (unsigned short& item : buffer)
+		{
+			const Array<char, 2> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+
+			index += sizeof(unsigned short);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 32비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> Serialize(const int(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 4> result{};
+
+		size_t index = 0;
+		for (int& item : buffer)
+		{
+			const Array<char, 4> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+
+			index += sizeof(int);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 부호 없는 32비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> Serialize(const unsigned int(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 4> result{};
+
+		size_t index = 0;
+		for (unsigned int& item : buffer)
+		{
+			const Array<char, 4> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+
+			index += sizeof(unsigned int);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 32비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> Serialize(const long(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 4> result{};
+
+		size_t index = 0;
+		for (long& item : buffer)
+		{
+			const Array<char, 4> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+
+			index += sizeof(long);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 부호 없는 32비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> Serialize(const unsigned long(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 4> result{};
+
+		size_t index = 0;
+		for (unsigned long& item : buffer)
+		{
+			const Array<char, 4> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+
+			index += sizeof(unsigned long);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 32비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 8> Serialize(const long long(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 8> result{};
+
+		size_t index = 0;
+		for (long long& item : buffer)
+		{
+			const Array<char, 8> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+			result[index + 4] = mid[4];
+			result[index + 5] = mid[5];
+			result[index + 6] = mid[6];
+			result[index + 7] = mid[7];
+
+			index += sizeof(long long);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// 부호 없는 32비트 정수 배열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length * 8> Serialize(const unsigned long long(&buffer)[Length]) noexcept(0 < Length)
+	{
+		Array<char, Length * 8> result{};
+
+		size_t index = 0;
+		for (unsigned long long& item : buffer)
+		{
+			const Array<char, 8> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+			result[index + 4] = mid[4];
+			result[index + 5] = mid[5];
+			result[index + 6] = mid[6];
+			result[index + 7] = mid[7];
+
+			index += sizeof(unsigned long long);
+		}
+
+		return result;
+	}
+
+	/// <summary>
 	/// 문자열을 직렬화합니다.
 	/// </summary>
 	template<size_t Length>

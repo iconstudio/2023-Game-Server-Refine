@@ -164,6 +164,19 @@ util::Serializer<short>
 };
 
 export template<> struct
+util::Serializer<short[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 2> Parse(const short(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<unsigned short>
 {
 	[[nodiscard]]
@@ -176,6 +189,19 @@ util::Serializer<unsigned short>
 	static constexpr util::Array<char, 2> Parse(unsigned short&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<unsigned short&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned short[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 2> Parse(const unsigned short(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
@@ -270,6 +296,19 @@ util::Serializer<int>
 };
 
 export template<> struct
+util::Serializer<int[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 4> Parse(const int(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<unsigned int>
 {
 	[[nodiscard]]
@@ -282,6 +321,19 @@ util::Serializer<unsigned int>
 	static constexpr util::Array<char, 4> Parse(unsigned int&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<unsigned int&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned int[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 4> Parse(const unsigned int(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
@@ -302,6 +354,19 @@ util::Serializer<long>
 };
 
 export template<> struct
+util::Serializer<long[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 4> Parse(const long(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<unsigned long>
 {
 	[[nodiscard]]
@@ -314,6 +379,19 @@ util::Serializer<unsigned long>
 	static constexpr util::Array<char, 4> Parse(unsigned long&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<unsigned long&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned long[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 4> Parse(const unsigned long(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
@@ -363,6 +441,19 @@ util::Serializer<long long>
 };
 
 export template<> struct
+util::Serializer<long long[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 8> Parse(const long long(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<unsigned long long>
 {
 	[[nodiscard]]
@@ -375,6 +466,19 @@ util::Serializer<unsigned long long>
 	static constexpr util::Array<char, 8> Parse(unsigned long long&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<unsigned long long&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned long long[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 8> Parse(const unsigned long long(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
