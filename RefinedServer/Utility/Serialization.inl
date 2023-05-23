@@ -487,10 +487,10 @@ namespace util::serialization
 		{
 			const char32_t& element = buffer[i];
 			const auto mid = Serialize(element);
-			result[i * 2] = mid[0];
-			result[i * 2 + 1] = mid[1];
-			result[i * 2 + 2] = mid[2];
-			result[i * 2 + 3] = mid[3];
+			result[i * 4] = mid[0];
+			result[i * 4 + 1] = mid[1];
+			result[i * 4 + 2] = mid[2];
+			result[i * 4 + 3] = mid[3];
 		}
 
 		return result;
@@ -499,7 +499,7 @@ namespace util::serialization
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
-	constexpr auto SerializeArray(const bool* const& buffer) noexcept(0 < Length)
+	constexpr auto SerializeArray(const bool* const& buffer) noexcept
 	{
 		constexpr size_t bytes_count = std::max(1ULL, Length / 8);
 
@@ -520,7 +520,177 @@ namespace util::serialization
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
-	constexpr Array<char, Length> SerializeArray(const char* const& buffer) noexcept(0 < Length)
+	constexpr auto SerializeArray(const short* const& buffer) noexcept
+	{
+		Array<char, Length * 2> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const short& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr auto SerializeArray(const unsigned short* const& buffer) noexcept
+	{
+		Array<char, Length * 2> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const unsigned short& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> SerializeArray(const int* const& buffer)
+	{
+		Array<char, Length * 4> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const int& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+			result[i * 2 + 2] = mid[2];
+			result[i * 2 + 3] = mid[3];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> SerializeArray(const unsigned int* const& buffer)
+	{
+		Array<char, Length * 4> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const unsigned int& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+			result[i * 2 + 2] = mid[2];
+			result[i * 2 + 3] = mid[3];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> SerializeArray(const long* const& buffer)
+	{
+		Array<char, Length * 4> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const long& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+			result[i * 2 + 2] = mid[2];
+			result[i * 2 + 3] = mid[3];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 4> SerializeArray(const unsigned long* const& buffer)
+	{
+		Array<char, Length * 4> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const unsigned long& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+			result[i * 2 + 2] = mid[2];
+			result[i * 2 + 3] = mid[3];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 8> SerializeArray(const long long* const& buffer)
+	{
+		Array<char, Length * 8> result{};
+
+		size_t index = 0;
+		for (long long& item : buffer)
+		{
+			const Array<char, 8> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+			result[index + 4] = mid[4];
+			result[index + 5] = mid[5];
+			result[index + 6] = mid[6];
+			result[index + 7] = mid[7];
+
+			index += sizeof(long long);
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length * 8> SerializeArray(const unsigned long long* const& buffer)
+	{
+		Array<char, Length * 8> result{};
+
+		size_t index = 0;
+		for (unsigned long long& item : buffer)
+		{
+			const Array<char, 8> mid = Serialize(item);
+
+			result[index] = mid[0];
+			result[index + 1] = mid[1];
+			result[index + 2] = mid[2];
+			result[index + 3] = mid[3];
+			result[index + 4] = mid[4];
+			result[index + 5] = mid[5];
+			result[index + 6] = mid[6];
+			result[index + 7] = mid[7];
+
+			index += sizeof(unsigned long long);
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	[[nodiscard]]
+	constexpr Array<char, Length> SerializeArray(const char* const& buffer) noexcept
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
 	}
@@ -528,7 +698,7 @@ namespace util::serialization
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
-	constexpr Array<char, Length> SerializeArray(const unsigned char* const& buffer) noexcept(0 < Length)
+	constexpr Array<char, Length> SerializeArray(const unsigned char* const& buffer) noexcept
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
 	}
@@ -536,7 +706,7 @@ namespace util::serialization
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
-	constexpr Array<char, Length> SerializeArray(const char8_t* const& buffer) noexcept(0 < Length)
+	constexpr Array<char, Length> SerializeArray(const char8_t* const& buffer) noexcept
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
 	}
@@ -544,7 +714,7 @@ namespace util::serialization
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
-	constexpr Array<char, Length * 2> SerializeArray(const char16_t* const& buffer)
+	constexpr Array<char, Length * 2> SerializeArray(const char16_t* const& buffer) noexcept
 	{
 		Array<char, Length * 2> result{};
 
@@ -562,7 +732,7 @@ namespace util::serialization
 	template<size_t Length>
 		requires (0 < Length)
 	[[nodiscard]]
-	constexpr Array<char, Length * 2> SerializeArray(const wchar_t* const& buffer)
+	constexpr Array<char, Length * 2> SerializeArray(const wchar_t* const& buffer) noexcept
 	{
 		Array<char, Length * 2> result{};
 
