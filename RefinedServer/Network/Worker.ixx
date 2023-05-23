@@ -11,8 +11,6 @@ import Net.Context;
 
 export extern "C++" namespace net
 {
-	using ThreadID = util::thread::id;
-
 	class [[nodiscard]] WorkerUnit
 	{
 	public:
