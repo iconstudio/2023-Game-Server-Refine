@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <utility>
+#include <bit>
 
 import Utility.Array;
 
@@ -254,5 +255,29 @@ namespace util::serialization
 				static_cast<char>((value >> 8ULL) & 0xFF),
 				static_cast<char>((value) & 0xFF)
 		};
+	}
+
+	/// <summary>
+	/// 32비트 부동 소수점을 직렬화합니다.
+	/// </summary>
+	constexpr Array<char, 4> Serialize(const float& value) noexcept
+	{
+		return Serialize(std::bit_cast<unsigned int>(value));
+	}
+
+	/// <summary>
+	/// 64비트 부동 소수점을 직렬화합니다.
+	/// </summary>
+	constexpr Array<char, 8> Serialize(const double& value) noexcept
+	{
+		return Serialize(std::bit_cast<unsigned long long>(value));
+	}
+
+	/// <summary>
+	/// 64비트 부동 소수점을 직렬화합니다.
+	/// </summary>
+	constexpr Array<char, 8> Serialize(const long double& value) noexcept
+	{
+		return Serialize(std::bit_cast<unsigned long long>(value));
 	}
 }
