@@ -17,6 +17,7 @@ export using ::SOCKET;
 export namespace net
 {
 	using registerPromise = Promise<void, int, void>;
+	using PortPromise = Promise<void, void, void>;
 
 	namespace abi
 	{
@@ -25,11 +26,11 @@ export namespace net
 			RegisterIoPort(const HANDLE& io_port, const HANDLE& handle, const ullong& key) noexcept;
 
 		[[nodiscard]]
-		inline Promise<void, void, void>
+		inline PortPromise
 			PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept;
 
 		[[nodiscard]]
-		inline Promise<void, void, void>
+		inline PortPromise
 			GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time = INFINITE) noexcept;
 
 		inline constinit HANDLE invalidHandle = INVALID_HANDLE_VALUE;
@@ -102,27 +103,27 @@ export namespace net
 			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, &ctx, std::chrono::duration_cast<std::chrono::milliseconds>(await_time).count());
 		}
 
-		inline auto Wait(OVERLAPPED* ctx, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = abi::infinite)
+		inline PortPromise Wait(OVERLAPPED* ctx, ullong* key_handle, ulong* bytes_handle, const ulong& await_time = abi::infinite)
 		{
 			return abi::GetIoPortResult(rawHandle, key_handle, bytes_handle, &ctx, await_time);
 		}
 
-		inline auto Post(OVERLAPPED* ctx, const ullong& key, const ulong& bytes)
+		inline PortPromise Post(OVERLAPPED* ctx, const ullong& key, const ulong& bytes)
 		{
 			return abi::PostIoPort(rawHandle, key, bytes, ctx);
 		}
 
-		inline auto Post(OVERLAPPED* ctx, ullong&& key, const ulong& bytes)
+		inline PortPromise Post(OVERLAPPED* ctx, ullong&& key, const ulong& bytes)
 		{
 			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), bytes, ctx);
 		}
 
-		inline auto Post(OVERLAPPED* ctx, const ullong& key, ulong&& bytes)
+		inline PortPromise Post(OVERLAPPED* ctx, const ullong& key, ulong&& bytes)
 		{
 			return abi::PostIoPort(rawHandle, key, static_cast<ulong&&>(bytes), ctx);
 		}
 
-		inline auto Post(OVERLAPPED* ctx, ullong&& key, ulong&& bytes)
+		inline PortPromise Post(OVERLAPPED* ctx, ullong&& key, ulong&& bytes)
 		{
 			return abi::PostIoPort(rawHandle, static_cast<ullong&&>(key), static_cast<ulong&&>(bytes), ctx);
 		}
@@ -176,7 +177,7 @@ export namespace net
 		}
 	}
 
-	Promise<void, void, void>
+	PortPromise
 		abi::PostIoPort(const HANDLE& io_port, const ullong& key, const ulong& bytes, OVERLAPPED* const& overlapped) noexcept
 	{
 		if (0 != ::PostQueuedCompletionStatus(io_port, bytes, key, overlapped))
@@ -189,7 +190,7 @@ export namespace net
 		}
 	}
 
-	Promise<void, void, void>
+	PortPromise
 		abi::GetIoPortResult(const HANDLE& io_port, ullong* const& key_handle, ulong* const& bytes_handle, OVERLAPPED** const& overlapped_handle, const ulong& await_time) noexcept
 	{
 		if (0 != ::GetQueuedCompletionStatus(io_port, bytes_handle, key_handle, overlapped_handle, await_time))
