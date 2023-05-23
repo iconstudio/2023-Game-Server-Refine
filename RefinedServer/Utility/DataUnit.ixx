@@ -18,6 +18,8 @@ export namespace util::datagram
 	class DataUnit<false, T>
 	{
 	public:
+		static inline constexpr size_t size = sizeof(T);
+
 		constexpr DataUnit() noexcept = default;
 		constexpr DataUnit(const DataUnit& other) noexcept = default;
 		constexpr DataUnit(DataUnit&& other) noexcept = default;
@@ -26,42 +28,24 @@ export namespace util::datagram
 		constexpr ~DataUnit() noexcept = default;
 
 		explicit constexpr DataUnit(const T& data)
-			noexcept requires(trivials<T>)
+			noexcept(noexcept(util::Serialize(declval<const T&>()))) requires copyable<T>
 		{
 			static_assert(serializables<T>, "T must be serializable");
 
-			const Array<char, sizeof(T)> result = util::Serialize(data);
+			const Array<char, size> result = util::Serialize(data);
 			result.CopyTo(myBuffer);
 		}
 
 		explicit constexpr DataUnit(T&& data)
-			noexcept requires(trivials<T>)
+			noexcept(noexcept(util::Serialize(declval<T&&>()))) requires movable<T>
 		{
 			static_assert(serializables<T>, "T must be serializable");
 
-			const Array<char, sizeof(T)> result = util::Serialize(static_cast<T&&>(data));
+			const Array<char, size> result = util::Serialize(static_cast<T&&>(data));
 			result.CopyTo(myBuffer);
 		}
 
-		explicit constexpr DataUnit(const T& data)
-			noexcept(noexcept(util::Serialize(declval<const T&>()))) requires(!trivials<T>)
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const auto result = util::Serialize(data);
-			result.CopyTo(myBuffer);
-		}
-
-		explicit constexpr DataUnit(T&& data)
-			noexcept(noexcept(util::Serialize(declval<T&&>()))) requires(!trivials<T>)
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const auto result = util::Serialize(static_cast<T&&>(data));
-			result.CopyTo(myBuffer);
-		}
-
-		char myBuffer[sizeof(T)]{};
+		char myBuffer[size]{};
 	};
 
 	template<typename T>
@@ -142,39 +126,21 @@ export namespace util::datagram
 		}
 
 		explicit constexpr DataUnit(const T& data)
-			noexcept requires(trivials<T>)
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const Array<char, sizeof(T)> result = util::Serialize(data);
-			result.CopyTo(myBuffer, sizeof(T));
-		}
-
-		explicit constexpr DataUnit(T&& data)
-			noexcept requires(trivials<T>)
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const Array<char, sizeof(T)> result = util::Serialize(static_cast<T&&>(data));
-			result.CopyTo(myBuffer, sizeof(T));
-		}
-
-		explicit constexpr DataUnit(const T& data)
-			requires(!trivials<T>)
+			requires copyable<T>
 		{
 			static_assert(serializables<T>, "T must be serializable");
 
 			const auto result = util::Serialize(data);
-			result.CopyTo(myBuffer, result.size());
+			result.CopyTo(myBuffer, myCapacity);
 		}
 
 		explicit constexpr DataUnit(T&& data)
-			requires(!trivials<T>)
+			requires movable<T>
 		{
 			static_assert(serializables<T>, "T must be serializable");
 
 			const auto result = util::Serialize(static_cast<T&&>(data));
-			result.CopyTo(myBuffer, result.size());
+			result.CopyTo(myBuffer, myCapacity);
 		}
 
 	private:
@@ -246,7 +212,11 @@ namespace util::test
 #if true
 	void test_dataunit_stack()
 	{
-		constexpr datagram::DataUnit<false, int> data{ 5 };
+		constexpr datagram::DataUnit<false, int> data0{ 5 };
+		constexpr datagram::DataUnit<false, int> data1{};
+		constexpr datagram::DataUnit<false, int> data2{ 0 };
+
+		static_assert(data0.myBuffer[3] == 5);
 	}
 #endif
 }
