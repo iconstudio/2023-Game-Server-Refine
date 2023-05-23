@@ -24,11 +24,22 @@ export namespace util
 	};
 
 	template<typename T>
-	concept Serializable = std::is_object_v<T>
+	concept serializables = std::is_object_v<T>
 		&& requires(const T & value, Serializer<T>&parser)
 	{
 		parser.Parse(value);
 	};
+
+	template<typename T>
+	constexpr
+		decltype(Serializer<T>::Parse(declval<clean_t<T>>()))
+		Serialize(const T& value)
+		noexcept(noexcept(Serializer<clean_t<T>>::template Parse(declval<clean_t<T>>())))
+	{
+		static_assert(serializables<clean_t<T>>, "T Cannot be serialized.");
+
+		return typename Serializer<clean_t<T>>::template Parse(value);
+	}
 }
 
 export template<> struct
@@ -540,13 +551,17 @@ namespace util::test
 		int b;
 		int c;
 	};
+
+	struct test_struct2
+	{};
 }
 
 template<>
 struct util::Serializer<util::test::test_struct>
 {
 	[[nodiscard]]
-	static constexpr util::Array<char, 12> Parse(const util::test::test_struct& value) noexcept
+	static constexpr util::Array<char, 12> Parse(const util::test::test_struct& value)
+	//	noexcept
 	{
 		util::Array<char, 12> result{};
 
@@ -562,7 +577,8 @@ namespace util::test
 {
 	void test_serializer() noexcept
 	{
-		static_assert(util::Serializable<test_struct>);
+		static_assert(util::serializables<test_struct>);
+		//static_assert(util::serializables<test_struct2>);
 
 		constexpr test_struct test1{ 1, 2, 3 };
 		constexpr auto rs1 = Serializer<test_struct>::Parse(test1);
@@ -587,6 +603,11 @@ namespace util::test
 		constexpr auto test_str3 = serialization::Serialize("¤·³Ä¤¡¤µ¹õÁ¹¿î¤·¤©¿õ³¯¤§¤·À¸¤Àµå¤À¤ÑÃ÷¾Ö¤ÌÃ¤¾ßÃß¾Ö¤Ì¤º´©¤Å¤Ì¤º¤§Àú¤Ã¤¸¤§");
 		constexpr auto test_str4 = serialization::Serialize(L"¤·³Ä¤¡¤µ¹õÁ¹¿î¤·¤©¿õ³¯¤§¤·À¸¤Àµå¤À¤ÑÃ÷¾Ö¤ÌÃ¤¾ßÃß¾Ö¤Ì¤º´©¤Å¤Ì¤º¤§Àú¤Ã¤¸¤§");
 
+		constexpr test_struct2 test4{};
+
+		constexpr auto vs1 = util::Serialize(3198983);
+		constexpr auto vs2 = util::Serialize(test1);
+		//constexpr auto vs3 = util::Serialize(test4);
 	}
 #endif // false
 }
