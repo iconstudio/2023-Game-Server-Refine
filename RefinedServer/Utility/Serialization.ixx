@@ -1,7 +1,7 @@
 module;
 #include "Serialization.inl"
 
-export module Utility.Serialization;
+export module Utility.Datagram.Serialization;
 import Utility;
 import Utility.String;
 import Utility.Array;

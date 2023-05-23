@@ -1,7 +1,7 @@
 module;
 #include "Deserialization.inl"
 
-export module Utility.Deserialization;
+export module Utility.Datagram.Deserialization;
 import Utility;
 import Utility.String;
 import Utility.Array;

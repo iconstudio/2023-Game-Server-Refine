@@ -1,4 +1,4 @@
-export module Utility.DataPacker;
+export module Utility.Datagram.Packer;
 
 export namespace util
 {
