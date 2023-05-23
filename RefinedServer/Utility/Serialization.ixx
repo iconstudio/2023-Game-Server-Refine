@@ -579,7 +579,8 @@ namespace util::test
 		constexpr auto rs6 = Serializer<int>::Parse(65535);
 		constexpr auto rs7 = Serializer<int>::Parse(65536);
 
-		constexpr auto rs8 = Serializer<char[]>::Parse("sdfsfsdfdfsdf");
+		constexpr auto rs8 = Serializer<char[]>::Parse("asdfgh");
+		constexpr auto rs8 = Serializer<wchar_t[]>::Parse(L"asdfgh");
 
 		constexpr auto test_str1 = serialization::Serialize("¤¡¤¤¤§");
 		constexpr auto test_str2 = serialization::Serialize(L"¤¡");
