@@ -332,9 +332,9 @@ namespace util::serialization
 		for (size_t i = 0; i < Length; ++i)
 		{
 			const wchar_t& element = buffer[i];
-			const char& [high, low] = Serialize(element);
-			result[i * 2] = high;
-			result[i * 2 + 1] = low;
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
 		}
 
 		return result;
@@ -351,9 +351,9 @@ namespace util::serialization
 		for (size_t i = 0; i < Length; ++i)
 		{
 			const char16_t& element = buffer[i];
-			const char& [high, low] = Serialize(element);
-			result[i * 2] = high;
-			result[i * 2 + 1] = low;
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
 		}
 
 		return result;

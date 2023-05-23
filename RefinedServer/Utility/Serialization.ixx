@@ -159,6 +159,12 @@ namespace util::test
 		constexpr auto result = util::Serializer<test_struct>::Parse(test);
 
 		static_assert(result[0] == 0);
+
+		constexpr auto test_str1 = serialization::Serialize("ぁいぇ");
+		constexpr auto test_str2 = serialization::Serialize(L"ぁ");
+		constexpr auto test_str3 = serialization::Serialize("し衬ぁさ辊凉款しぉ旷朝ぇし栏だ靛だぱ明局ぬ盲具眠局ぬず穿づぬずぇ历っじぇ");
+		constexpr auto test_str4 = serialization::Serialize(L"し衬ぁさ辊凉款しぉ旷朝ぇし栏だ靛だぱ明局ぬ盲具眠局ぬず穿づぬずぇ历っじぇ");
+
 	}
 #endif // false
 }
