@@ -64,6 +64,19 @@ util::Serializer<char>
 };
 
 export template<> struct
+util::Serializer<char[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length> Parse(const char(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<unsigned char>
 {
 	[[nodiscard]]
@@ -80,6 +93,19 @@ util::Serializer<unsigned char>
 };
 
 export template<> struct
+util::Serializer<unsigned char[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length> Parse(const unsigned char(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<char8_t>
 {
 	[[nodiscard]]
@@ -92,6 +118,19 @@ util::Serializer<char8_t>
 	static constexpr util::Array<char, 1> Parse(char8_t&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<char8_t&&>(value));
+	}
+};
+
+export struct
+util::Serializer<char8_t[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length> Parse(const char8_t(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
@@ -144,6 +183,19 @@ util::Serializer<char16_t>
 };
 
 export template<> struct
+util::Serializer<char16_t[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 2> Parse(const char16_t(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<wchar_t>
 {
 	[[nodiscard]]
@@ -156,6 +208,19 @@ util::Serializer<wchar_t>
 	static constexpr util::Array<char, 2> Parse(wchar_t&& value) noexcept
 	{
 		return serialization::Serialize(static_cast<wchar_t&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<wchar_t[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr util::Array<char, Length * 2> Parse(const wchar_t(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
 	}
 };
 
@@ -228,6 +293,9 @@ namespace util::test
 
 		constexpr test_struct test3{ 255, 256, 512 };
 		constexpr auto rs3 = util::Serializer<test_struct>::Parse(test3);
+
+		constexpr auto rs4 = util::Serializer<test_struct>::Parse(test3);
+
 
 		constexpr auto test_str1 = serialization::Serialize("¤¡¤¤¤§");
 		constexpr auto test_str2 = serialization::Serialize(L"¤¡");

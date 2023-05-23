@@ -218,6 +218,25 @@ namespace util::serialization
 	}
 
 	/// <summary>
+	/// UTF-16 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	constexpr Array<char, Length * 2> Serialize(const char16_t(&buffer)[Length])
+	{
+		Array<char, Length * 2> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const char16_t& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+		}
+
+		return result;
+	}
+
+	/// <summary>
 	/// 와이드 문자열을 직렬화합니다.
 	/// </summary>
 	template<size_t Length>
@@ -236,17 +255,53 @@ namespace util::serialization
 		return result;
 	}
 
-	/// <summary>
-	/// UTF-16 문자열을 직렬화합니다.
-	/// </summary>
 	template<size_t Length>
-	constexpr Array<char, Length * 2> Serialize(const char16_t(&buffer)[Length])
+		requires (0 < Length)
+	constexpr Array<char, Length> SerializeArray(const char* const& buffer) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ buffer, buffer + Length };
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	constexpr Array<char, Length> SerializeArray(const unsigned char* const& buffer) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ buffer, buffer + Length };
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	constexpr Array<char, Length> SerializeArray(const char8_t* const& buffer) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ buffer, buffer + Length };
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	constexpr Array<char, Length * 2> SerializeArray(const char16_t* const& buffer)
 	{
 		Array<char, Length * 2> result{};
 
 		for (size_t i = 0; i < Length; ++i)
 		{
 			const char16_t& element = buffer[i];
+			const auto mid = Serialize(element);
+			result[i * 2] = mid[0];
+			result[i * 2 + 1] = mid[1];
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
+	constexpr Array<char, Length * 2> SerializeArray(const wchar_t* const& buffer)
+	{
+		Array<char, Length * 2> result{};
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			const wchar_t& element = buffer[i];
 			const auto mid = Serialize(element);
 			result[i * 2] = mid[0];
 			result[i * 2 + 1] = mid[1];
