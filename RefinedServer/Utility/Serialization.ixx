@@ -31,8 +31,136 @@ export namespace util
 	};
 }
 
-export template<>
-struct util::Serializer<int>
+export template<> struct
+util::Serializer<bool>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(const bool& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(bool&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<bool&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<char>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(const char& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(char&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<char&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned char>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(const unsigned char& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(unsigned char&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<unsigned char&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<char8_t>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(const char8_t& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 1> Parse(char8_t&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<char8_t&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<short>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(const short& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(short&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<short&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned short>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(const unsigned short& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(unsigned short&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<unsigned short&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<char16_t>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(const char16_t& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(char16_t&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<char16_t&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<wchar_t>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(const wchar_t& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 2> Parse(wchar_t&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<wchar_t&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<int>
 {
 	[[nodiscard]]
 	static constexpr util::Array<char, 4> Parse(const int& value) noexcept
@@ -91,11 +219,15 @@ namespace util::test
 	{
 		static_assert(util::Serializable<test_struct>);
 
-		constexpr test_struct test{ 1, 2, 3 };
+		constexpr test_struct test1{ 1, 2, 3 };
+		constexpr auto rs1 = util::Serializer<test_struct>::Parse(test1);
+		static_assert(rs1[0] == 0);
 
-		constexpr auto result = util::Serializer<test_struct>::Parse(test);
+		constexpr test_struct test2{ 302830631, 68212049, 1205071 };
+		constexpr auto rs2 = util::Serializer<test_struct>::Parse(test2);
 
-		static_assert(result[0] == 0);
+		constexpr test_struct test3{ 255, 256, 512 };
+		constexpr auto rs3 = util::Serializer<test_struct>::Parse(test3);
 
 		constexpr auto test_str1 = serialization::Serialize("¤¡¤¤¤§");
 		constexpr auto test_str2 = serialization::Serialize(L"¤¡");
