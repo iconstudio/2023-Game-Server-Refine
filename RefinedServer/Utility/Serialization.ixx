@@ -40,18 +40,24 @@ export namespace util
 		return typename Serializer<clean_t<T>>::template Parse(value);
 	}
 
-	//decltype(Serializer<clean_t<T>[]>::Parse(declval<clean_t<T>[Length]>()))
 	template<typename T, size_t Length>
+		requires (serializables<clean_t<T>[]>)
 	constexpr
-		auto
+		decltype(Serializer<clean_t<T>[]>::Parse(declval<clean_t<T>[Length]>()))
 		Serialize(const T(&buffer)[Length])
 		noexcept(noexcept(Serializer<clean_t<T>[]>::template Parse(declval<clean_t<T>[Length]>())))
 	{
-		if constexpr (serializables<clean_t<T>[]>)
-		{
-			return typename Serializer<clean_t<T>[]>::template Parse(buffer);
-		}
-		else if constexpr (serializables<clean_t<T>>)
+		return typename Serializer<clean_t<T>[]>::template Parse(buffer);
+	}
+
+	template<typename T, size_t Length>
+		requires (!serializables<clean_t<T>[]>)
+	constexpr
+		auto
+		Serialize(const T(&buffer)[Length])
+		noexcept(noexcept(Serializer<clean_t<T>>::template Parse(declval<clean_t<T>>())))
+	{
+		if constexpr (serializables<clean_t<T>>)
 		{
 			Array<char, sizeof(T)* Length> result{};
 
@@ -59,7 +65,7 @@ export namespace util
 			for (const T& element : buffer)
 			{
 				const Array<char, sizeof(T)> mid = Serializer<clean_t<T>>::template Parse(element);
-				
+
 				for (const char& character : mid)
 				{
 					result[offset++] = character;
@@ -691,7 +697,7 @@ namespace util::test
 		constexpr auto rs7 = Serializer<int>::Parse(65536);
 
 		constexpr auto rs8 = Serializer<char[]>::Parse("asdfgh");
-		constexpr auto rs8 = Serializer<wchar_t[]>::Parse(L"asdfgh");
+		constexpr auto rs9 = Serializer<wchar_t[]>::Parse(L"asdfgh");
 
 		constexpr auto test_str1 = serialization::Serialize("¤¡¤¤¤§");
 		constexpr auto test_str2 = serialization::Serialize(L"¤¡");
