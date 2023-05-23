@@ -40,6 +40,14 @@ export namespace util
 
 		return typename Serializer<clean_t<T>>::template Parse(value);
 	}
+
+	template<enumerations E>
+	constexpr
+		decltype(Serializer<underlying_type_t<clean_t<E>>>::Parse(declval<underlying_type_t<clean_t<E>>>()))
+		Serialize(const E& value) noexcept
+	{
+		return typename Serializer<underlying_type_t<E>>::template Parse(static_cast<underlying_type_t<clean_t<E>>>(value));
+	}
 }
 
 export template<> struct
@@ -554,6 +562,21 @@ namespace util::test
 
 	struct test_struct2
 	{};
+
+	enum test_enum1
+	{
+		aa = 100, bb = 200, cc = 300
+	};
+
+	enum class test_enum2
+	{
+		aaa, bbb, ccc
+	};
+
+	enum class test_enum3 : long long
+	{
+		a = 8239017, b = 612014, c = 5195206
+	};
 }
 
 template<>
@@ -608,6 +631,18 @@ namespace util::test
 		constexpr auto vs1 = util::Serialize(3198983);
 		constexpr auto vs2 = util::Serialize(test1);
 		//constexpr auto vs3 = util::Serialize(test4);
+
+		constexpr auto es1 = util::Serialize(test_enum1::aa);
+		constexpr auto es2 = util::Serialize(test_enum1::bb);
+		constexpr auto es3 = util::Serialize(test_enum1::cc);
+
+		constexpr auto es4 = util::Serialize(test_enum2::aaa);
+		constexpr auto es5 = util::Serialize(test_enum2::bbb);
+		constexpr auto es6 = util::Serialize(test_enum2::ccc);
+
+		constexpr auto es7 = util::Serialize(test_enum3::a);
+		constexpr auto es8 = util::Serialize(test_enum3::b);
+		constexpr auto es9 = util::Serialize(test_enum3::c);
 	}
 #endif // false
 }
