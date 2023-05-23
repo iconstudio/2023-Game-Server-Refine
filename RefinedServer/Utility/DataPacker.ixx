@@ -1,47 +1,16 @@
 export module Utility.Datagram.Packer;
 import Utility;
+import Utility.Meta;
 import Utility.Constraints;
 import Utility.Memory;
 import Utility.Array;
 import Utility.Union;
 import Utility.Datagram.Serialization;
 
-export namespace util
+export namespace util::datagram
 {
-	template<typename T = void>
-	class DataUnit
-	{
-	public:
-		static inline constexpr size_t size = sizeof(T);
-
-		constexpr DataUnit() noexcept
-		{}
-
-		template<typename U>
-		constexpr DataUnit(U&& data) noexcept(noexcept(Serialize(declval<U>())))
-		{
-			const auto result = Serialize(forward<U>(data));
-
-			size_t index = 0;
-			for (const char& element : result)
-			{
-				myBuffer[index++] = element;
-			}
-			//result.CopyTo(myBuffer);
-		}
-
-		constexpr ~DataUnit() noexcept
-		{}
-
-		char myBuffer[size]{};
-	};
-
-	template<>
-	class DataUnit<void>
-	{
-	public:
-		constexpr DataUnit() noexcept = default;
-	};
+	template<bool Heap, typename... Ts>
+	class [[nodiscard]] DataPacker;
 
 	template<typename... Ts>
 	class [[nodiscard]] DataPacker;
@@ -50,6 +19,9 @@ export namespace util
 	class DataPacker<>
 	{
 	public:
+		static inline constexpr size_t myLength = sizeof...(Ts);
+		static inline constexpr size_t mySize = meta::bsize_v<Ts...>;
+
 		constexpr DataPacker() noexcept = default;
 		constexpr ~DataPacker() noexcept = default;
 
@@ -89,8 +61,8 @@ export namespace util
 		DataPacker<Rty...> nextNode;
 	};
 
-	template<typename... Ts>
-	DataPacker(Ts...) -> DataPacker<Ts...>;
+	template<bool Heap, typename... Ts>
+	DataPacker(Heap, Ts...) -> DataPacker<Heap, Ts...>;
 }
 
 #pragma warning(push, 1)
