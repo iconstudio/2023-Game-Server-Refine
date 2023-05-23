@@ -182,7 +182,7 @@ export namespace util
 
 		template<size_t L2>
 			requires (0 < L2)
-		constexpr void CopyTo(std::array<value_type, L2>& target)
+		constexpr void CopyTo(std::array<value_type, L2>& target) const
 			noexcept(nothrow_copy_assignables<value_type>)
 		{
 			array_iterator<value_type, L2> oit = target.begin();
@@ -195,7 +195,7 @@ export namespace util
 
 		template<size_t L2>
 			requires (0 < L2)
-		constexpr void CopyTo(Array<value_type, L2>& target)
+		constexpr void CopyTo(Array<value_type, L2>& target) const
 			noexcept(nothrow_copy_assignables<value_type>)
 		{
 			iterator oit = target.begin();
@@ -208,12 +208,22 @@ export namespace util
 
 		template<size_t L2>
 			requires (0 < L2)
-		constexpr void CopyTo(value_type(&target)[L2])
+		constexpr void CopyTo(value_type(&target)[L2]) const
 			noexcept(nothrow_copy_assignables<value_type>)
 		{
 			value_type* oit = std::begin(target);
 
 			for (const_iterator it = cbegin(); it != cend(); ++it, (void) ++oit)
+			{
+				*oit = *it;
+			}
+		}
+
+		constexpr void CopyTo(value_type* target, const size_t& length) const
+		{
+			value_type* oit = target;
+
+			for (const_iterator it = cbegin(); it != cend(), oit < target + length; ++it, (void) ++oit)
 			{
 				*oit = *it;
 			}
