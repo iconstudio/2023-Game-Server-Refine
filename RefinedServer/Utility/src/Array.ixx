@@ -211,7 +211,7 @@ export namespace util
 		constexpr void CopyTo(value_type(&target)[L2]) const
 			noexcept(nothrow_copy_assignables<value_type>)
 		{
-			value_type* oit = std::begin(target);
+			value_type* oit = target;
 
 			for (const_iterator it = cbegin(); it != cend(); ++it, (void) ++oit)
 			{
