@@ -40,15 +40,38 @@ export namespace util
 		return typename Serializer<clean_t<T>>::template Parse(value);
 	}
 
+	//decltype(Serializer<clean_t<T>[]>::Parse(declval<clean_t<T>[Length]>()))
 	template<typename T, size_t Length>
 	constexpr
-		decltype(Serializer<clean_t<T>[]>::Parse(declval<clean_t<T>[Length]>()))
-		Serialize(const T(&value)[Length])
+		auto
+		Serialize(const T(&buffer)[Length])
 		noexcept(noexcept(Serializer<clean_t<T>[]>::template Parse(declval<clean_t<T>[Length]>())))
 	{
-		static_assert(serializables<clean_t<T>[]>, "T[] Cannot be serialized.");
+		if constexpr (serializables<clean_t<T>[]>)
+		{
+			return typename Serializer<clean_t<T>[]>::template Parse(buffer);
+		}
+		else if constexpr (serializables<clean_t<T>>)
+		{
+			Array<char, sizeof(T)* Length> result{};
 
-		return typename Serializer<clean_t<T>[]>::template Parse(value);
+			size_t offset = 0;
+			for (const T& element : buffer)
+			{
+				const Array<char, sizeof(T)> mid = Serializer<clean_t<T>>::template Parse(element);
+				
+				for (const char& character : mid)
+				{
+					result[offset++] = character;
+				}
+			}
+
+			return result;
+		}
+		else
+		{
+			static_assert(always_false<clean_t<T>>, "T[] Cannot be serialized.");
+		}
 	}
 
 	template<enumerations E>
@@ -696,10 +719,12 @@ namespace util::test
 		constexpr int arr1[] = { 1, 2, 3, 4, 5 };
 		constexpr float arr2[] = { 400.0591012f, 30.0951234f, 60841.0915f, 206167.013133f };
 		constexpr double arr3[] = { 034909588321004938.10344953894192120303958, 40286231204.063489153 };
+		constexpr test_struct arr4[] = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
 
 		constexpr auto fs1 = util::Serialize(arr1);
 		constexpr auto fs2 = util::Serialize(arr2);
 		constexpr auto fs3 = util::Serialize(arr3);
+		constexpr auto fs4 = util::Serialize(arr4);
 	}
 #endif // false
 }
