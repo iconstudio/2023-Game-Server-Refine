@@ -177,28 +177,11 @@ namespace util::serialization
 		return Serialize(std::bit_cast<unsigned long long>(value));
 	}
 
-	template<size_t Length>
-	constexpr Array<char, Length> Serialize(const char(&buffer)[Length]) noexcept(0 < Length)
-	{
-		return Array<char, Length>{ buffer };
-	}
-
-	template<size_t Length>
-	constexpr Array<char, Length> Serialize(const unsigned char(&buffer)[Length]) noexcept(0 < Length)
-	{
-		return Array<char, Length>{ from_range, buffer };
-	}
-
-	template<size_t Length>
-	constexpr Array<char, Length> Serialize(const char8_t(&buffer)[Length]) noexcept(0 < Length)
-	{
-		return Array<char, Length>{ from_range, buffer };
-	}
-
 	/// <summary>
 	/// 비트 배열을 직렬화합니다.
 	/// </summary>
 	template<size_t Length>
+	[[nodiscard]]
 	constexpr auto Serialize(const bool(&buffer)[Length]) noexcept(0 < Length)
 	{
 		constexpr size_t bytes_count = std::max(1ULL, Length / 8);
@@ -218,9 +201,40 @@ namespace util::serialization
 	}
 
 	/// <summary>
+	/// 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length> Serialize(const char(&buffer)[Length]) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ buffer };
+	}
+
+	/// <summary>
+	/// 부호없는 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length> Serialize(const unsigned char(&buffer)[Length]) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ from_range, buffer };
+	}
+
+	/// <summary>
+	/// UTF-8 문자열을 직렬화합니다.
+	/// </summary>
+	template<size_t Length>
+	[[nodiscard]]
+	constexpr Array<char, Length> Serialize(const char8_t(&buffer)[Length]) noexcept(0 < Length)
+	{
+		return Array<char, Length>{ from_range, buffer };
+	}
+
+	/// <summary>
 	/// UTF-16 문자열을 직렬화합니다.
 	/// </summary>
 	template<size_t Length>
+	[[nodiscard]]
 	constexpr Array<char, Length * 2> Serialize(const char16_t(&buffer)[Length])
 	{
 		Array<char, Length * 2> result{};
@@ -240,6 +254,7 @@ namespace util::serialization
 	/// 와이드 문자열을 직렬화합니다.
 	/// </summary>
 	template<size_t Length>
+	[[nodiscard]]
 	constexpr Array<char, Length * 2> Serialize(const wchar_t(&buffer)[Length])
 	{
 		Array<char, Length * 2> result{};
@@ -257,6 +272,7 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	[[nodiscard]]
 	constexpr auto SerializeArray(const bool* const& buffer) noexcept(0 < Length)
 	{
 		constexpr size_t bytes_count = std::max(1ULL, Length / 8);
@@ -277,6 +293,7 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	[[nodiscard]]
 	constexpr Array<char, Length> SerializeArray(const char* const& buffer) noexcept(0 < Length)
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
@@ -284,6 +301,7 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	[[nodiscard]]
 	constexpr Array<char, Length> SerializeArray(const unsigned char* const& buffer) noexcept(0 < Length)
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
@@ -291,6 +309,7 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	[[nodiscard]]
 	constexpr Array<char, Length> SerializeArray(const char8_t* const& buffer) noexcept(0 < Length)
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
@@ -298,6 +317,7 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	[[nodiscard]]
 	constexpr Array<char, Length * 2> SerializeArray(const char16_t* const& buffer)
 	{
 		Array<char, Length * 2> result{};
@@ -315,6 +335,7 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	[[nodiscard]]
 	constexpr Array<char, Length * 2> SerializeArray(const wchar_t* const& buffer)
 	{
 		Array<char, Length * 2> result{};
