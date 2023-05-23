@@ -48,6 +48,19 @@ util::Serializer<bool>
 };
 
 export template<> struct
+util::Serializer<bool[]>
+{
+	template<size_t Length>
+	[[nodiscard]]
+	static constexpr auto Parse(const bool(&buffer)[Length]) noexcept
+	{
+		static_assert(0 < Length, "The length of the array must be greater than zero.");
+
+		return serialization::SerializeArray<Length>(buffer);
+	}
+};
+
+export template<> struct
 util::Serializer<char>
 {
 	[[nodiscard]]
@@ -121,7 +134,7 @@ util::Serializer<char8_t>
 	}
 };
 
-export struct
+export template<> struct
 util::Serializer<char8_t[]>
 {
 	template<size_t Length>
@@ -233,6 +246,12 @@ util::Serializer<int>
 		return serialization::Serialize(value);
 	}
 
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(int&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<int&&>(value));
+	}
+
 	template<size_t Offset, size_t Length>
 	static constexpr void ParseTo(const int& value, util::Array<char, Length>& dest)
 		noexcept(Offset + sizeof(int) <= Length)
@@ -247,6 +266,134 @@ util::Serializer<int>
 		dest[Offset + 1] = result[1];
 		dest[Offset + 2] = result[2];
 		dest[Offset + 3] = result[3];
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned int>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(const unsigned int& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(unsigned int&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<unsigned int&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<long>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(const long& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(long&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<long&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned long>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(const unsigned long& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(unsigned long&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<unsigned long&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<long long>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(const long long& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(long long&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<long long&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<unsigned long long>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(const unsigned long long& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(unsigned long long&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<unsigned long long&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<float>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(const float& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 4> Parse(float&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<float&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<double>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(const double& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(double&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<double&&>(value));
+	}
+};
+
+export template<> struct
+util::Serializer<long double>
+{
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(const long double& value) noexcept
+	{
+		return serialization::Serialize(value);
+	}
+
+	[[nodiscard]]
+	static constexpr util::Array<char, 8> Parse(long double&& value) noexcept
+	{
+		return serialization::Serialize(static_cast<long double&&>(value));
 	}
 };
 
@@ -285,17 +432,21 @@ namespace util::test
 		static_assert(util::Serializable<test_struct>);
 
 		constexpr test_struct test1{ 1, 2, 3 };
-		constexpr auto rs1 = util::Serializer<test_struct>::Parse(test1);
+		constexpr auto rs1 = Serializer<test_struct>::Parse(test1);
 		static_assert(rs1[0] == 0);
 
 		constexpr test_struct test2{ 302830631, 68212049, 1205071 };
-		constexpr auto rs2 = util::Serializer<test_struct>::Parse(test2);
+		constexpr auto rs2 = Serializer<test_struct>::Parse(test2);
 
 		constexpr test_struct test3{ 255, 256, 512 };
-		constexpr auto rs3 = util::Serializer<test_struct>::Parse(test3);
+		constexpr auto rs3 = Serializer<test_struct>::Parse(test3);
 
-		constexpr auto rs4 = util::Serializer<test_struct>::Parse(test3);
+		constexpr auto rs4 = Serializer<float>::Parse(123.1023f);
+		constexpr auto rs5 = Serializer<double>::Parse(0129578210.605827891059);
+		constexpr auto rs6 = Serializer<int>::Parse(65535);
+		constexpr auto rs7 = Serializer<int>::Parse(65536);
 
+		constexpr auto rs8 = Serializer<char[]>::Parse("sdfsfsdfdfsdf");
 
 		constexpr auto test_str1 = serialization::Serialize("¤¡¤¤¤§");
 		constexpr auto test_str2 = serialization::Serialize(L"¤¡");

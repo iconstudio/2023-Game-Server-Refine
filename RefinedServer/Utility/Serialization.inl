@@ -257,6 +257,26 @@ namespace util::serialization
 
 	template<size_t Length>
 		requires (0 < Length)
+	constexpr auto SerializeArray(const bool* const& buffer) noexcept(0 < Length)
+	{
+		constexpr size_t bytes_count = std::max(1ULL, Length / 8);
+
+		Array<char, bytes_count> result{};
+		for (size_t i = 0; i < bytes_count; ++i)
+		{
+			char& element = result[i];
+			for (size_t j = 0; j < 8; ++j)
+			{
+				const bool& bit = buffer[i * 8 + j];
+				element |= static_cast<char>(bit) << j;
+			}
+		}
+
+		return result;
+	}
+
+	template<size_t Length>
+		requires (0 < Length)
 	constexpr Array<char, Length> SerializeArray(const char* const& buffer) noexcept(0 < Length)
 	{
 		return Array<char, Length>{ buffer, buffer + Length };
