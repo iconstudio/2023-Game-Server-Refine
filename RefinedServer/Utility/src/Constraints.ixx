@@ -25,6 +25,12 @@ export namespace util
 	concept enumerations = make_conjunction<std::is_enum, clean_t<Ts>...>;
 
 	template<typename... Ts>
+	concept soft_enumerations = enumerations<Ts...> && !make_disjunction<std::is_scoped_enum, clean_t<Ts>...>;
+
+	template<typename... Ts>
+	concept hard_enumerations = enumerations<Ts...> && make_conjunction<std::is_scoped_enum, clean_t<Ts>...>;
+
+	template<typename... Ts>
 	concept classes = make_conjunction<std::is_class, clean_t<Ts>...>;
 
 	template<typename T, typename... Args>
