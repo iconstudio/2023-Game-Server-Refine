@@ -129,7 +129,7 @@ export namespace util
 		}
 
 		template<invocables<reference> Fn>
-		constexpr void apply(Fn&& function)
+		constexpr void Apply(Fn&& function)
 			noexcept(noexcept(forward<Fn>(function)(declval<reference>())))
 		{
 			for (reference elem : *this)
@@ -139,7 +139,7 @@ export namespace util
 		}
 
 		template<invocables<const_reference> Fn>
-		constexpr void apply(Fn&& function) const
+		constexpr void Apply(Fn&& function) const
 			noexcept(noexcept(forward<Fn>(function)(declval<const_reference>())))
 		{
 			for (const_reference elem : *this)
@@ -150,7 +150,7 @@ export namespace util
 
 		template<convertible_to<value_type> Uty, size_t L2>
 			requires (0 < L2)
-		constexpr void assign(const Array<Uty, L2>& other)
+		constexpr void Assign(const Array<Uty, L2>& other)
 			noexcept(nothrow_assignables<value_type, Uty>)
 		{
 			auto src = other.cbegin();
@@ -163,7 +163,7 @@ export namespace util
 
 		template<convertible_to<value_type> Uty, size_t L2>
 			requires (0 < L2)
-		constexpr void assign(Array<Uty, L2>&& other)
+		constexpr void Assign(Array<Uty, L2>&& other)
 			noexcept(nothrow_assignables<value_type, Uty>)
 		{
 			auto src = other.begin();
@@ -174,10 +174,49 @@ export namespace util
 			}
 		}
 
-		constexpr void fill(const value_type& fill_value)
+		constexpr void Fill(const value_type& fill_value)
 			noexcept(nothrow_copy_assignables<value_type>)
 		{
 			std::fill_n(myData, Length, fill_value);
+		}
+
+		template<size_t L2>
+			requires (0 < L2)
+		constexpr void CopyTo(std::array<value_type, L2>& target)
+			noexcept(nothrow_copy_assignables<value_type>)
+		{
+			array_iterator<value_type, L2> oit = target.begin();
+
+			for (const_iterator it = cbegin(); it != cend(); ++it, (void) ++oit)
+			{
+				*oit = *it;
+			}
+		}
+
+		template<size_t L2>
+			requires (0 < L2)
+		constexpr void CopyTo(Array<value_type, L2>& target)
+			noexcept(nothrow_copy_assignables<value_type>)
+		{
+			iterator oit = target.begin();
+
+			for (const_iterator it = cbegin(); it != cend(); ++it, (void) ++oit)
+			{
+				*oit = *it;
+			}
+		}
+
+		template<size_t L2>
+			requires (0 < L2)
+		constexpr void CopyTo(value_type(&target)[L2])
+			noexcept(nothrow_copy_assignables<value_type>)
+		{
+			value_type* oit = std::begin(target);
+
+			for (const_iterator it = cbegin(); it != cend(); ++it, (void) ++oit)
+			{
+				*oit = *it;
+			}
 		}
 
 		constexpr void swap(std::array<value_type, Length>& other_data)
