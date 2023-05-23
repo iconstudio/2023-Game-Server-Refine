@@ -1,5 +1,5 @@
 module;
-#include <type_traits>
+#include "Serialiazation.inl"
 
 export module Utility.Serialization;
 import Utility;

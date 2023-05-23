@@ -41,4 +41,7 @@
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)Utility.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Serialiazation.inl" />
+  </ItemGroup>
 </Project>
