@@ -32,13 +32,24 @@ export namespace util
 
 	template<typename T>
 	constexpr
-		decltype(Serializer<T>::Parse(declval<clean_t<T>>()))
+		decltype(Serializer<clean_t<T>>::Parse(declval<clean_t<T>>()))
 		Serialize(const T& value)
 		noexcept(noexcept(Serializer<clean_t<T>>::template Parse(declval<clean_t<T>>())))
 	{
 		static_assert(serializables<clean_t<T>>, "T Cannot be serialized.");
 
 		return typename Serializer<clean_t<T>>::template Parse(value);
+	}
+
+	template<typename T, size_t Length>
+	constexpr
+		decltype(Serializer<clean_t<T>[]>::Parse(declval<clean_t<T>[Length]>()))
+		Serialize(const T(&value)[Length])
+		noexcept(noexcept(Serializer<clean_t<T>[]>::template Parse(declval<clean_t<T>[Length]>())))
+	{
+		static_assert(serializables<clean_t<T>[]>, "T[] Cannot be serialized.");
+
+		return typename Serializer<clean_t<T>[]>::template Parse(value);
 	}
 
 	template<enumerations E>
@@ -643,6 +654,12 @@ namespace util::test
 		constexpr auto es7 = util::Serialize(test_enum3::a);
 		constexpr auto es8 = util::Serialize(test_enum3::b);
 		constexpr auto es9 = util::Serialize(test_enum3::c);
+
+		constexpr int arr1[] = { 1, 2, 3, 4, 5 };
+		constexpr float arr2[] = { 400.0591012f, 30.0951234f, 60841.0915f, 206167.013133f };
+
+		constexpr auto fs1 = util::Serialize(arr1);
+		constexpr auto fs2 = util::Serialize(arr2);
 	}
 #endif // false
 }
