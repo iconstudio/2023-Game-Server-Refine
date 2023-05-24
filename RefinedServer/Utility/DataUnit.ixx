@@ -51,30 +51,6 @@ export namespace util::datagram
 	template<typename T>
 	class DataUnit<true, T>
 	{
-		struct Watcher
-		{
-			constexpr Watcher(char*& buffer, const size_t& size) noexcept
-				: myBuffer(buffer), mySize(size)
-			{}
-
-			constexpr ~Watcher() noexcept(trivials<T>)
-			{
-				if (isEnabled)
-				{
-					delete[] myBuffer;
-				}
-			}
-
-			constexpr void Disable() noexcept
-			{
-				isEnabled = false;
-			}
-
-			char*& myBuffer;
-			size_t mySize = 0;
-			bool isEnabled = true;
-		};
-
 	public:
 		constexpr DataUnit() noexcept = default;
 
