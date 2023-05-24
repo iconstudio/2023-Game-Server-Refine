@@ -5,6 +5,7 @@ import Utility.Constraints;
 import Utility.Memory;
 import Utility.Array;
 import Utility.Union;
+import Utility.Datagram.Unit;
 import Utility.Datagram.Serialization;
 
 export namespace util::datagram
@@ -62,7 +63,7 @@ export namespace util::datagram
 	};
 
 	template<bool Heap, typename... Ts>
-	DataPacker(Heap, Ts...) -> DataPacker<Heap, Ts...>;
+	DataPacker(Ts...) -> DataPacker<Heap, Ts...>;
 }
 
 #pragma warning(push, 1)
