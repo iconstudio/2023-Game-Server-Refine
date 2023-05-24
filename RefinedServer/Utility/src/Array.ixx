@@ -219,11 +219,13 @@ export namespace util
 			}
 		}
 
-		constexpr void CopyTo(value_type* target, const size_t& length) const
+		constexpr void CopyTo(value_type* const& target, const size_t& length) const
 		{
 			value_type* oit = target;
 
-			for (const_iterator it = cbegin(); it != cend(), oit < target + length; ++it, (void) ++oit)
+			for (const_iterator it = cbegin();
+				(void)(it != cend()), oit != target + length;
+				++it, (void) ++oit)
 			{
 				*oit = *it;
 			}
