@@ -451,6 +451,9 @@ export namespace meta
 	struct tsize<Seq<>> : public std::integral_constant<size_t, 0>
 	{};
 
+	template <typename T>
+	inline constexpr size_t tsize_v = tsize<T>::value;
+
 	// summarize byte size of a packed sequence
 	template <typename T>
 	struct rng_size : public std::integral_constant<size_t, 0>
@@ -462,18 +465,6 @@ export namespace meta
 
 	template <template <typename...> typename Seq, typename... Ts>
 	inline constexpr size_t rng_size_v = rng_size<Seq<Ts...>>::value;
-
-	// summarize byte size of each type in a sequence
-	template <typename... Ts>
-	struct bsize : public std::integral_constant<size_t, 0>
-	{};
-
-	template <typename T, typename... Ts>
-	struct bsize<T, Ts...> : public std::integral_constant<size_t, sizeof(T) + bsize<Ts...>::value>
-	{};
-
-	template <typename... Ts>
-	inline constexpr size_t bsize_v = bsize<Ts...>::value;
 
 	template <typename T>
 	struct empty;
@@ -489,10 +480,7 @@ export namespace meta
 	template <typename T>
 	inline constexpr bool empty_v = empty<T>::value;
 
-	template <typename T>
-	inline constexpr size_t tsize_v = tsize<T>::value;
-
-	// get byte size of sequence
+	// summarize byte size of each type in a sequence
 	template <typename...>
 	struct byte_size;
 

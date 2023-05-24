@@ -12,52 +12,29 @@ import Utility.Datagram.Serialization;
 export namespace util::datagram
 {
 	template<typename T>
-	class DataUnit;
-
-	template<>
-	class DataUnit<void>
+	struct DataUnit
 	{
-	public:
-		constexpr DataUnit() noexcept = default;
-		constexpr DataUnit(const DataUnit& other) noexcept = default;
-		constexpr DataUnit(DataUnit&& other) noexcept = default;
-		constexpr DataUnit& operator=(const DataUnit& other) noexcept = default;
-		constexpr DataUnit& operator=(DataUnit&& other) noexcept = default;
-		constexpr ~DataUnit() noexcept = default;
-	};
-
-	template<typename T>
-	class DataUnit
-	{
-	public:
 		static inline constexpr size_t size = sizeof(T);
 
-		constexpr DataUnit() noexcept = default;
+		constexpr DataUnit(char* output, const size_t& offset) noexcept
+			: myBuffer(output + offset)
+		{}
+
+		constexpr void Write(const T& value) const
+		{
+			static_assert(serializables<T>, "T must be serializable");
+
+			const Array<char, size> result = util::Serialize(value);
+			result.CopyTo(myBuffer, size);
+		}
+
 		constexpr DataUnit(const DataUnit& other) noexcept = default;
 		constexpr DataUnit(DataUnit&& other) noexcept = default;
 		constexpr DataUnit& operator=(const DataUnit& other) noexcept = default;
 		constexpr DataUnit& operator=(DataUnit&& other) noexcept = default;
 		constexpr ~DataUnit() noexcept = default;
 
-		explicit constexpr DataUnit(const T& data)
-			noexcept(noexcept(util::Serialize(declval<const T&>()))) requires copyable<T>
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const Array<char, size> result = util::Serialize(data);
-			result.CopyTo(myBuffer);
-		}
-
-		explicit constexpr DataUnit(T&& data)
-			noexcept(noexcept(util::Serialize(declval<T&&>()))) requires movable<T>
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const Array<char, size> result = util::Serialize(static_cast<T&&>(data));
-			result.CopyTo(myBuffer);
-		}
-
-		char myBuffer[size]{};
+		char* myBuffer;
 	};
 
 	template<typename T>
@@ -70,12 +47,17 @@ namespace util::test
 #if true
 	constexpr void test_dataunit_stack() noexcept
 	{
-		constexpr datagram::DataUnit<int> data0{ 5 };
-		constexpr datagram::DataUnit<int> data1{};
-		constexpr datagram::DataUnit<int> data2{ 0 };
+		char output[1000]{};
 
-		static_assert(data0.myBuffer[3] == 5);
+		datagram::DataUnit<int> data0{ output, 0 };
+		datagram::DataUnit<int> data1{ output, 4 };
+		datagram::DataUnit<int> data2{ output, 8 };
 
+		data0.Write(1);
+		data1.Write(2);
+		data2.Write(3);
+
+		//static_assert(data0.myBuffer[3] == 5);
 		//static_assert((data3.myBuffer)[3] == 5);
 	}
 #endif

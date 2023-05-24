@@ -24,10 +24,24 @@ export namespace util
 	};
 
 	template<typename T>
-	concept serializables = requires(const T & value, Serializer<T>&parser)
+	concept serializable = requires(const T & value, Serializer<T>&parser)
 	{
 		parser.Parse(value);
 	};
+
+	template<typename... Ts>
+	struct test_serializables : true_type
+	{};
+
+	template<typename T, typename... Ts>
+	struct test_serializables<T, Ts...> : conditional_t<serializable<T>, test_serializables<Ts...>, false_type>
+	{};
+
+	template<typename... Ts>
+	inline constexpr bool test_serializables_v = test_serializables<Ts...>::value;
+
+	template<typename... Ts>
+	concept serializables = test_serializables_v<Ts...>;
 
 	template<typename T>
 	constexpr

@@ -130,7 +130,7 @@ namespace util::detail
 		{}
 
 		// Initialize my value with Args by a Type (not void)
-	template <typename T, typename... Args>
+		template <typename T, typename... Args>
 			requires (same_as<clean_t<T>, Fty>&& notvoids<Fty>)
 		explicit(is_explicit_constructible_v<T>)
 			constexpr
@@ -160,7 +160,7 @@ namespace util::detail
 
 		// Recursively find the specified type
 		template <typename T, typename... Args>
-			requires (!same_as<clean_t<T>, Fty> && meta::included_v<T, Fty, Rty...>)
+			requires (!same_as<clean_t<T>, Fty>&& meta::included_v<T, Fty, Rty...>)
 		explicit
 			constexpr
 			PlacedVariant(in_place_type_t<T>, Args&&... args)
@@ -179,7 +179,7 @@ namespace util::detail
 
 		// When cannot find the specified type
 		template <typename T, typename... Args>
-			requires (!same_as<clean_t<T>, Fty>&& !meta::included_v<T, Fty, Rty...>)
+			requires (!same_as<clean_t<T>, Fty> && !meta::included_v<T, Fty, Rty...>)
 		explicit
 			constexpr
 			PlacedVariant(in_place_type_t<T>, Args&&... args)

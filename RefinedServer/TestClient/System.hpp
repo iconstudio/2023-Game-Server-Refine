@@ -40,4 +40,6 @@ public:
 
 	net::EndPoint myAddress;
 	net::EndPoint serverAddress;
+
+	Camera myCamera;
 };
