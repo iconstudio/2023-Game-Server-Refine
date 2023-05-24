@@ -45,7 +45,7 @@ export namespace util::datagram
 		constexpr ~DataPacker() noexcept
 		{}
 
-		DataUnit<Fty> myData{};
+		DataUnit<Fty> myData;
 		DataPacker<Rty...> nextNode;
 	};
 
@@ -59,7 +59,7 @@ export namespace util::datagram
 		constexpr DataPacker() noexcept = default;
 		constexpr ~DataPacker() noexcept = default;
 
-		DataUnit<void> myData{};
+		[[msvc::no_unique_address]] DataUnit<void> myData{};
 	};
 
 	template<typename... Ts>
