@@ -2,14 +2,15 @@
 import Net;
 import Net.Socket;
 import Net.EndPoint;
+import Net.Promise;
 
 // @brief Class representing a camera orbiting around its target.
 // @ingroup gl_utils
-class System
+class Camera
 {
 public:
-	System();
-	~System();
+	Camera();
+	~Camera();
 
 	void Update(float dt);
 
@@ -25,4 +26,18 @@ public:
 
 	glm::vec3 getPosition() const;
 	glm::mat4 getViewMatrix() const;
+};
+
+class System
+{
+public:
+	System() noexcept;
+	~System() noexcept;
+
+	void Awake();
+	void Start();
+	void Update();
+
+	net::EndPoint myAddress;
+	net::EndPoint serverAddress;
 };
