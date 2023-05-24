@@ -52,6 +52,8 @@ export namespace util::datagram
 	class DataUnit<true, T>
 	{
 	public:
+		static inline constexpr size_t size = sizeof(T);
+
 		constexpr DataUnit() noexcept = default;
 
 		constexpr DataUnit(const DataUnit& other) noexcept(trivials<T>)
@@ -66,32 +68,18 @@ export namespace util::datagram
 
 		constexpr DataUnit& operator=(const DataUnit& other) noexcept(trivials<T>)
 		{
-			if (myBuffer)
-			{
-				Copy(other.myBuffer, other.myCapacity);
-			}
-			else
-			{
-				Allocate(other.myCapacity);
-				myCapacity = other.myCapacity;
+			TryAllocate();
 
-				Copy(other.myBuffer, other.myCapacity);
-			}
+			Copy(other.myBuffer.get(), size);
+
+			other.Tidy();
 		}
 
 		constexpr DataUnit& operator=(DataUnit&& other) noexcept(trivials<T>)
 		{
-			if (myBuffer)
-			{
-				Move(move(other.myBuffer), other.myCapacity);
-			}
-			else
-			{
-				Allocate(other.myCapacity);
-				myCapacity = other.myCapacity;
+			TryAllocate();
 
-				Move(move(other.myBuffer), other.myCapacity);
-			}
+			Move(other.myBuffer.get(), size);
 
 			other.Tidy();
 		}
@@ -102,53 +90,42 @@ export namespace util::datagram
 		}
 
 		explicit constexpr DataUnit(const T& data)
-			requires copyable<T>
 		{
 			static_assert(serializables<T>, "T must be serializable");
 
-			const auto result = util::Serialize(data);
-			result.CopyTo(myBuffer, myCapacity);
+			TryAllocate();
+
+			const Array<char, size> result = util::Serialize(data);
+			char* (ptr) = myBuffer.get();
+
+			result.CopyTo(ptr, size);
 		}
 
-		explicit constexpr DataUnit(T&& data)
-			requires movable<T>
-		{
-			static_assert(serializables<T>, "T must be serializable");
-
-			const auto result = util::Serialize(static_cast<T&&>(data));
-			result.CopyTo(myBuffer, myCapacity);
-		}
+		unique_ptr<char[]> myBuffer = nullptr;
 
 	private:
-		constexpr void TryAllocate(const size_t& new_capacity) noexcept(trivials<T>)
+		constexpr void TryAllocate()
 		{
 			if (!myBuffer)
 			{
-				Allocate(new_capacity);
-			}
-			else if (myCapacity < new_capacity)
-			{
-				Tidy();
-				Allocate(new_capacity);
+				Allocate();
 			}
 		}
 
-		constexpr char* Allocate(const size_t& new_capacity) noexcept(trivials<T>)
+		constexpr void Allocate()
 		{
-			myBuffer = new char[new_capacity];
-			myCapacity = new_capacity;
-			return myBuffer;
+			myBuffer = unique_ptr<char[]>(new char[size] {});
 		}
 
 		constexpr void Copy(const char* const& buffer, const size_t& from_capacity)
 		{
 			if (std::is_constant_evaluated())
 			{
-				std::copy(buffer, buffer + from_capacity, myBuffer);
+				std::copy(buffer, buffer + from_capacity, myBuffer.get());
 			}
 			else
 			{
-				::memcpy_s(myBuffer, myCapacity, buffer, from_capacity);
+				::memcpy_s(myBuffer.get(), size, buffer, from_capacity);
 			}
 		}
 
@@ -156,11 +133,11 @@ export namespace util::datagram
 		{
 			if (std::is_constant_evaluated())
 			{
-				std::move(buffer, buffer + from_capacity, myBuffer);
+				std::move(buffer, buffer + from_capacity, myBuffer.get());
 			}
 			else
 			{
-				::memcpy_s(myBuffer, myCapacity, buffer, from_capacity);
+				::memcpy_s(myBuffer.get(), size, buffer, from_capacity);
 			}
 		}
 
@@ -168,14 +145,9 @@ export namespace util::datagram
 		{
 			if (myBuffer)
 			{
-				delete[] myBuffer;
-				myBuffer = nullptr;
-				myCapacity = 0;
+				myBuffer.reset();
 			}
 		}
-
-		char* myBuffer = nullptr;
-		volatile size_t myCapacity = 0;
 	};
 
 	template<bool Heap, typename T>
@@ -186,13 +158,24 @@ export namespace util::datagram
 namespace util::test
 {
 #if true
-	void test_dataunit_stack()
+	constexpr datagram::DataUnit<true, int> test_dataunit_heap() noexcept
+	{
+		return datagram::DataUnit<true, int>{ 5 };
+	}
+
+	constexpr void test_dataunit_stack() noexcept
 	{
 		constexpr datagram::DataUnit<false, int> data0{ 5 };
 		constexpr datagram::DataUnit<false, int> data1{};
 		constexpr datagram::DataUnit<false, int> data2{ 0 };
 
 		static_assert(data0.myBuffer[3] == 5);
+
+		constexpr datagram::DataUnit<true, int> data3 = test_dataunit_heap();
+		constexpr datagram::DataUnit<true, int> data4{};
+		const datagram::DataUnit<true, int> data5{ 0 };
+
+		//static_assert((data3.myBuffer)[3] == 5);
 	}
 #endif
 }
