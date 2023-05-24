@@ -55,39 +55,9 @@ export namespace util::datagram
 		static inline constexpr size_t size = sizeof(T);
 
 		constexpr DataUnit() noexcept = default;
-
-		constexpr DataUnit(const DataUnit& other) noexcept(trivials<T>)
-		{
-			this->operator=(other);
-		}
-
-		constexpr DataUnit(DataUnit&& other) noexcept(trivials<T>)
-		{
-			this->operator=(move(other));
-		}
-
-		constexpr DataUnit& operator=(const DataUnit& other) noexcept(trivials<T>)
-		{
-			TryAllocate();
-
-			Copy(other.myBuffer.get(), size);
-
-			other.Tidy();
-		}
-
-		constexpr DataUnit& operator=(DataUnit&& other) noexcept(trivials<T>)
-		{
-			TryAllocate();
-
-			Move(other.myBuffer.get(), size);
-
-			other.Tidy();
-		}
-
-		constexpr ~DataUnit() noexcept(trivials<T>)
-		{
-			Tidy();
-		}
+		constexpr DataUnit(DataUnit&& other) noexcept = default;
+		constexpr DataUnit& operator=(DataUnit&& other) noexcept = default;
+		constexpr ~DataUnit() noexcept(trivials<T>) = default;
 
 		explicit constexpr DataUnit(const T& data)
 		{
@@ -101,6 +71,9 @@ export namespace util::datagram
 			result.CopyTo(ptr, size);
 		}
 
+		DataUnit(const DataUnit& other) = delete;
+		DataUnit& operator=(const DataUnit& other) = delete;
+
 		unique_ptr<char[]> myBuffer = nullptr;
 
 	private:
@@ -108,44 +81,7 @@ export namespace util::datagram
 		{
 			if (!myBuffer)
 			{
-				Allocate();
-			}
-		}
-
-		constexpr void Allocate()
-		{
-			myBuffer = unique_ptr<char[]>(new char[size] {});
-		}
-
-		constexpr void Copy(const char* const& buffer, const size_t& from_capacity)
-		{
-			if (std::is_constant_evaluated())
-			{
-				std::copy(buffer, buffer + from_capacity, myBuffer.get());
-			}
-			else
-			{
-				::memcpy_s(myBuffer.get(), size, buffer, from_capacity);
-			}
-		}
-
-		constexpr void Move(char* (&& buffer), const size_t& from_capacity)
-		{
-			if (std::is_constant_evaluated())
-			{
-				std::move(buffer, buffer + from_capacity, myBuffer.get());
-			}
-			else
-			{
-				::memcpy_s(myBuffer.get(), size, buffer, from_capacity);
-			}
-		}
-
-		constexpr void Tidy() noexcept
-		{
-			if (myBuffer)
-			{
-				myBuffer.reset();
+				myBuffer = unique_ptr<char[]>(new char[size] {});
 			}
 		}
 	};
@@ -171,8 +107,8 @@ namespace util::test
 
 		static_assert(data0.myBuffer[3] == 5);
 
-		constexpr datagram::DataUnit<true, int> data3 = test_dataunit_heap();
-		constexpr datagram::DataUnit<true, int> data4{};
+		const datagram::DataUnit<true, int> data3 = test_dataunit_heap();
+		const datagram::DataUnit<true, int> data4{};
 		const datagram::DataUnit<true, int> data5{ 0 };
 
 		//static_assert((data3.myBuffer)[3] == 5);
