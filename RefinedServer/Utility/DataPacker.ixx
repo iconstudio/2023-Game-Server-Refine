@@ -68,31 +68,10 @@ export namespace util::datagram
 		constexpr ~DataPacker() noexcept
 		{}
 
-		template<size_t Index>
-		static consteval size_t Summarize() noexcept
-		{
-			if constexpr (0 == Index)
-			{
-				return 0;
-			}
-			else
-			{
-				return SummarizeFor(std::make_index_sequence<Index>{});
-			}
-		}
-
-		template<size_t... Indices>
-		static consteval size_t SummarizeFor(std::index_sequence<Indices...>) noexcept
-		{
-			size_t result = 0;
-
-			((result += sizeof(std::tuple_element_t<Indices, Pack>)), ...);
-
-			return result;
-		}
-
-		template<typename... Args, size_t I, size_t... Indices>
-		constexpr void InternalWrites(const std::tuple<Args...>& data, std::index_sequence<I, Indices...>)
+		template<typename... Args, size_t I, size_t Next, size_t... Indices>
+		constexpr
+			void
+			InternalWrites(const std::tuple<Args...>& data, std::index_sequence<I, Next, Indices...>)
 			noexcept
 		{
 			Write(std::get<I>(data), Summarize<I>());
@@ -129,6 +108,29 @@ export namespace util::datagram
 		}
 
 		char internalBuffer[mySize]{};
+
+		template<size_t Index>
+		static consteval size_t Summarize() noexcept
+		{
+			if constexpr (0 == Index)
+			{
+				return 0;
+			}
+			else
+			{
+				return SummarizeFor(std::make_index_sequence<Index>{});
+			}
+		}
+
+		template<size_t... Indices>
+		static consteval size_t SummarizeFor(std::index_sequence<Indices...>) noexcept
+		{
+			size_t result = 0;
+
+			((result += sizeof(meta::at<Pack, Indices>)), ...);
+
+			return result;
+		}
 	};
 
 	template<>
