@@ -4,7 +4,6 @@ module;
 #include <string>
 #include <string_view>
 #include <chrono>
-
 export module Net;
 
 export namespace net
@@ -152,7 +151,7 @@ export namespace net
 		using ::WSAGetLastError;
 	}
 
-	inline constexpr const std::string_view& (GetServerVersion)() noexcept
+	inline constexpr const std::string_view& (GetServerVersion) () noexcept
 	{
 		return constants::VERSION;
 	}

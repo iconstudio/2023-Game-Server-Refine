@@ -395,5 +395,5 @@ export namespace net
 		volatile bool isOut{ false };
 		SOCKET myHandle{ abi::InvalidSocket };
 		EndPoint myEndPoint{};
-		};
-	}
+	};
+}

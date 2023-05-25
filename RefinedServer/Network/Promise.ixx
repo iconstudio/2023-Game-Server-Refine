@@ -1358,9 +1358,9 @@ export namespace net
 		size_t myIndex = 0;
 	};
 
-	using Proxy = Promise<void, void>;
+	using Proxy = Promise<void, void, void>;
 
-	using ioError = Promise<void, int>;
+	using ioError = Promise<void, int, void>;
 
 	template<typename T>
 	Promise(T) -> Promise<T, void, void>;
