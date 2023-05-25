@@ -9,10 +9,16 @@ import Net.Promise;
 class Camera
 {
 public:
-	Camera();
-	~Camera();
+	Camera() noexcept
+	{}
 
-	void Update(float dt);
+	~Camera() noexcept
+	{}
+
+	void Awake();
+	void Start();
+	void Update(const float& delta_time);
+	void LateUpdate(const float& delta_time);
 
 	void SetCameraTarget(const glm::vec3& target);
 	void SetCameraDistance(const float& distance);
@@ -36,8 +42,10 @@ public:
 
 	void Awake();
 	void Start();
-	void Update();
+	void Update(const float& delta_time);
+	void LateUpdate(const float& delta_time);
 
+	net::Socket mySocket;
 	net::EndPoint myAddress;
 	net::EndPoint serverAddress;
 
