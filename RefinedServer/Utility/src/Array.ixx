@@ -224,7 +224,7 @@ export namespace util
 			value_type* oit = target;
 
 			for (const_iterator it = cbegin();
-				(void)(it != cend()), oit != target + length;
+				it != cend() && oit < target + length;
 				++it, (void) ++oit)
 			{
 				*oit = *it;

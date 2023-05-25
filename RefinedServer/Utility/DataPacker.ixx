@@ -1,4 +1,5 @@
 module;
+#include <type_traits>
 #include <tuple>
 
 export module Utility.Datagram.Packer;
@@ -47,7 +48,7 @@ export namespace util::datagram
 		};
 
 	public:
-		using Pack = meta::MetaList<Fty, Rty...>;
+		using Pack = std::tuple<Fty, Rty...>;
 
 		static inline constexpr size_t myLength = 1 + sizeof...(Rty);
 		static inline constexpr size_t mySize = meta::byte_size_v<Fty, Rty...>;
@@ -69,36 +70,56 @@ export namespace util::datagram
 			Writes(std::forward_as_tuple(forward<Args>(args)...), std::index_sequence_for<Args...>{});
 		}
 
-		template<size_t Index, typename... Args>
-		consteval size_t Summarize() noexcept
-		{
+		constexpr ~DataPacker() noexcept
+		{}
 
+		template<size_t Index>
+		static consteval size_t Summarize() noexcept
+		{
+			if constexpr (0 == Index)
+			{
+				return 0;
+			}
+			else
+			{
+				return SummarizeFor(std::make_index_sequence<Index>{});
+			}
+		}
+
+		template<size_t... Indices>
+		static consteval size_t SummarizeFor(std::index_sequence<Indices...>) noexcept
+		{
+			size_t result = 0;
+
+			((result += sizeof(std::tuple_element_t<Indices, Pack>)), ...);
+
+			return result;
 		}
 
 		template<typename... Args, size_t... Indices>
 		constexpr void Writes(std::tuple<Args...>&& data, std::index_sequence<Indices...>)
 			noexcept
 		{
-			size_t offset = 0;
-
+			(((Write(std::get<Indices>(data), Summarize<Indices>()))), ...);
 		}
 
 		template<typename T>
 		constexpr void Write(T&& value, const size_t& offset)
 		{
+			const auto serialized = util::Serialize(forward<T>(value));
+			char* const& ptr = internalBuffer + offset;
+
+			serialized.CopyTo(ptr, myLength);
 		}
 
-		constexpr ~DataPacker() noexcept
-		{}
-
-		constexpr void Serialize(char* const& output, const size_t& out_length) const
+		constexpr void Serialize(char* const& output, const size_t& out_length) const noexcept
 		{
 
 		}
 
-		constexpr char* Serialize()
+		constexpr char* Serialize() noexcept
 		{
-
+			return internalBuffer;
 		}
 
 		char internalBuffer[mySize]{};
@@ -122,7 +143,7 @@ export namespace util::datagram
 }
 
 #pragma warning(push, 1)
-namespace util::test
+export namespace util::test
 {
 #if true
 	void test_datapacker()
@@ -131,16 +152,16 @@ namespace util::test
 
 		constexpr datagram::DataPacker<int> test_pk2{};
 
-		constexpr datagram::DataPacker test_pk3{ 5000 };
+		constexpr datagram::DataPacker test_pk3{ 1 };
+		static_assert(test_pk3.internalBuffer[3] != 1);
 
 		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk4{};
 
-		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk5{ 1230, 40L, 0.0174124983f };
+		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk5{ 256, 40L, 0.0174124983f };
 
 		static_assert(test_pk5.myLength == 7);
 		static_assert(test_pk5.mySize == sizeof(int) + sizeof(long) + sizeof(float) + sizeof(short) + sizeof(unsigned char) + sizeof(unsigned) + sizeof(bool));
-		//static_assert(test_pk5.nextNode.nextNode.myData.size != 0.0174124983f);
-		//static_assert(test_pk5.nextNode.nextNode.myData.size == 4);
+		static_assert(test_pk5.internalBuffer[1] != 1);
 	}
 #endif // true
 }
