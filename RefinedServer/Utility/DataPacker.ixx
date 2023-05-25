@@ -164,7 +164,7 @@ export namespace util::test
 
 		constexpr datagram::DataPacker<int> test_pk2{};
 
-		constexpr datagram::DataPacker test_pk3{ 1 };
+		constexpr datagram::DataPacker<int, int, int> test_pk3{ 1000000, 2, 3 };
 		static_assert(test_pk3.internalBuffer[3] != 1);
 
 		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk4{};
