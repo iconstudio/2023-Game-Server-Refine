@@ -42,11 +42,6 @@ export namespace util::datagram
 	template<notvoids Fty, notvoids... Rty>
 	class [[nodiscard]] DataPacker<Fty, Rty...>
 	{
-		struct Enumerator
-		{
-
-		};
-
 	public:
 		using Pack = std::tuple<Fty, Rty...>;
 
