@@ -1,5 +1,5 @@
 module;
-#include <type_traits>
+#include <utility>
 #include <tuple>
 
 export module Utility.Datagram.Packer;
@@ -67,7 +67,7 @@ export namespace util::datagram
 		{
 			static_assert(serializables<clean_t<Args>...>);
 
-			Writes(std::forward_as_tuple(forward<Args>(args)...), std::index_sequence_for<Args...>{});
+			InternalWrites(std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{});
 		}
 
 		constexpr ~DataPacker() noexcept
@@ -96,17 +96,25 @@ export namespace util::datagram
 			return result;
 		}
 
-		template<typename... Args, size_t... Indices>
-		constexpr void Writes(std::tuple<Args...>&& data, std::index_sequence<Indices...>)
+		template<typename... Args, size_t I, size_t... Indices>
+		constexpr void InternalWrites(const std::tuple<Args...>& data, std::index_sequence<I, Indices...>)
 			noexcept
 		{
-			(((Write(std::get<Indices>(data), Summarize<Indices>()))), ...);
+			Write(std::get<I>(data), Summarize<I>());
+
+			// continue
+			InternalWrites(data, std::index_sequence<Indices...>{});
 		}
+
+		template<typename... Args>
+		constexpr void InternalWrites(const std::tuple<Args...>& data, std::index_sequence<>)
+			noexcept
+		{}
 
 		template<typename T>
 		constexpr void Write(T&& value, const size_t& offset)
 		{
-			const auto serialized = util::Serialize(forward<T>(value));
+			const auto serialized = util::Serialize(std::forward<T>(value));
 			char* const& ptr = internalBuffer + offset;
 
 			serialized.CopyTo(ptr, myLength);
@@ -114,7 +122,10 @@ export namespace util::datagram
 
 		constexpr void Serialize(char* const& output, const size_t& out_length) const noexcept
 		{
-
+			for (const char* it = internalBuffer; it != internalBuffer + out_length; ++it, ++output)
+			{
+				*output = *it;
+			}
 		}
 
 		constexpr char* Serialize() noexcept
@@ -156,6 +167,14 @@ export namespace util::test
 		static_assert(test_pk3.internalBuffer[3] != 1);
 
 		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk4{};
+		constexpr size_t pk4_sz_a0 = test_pk4.Summarize<0>();
+		constexpr size_t pk4_sz_a1 = test_pk4.Summarize<1>();
+		constexpr size_t pk4_sz_a2 = test_pk4.Summarize<2>();
+		constexpr size_t pk4_sz_a3 = test_pk4.Summarize<3>();
+		constexpr size_t pk4_sz_a4 = test_pk4.Summarize<4>();
+		constexpr size_t pk4_sz_a5 = test_pk4.Summarize<5>();
+		constexpr size_t pk4_sz_a6 = test_pk4.Summarize<6>();
+		constexpr size_t pk4_sz_a7 = test_pk4.Summarize<7>();
 
 		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk5{ 256, 40L, 0.0174124983f };
 
