@@ -77,13 +77,17 @@ export namespace util::datagram
 			Write(std::get<I>(data), Summarize<I>());
 
 			// continue
-			InternalWrites(data, std::index_sequence<Indices...>{});
+			InternalWrites(data, std::index_sequence<Next, Indices...>{});
 		}
 
-		template<typename... Args>
-		constexpr void InternalWrites(const std::tuple<Args...>& data, std::index_sequence<>)
+		template<typename... Args, size_t Last>
+		constexpr
+			void
+			InternalWrites(const std::tuple<Args...>& data, std::index_sequence<Last>)
 			noexcept
-		{}
+		{
+			Write(std::get<Last>(data), Summarize<Last>());
+		}
 
 		template<typename T>
 		constexpr void Write(T&& value, const size_t& offset)
