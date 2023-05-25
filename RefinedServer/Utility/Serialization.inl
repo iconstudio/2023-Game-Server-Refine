@@ -5,6 +5,18 @@
 
 import Utility.Array;
 
+namespace util
+{
+	static inline constexpr unsigned char Byte = 0XFFU;
+
+	template<typename T>
+	[[nodiscard]]
+	constexpr char RShift(const T& value, const size_t& times) noexcept
+	{
+		return static_cast<char>(static_cast<unsigned char>(value >> (times * 8)) & Byte);
+	}
+}
+
 namespace util::serialization
 {
 	/// <summary>
@@ -44,10 +56,11 @@ namespace util::serialization
 	/// </summary>
 	constexpr Array<char, 2> Serialize(const unsigned short& value) noexcept
 	{
+		const unsigned longer = static_cast<unsigned>(value);
+
 		return Array<char, 2>
 		{
-			static_cast<char>((value >> 8) & 0xFF),
-				static_cast<char>((value) & 0xFF)
+			RShift(longer, 0), RShift(longer, 1)
 		};
 	}
 
@@ -80,12 +93,14 @@ namespace util::serialization
 	/// </summary>
 	constexpr Array<char, 4> Serialize(const unsigned int& value) noexcept
 	{
+		const unsigned long long longer = static_cast<unsigned long long>(value);
+
 		return Array<char, 4>
 		{
-			static_cast<char>((value >> 24U) & 0xFF),
-				static_cast<char>((value >> 16U) & 0xFF),
-				static_cast<char>((value >> 8U) & 0xFF),
-				static_cast<char>((value) & 0xFF)
+			RShift(longer, 0),
+			RShift(longer, 1),
+			RShift(longer, 2),
+			RShift(longer, 3),
 		};
 	}
 
@@ -102,12 +117,14 @@ namespace util::serialization
 	/// </summary>
 	constexpr Array<char, 4> Serialize(const unsigned long& value) noexcept
 	{
+		const unsigned long long longer = static_cast<unsigned long long>(value);
+
 		return Array<char, 4>
 		{
-			static_cast<char>((value >> 24UL) & 0xFF),
-				static_cast<char>((value >> 16UL) & 0xFF),
-				static_cast<char>((value >> 8UL) & 0xFF),
-				static_cast<char>((value) & 0xFF)
+			RShift(longer, 0),
+			RShift(longer, 1),
+			RShift(longer, 2),
+			RShift(longer, 3),
 		};
 	}
 

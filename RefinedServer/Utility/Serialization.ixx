@@ -697,7 +697,7 @@ namespace util::test
 
 		constexpr test_struct test1{ 1, 2, 3 };
 		constexpr auto rs1 = Serializer<test_struct>::Parse(test1);
-		static_assert(rs1[0] == 0);
+		static_assert(rs1[0] == 1);
 
 		constexpr test_struct test2{ 302830631, 68212049, 1205071 };
 		constexpr auto rs2 = Serializer<test_struct>::Parse(test2);

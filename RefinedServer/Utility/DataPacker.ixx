@@ -92,7 +92,9 @@ export namespace util::datagram
 		template<typename T>
 		constexpr void Write(T&& value, const size_t& offset)
 		{
-			const auto serialized = util::Serialize(std::forward<T>(value));
+			using parser = typename util::template Serializer<clean_t<T>>;
+
+			const auto serialized = parser::Parse(std::forward<T>(value));
 			char* const& ptr = internalBuffer + offset;
 
 			serialized.CopyTo(ptr, myLength);
@@ -181,7 +183,7 @@ export namespace util::test
 
 		static_assert(test_pk5.myLength == 7);
 		static_assert(test_pk5.mySize == sizeof(int) + sizeof(long) + sizeof(float) + sizeof(short) + sizeof(unsigned char) + sizeof(unsigned) + sizeof(bool));
-		static_assert(test_pk5.internalBuffer[1] != 1);
+		static_assert(test_pk5.internalBuffer[1] == 1);
 	}
 #endif // true
 }
