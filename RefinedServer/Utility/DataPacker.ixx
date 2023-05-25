@@ -120,7 +120,7 @@ export namespace util::datagram
 			serialized.CopyTo(ptr, myLength);
 		}
 
-		constexpr void Serialize(char* const& output, const size_t& out_length) const noexcept
+		constexpr void Serialize(const char* output, const size_t& out_length) const noexcept
 		{
 			for (const char* it = internalBuffer; it != internalBuffer + out_length; ++it, ++output)
 			{
