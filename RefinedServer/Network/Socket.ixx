@@ -114,7 +114,7 @@ namespace net
 		inline ioError Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
 		{
 			return CheckBool(
-				BasicSocket::Accept(client.myHandle, buffer, context, result_bytes)
+				BasicSocket::Accept(client.Handle(), buffer, context, result_bytes)
 			);
 		}
 
@@ -145,7 +145,7 @@ namespace net
 				return -1;
 			}
 
-			return CheckIO(::WSARecv(myHandle, util::addressof(buffer), 1UL, nullptr, &flags, context, routine));
+			return CheckIO(BasicSocket::BeginRecv(buffer, context, routine, flags));
 		}
 
 		inline ioError BeginSend(WSABUF buffer, Context* const& context, CompletionRoutine routine, const unsigned long& flags = 0) noexcept
@@ -155,7 +155,7 @@ namespace net
 				return -1;
 			}
 
-			return CheckIO(::WSASend(myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine));
+			return CheckIO(BasicSocket::BeginSend(buffer, context, routine, flags));
 		}
 
 		[[nodiscard]]
