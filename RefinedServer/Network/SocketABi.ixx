@@ -35,7 +35,7 @@ export namespace net
 		NoDelay = TCP_NODELAY,
 		DontLinger = SO_DONTLINGER,
 		KeepAlive = SO_KEEPALIVE,
-		Update = SO_UPDATE_ACCEPT_CONTEXT
+		Update = SO_UPDATE_ACCEPT_CONTEXT // MSWSock.h
 	};
 
 	enum SocketIos : unsigned long
