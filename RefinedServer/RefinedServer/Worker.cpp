@@ -27,7 +27,7 @@ NODISCARD constexpr User* ToUser(Context* const& context)
 	}
 }
 
-void Update(Context* const& context, const unsigned long long& key, const unsigned long& bytes)
+void Update(Context* const& context, const unsigned long long& key, const unsigned long& bytes, const bool& succeed)
 {
 	switch (context->GetOperation())
 	{
@@ -36,11 +36,15 @@ void Update(Context* const& context, const unsigned long long& key, const unsign
 			User* const& user = ToUser(context);
 			if (nullptr == user)
 			{
-				util::Println("사용자 {}을(를) 찾을 수 없습니다.", key);
+				util::Println("사용자 {}을(를) 찾을 수가 없습니다.", key);
 				return;
 			}
 
-
+			if (!succeed)
+			{
+				util::Println("사용자 {}을(를) 수용할 수 없습니다.", key);
+				return;
+			}
 		}
 		break;
 
@@ -49,10 +53,15 @@ void Update(Context* const& context, const unsigned long long& key, const unsign
 			User* const& user = ToUser(context);
 			if (nullptr == user)
 			{
-				util::Println("사용자 {}을(를) 찾을 수 없습니다.", key);
+				util::Println("사용자 {}을(를) 찾을 수가 없습니다.", key);
 				return;
 			}
 
+			if (!succeed)
+			{
+				util::Println("사용자 {}을(를) 환영할 수 없습니다.", key);
+				return;
+			}
 
 		}
 		break;
