@@ -106,6 +106,14 @@ export namespace net
 			return ::listen(myHandle, backlog);
 		}
 
+		inline int Accept(const SOCKET& socket, void* const& buffer, Context& context, unsigned long& result_bytes)
+		{
+			return Accept(client, buffer
+				, util::addressof(context)
+				, util::addressof(result_bytes)
+			);
+		}
+
 		inline int Accept(const BasicSocket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
 		{
 			return Accept(client, buffer
@@ -116,7 +124,16 @@ export namespace net
 
 		inline int Accept(const BasicSocket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
 		{
-			return ::AcceptEx(myHandle, client.myHandle
+			return Accept(client.myHandle
+				, buffer
+				, context
+				, result_bytes
+			);
+		}
+
+		inline int Accept(const SOCKET& target, void* const& buffer, Context* const& context, unsigned long* result_bytes)
+		{
+			return ::AcceptEx(myHandle, target
 				, buffer, 0UL
 				, abi::DEFAULT_ACCEPT_SIZE
 				, abi::DEFAULT_ACCEPT_SIZE
