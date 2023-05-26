@@ -19,6 +19,11 @@ export namespace core
 
 		~User() noexcept = default;
 
+		void Cleanup() noexcept
+		{
+			Clear();
+		}
+
 		User(const User& other) = delete;
 		User(User&& other) = delete;
 		User& operator=(const User& other) = delete;
