@@ -9,20 +9,52 @@ import Net;
 import Net.CompletionPort;
 import Net.Context;
 import Net.Worker;
+import Core.User;
+import Core.Packet.Identifier;
 
 using namespace ::net;
 using namespace ::core;
+
+NODISCARD constexpr User* ToUser(Context* const& context)
+{
+	try
+	{
+		return static_cast<User*>(context);
+	}
+	catch (...)
+	{
+		return nullptr;
+	}
+}
 
 void Update(Context* const& context, const unsigned long long& key, const unsigned long& bytes)
 {
 	switch (context->GetOperation())
 	{
 		case Operation::ACCEPT:
-		{}
+		{
+			User* const& user = ToUser(context);
+			if (nullptr == user)
+			{
+				util::Println("사용자 {}을(를) 찾을 수 없습니다.", key);
+				return;
+			}
+
+
+		}
 		break;
 
 		case Operation::WELCOME:
-		{}
+		{
+			User* const& user = ToUser(context);
+			if (nullptr == user)
+			{
+				util::Println("사용자 {}을(를) 찾을 수 없습니다.", key);
+				return;
+			}
+
+
+		}
 		break;
 
 		case Operation::CLOSE:
