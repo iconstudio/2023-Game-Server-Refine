@@ -26,7 +26,7 @@ export namespace core
 			return BeginWelcome().if_then([this]() noexcept {
 				// end immediately (sent welcome message just now)
 				EndWelcome();
-			}).or_else([this]() noexcept {
+			}).else_then([this]() noexcept {
 				// end failure immediately
 				EndFailedWelcome();
 			});

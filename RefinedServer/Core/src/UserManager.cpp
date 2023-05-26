@@ -107,6 +107,8 @@ void UserManager::EndAccept(User* const& newbie) noexcept
 	util::Println("새로운 유저 {}이(가) 접속했습니다.", newbie->MyID());
 
 	lastUserID = newbie->MyID() + 1;
+
+	newbie->Welcome();
 }
 
 void UserManager::EndFailedAccept(User* const& newbie) noexcept
