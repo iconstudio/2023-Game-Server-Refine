@@ -21,7 +21,7 @@ export namespace core
 
 		~User() noexcept = default;
 
-		inline net::Proxy Welcome() noexcept
+		inline net::ioError Welcome() noexcept
 		{
 			return BeginWelcome().if_then([this]() noexcept {
 				// end immediately (sent welcome message just now)
@@ -32,20 +32,27 @@ export namespace core
 			});
 		}
 
-		net::Proxy BeginWelcome() noexcept
+		net::ioError BeginWelcome() noexcept
 		{
 			if (!IsTaken())
 			{
-				return net::io::failure;
+				return -1;
 			}
 
 			if (!SetOperation(Operation::NONE, Operation::WELCOME))
 			{
-				return net::io::failure;
+				return -1;
 			}
 
-			// immediately send welcome message
-			return net::io::success;
+			// welcome message
+			WSABUF buffer =
+			{
+				.len = 50,
+				.buf = nullptr
+			};
+
+			// send the welcome message
+			return Send(buffer);
 		}
 
 		inline bool EndWelcome() noexcept
@@ -73,5 +80,16 @@ export namespace core
 		User& operator=(User&& other) = delete;
 
 		net::Socket mySocket;
+
+	private:
+		inline net::ioError Send(const WSABUF& buffer) noexcept
+		{
+			return mySocket.Send(buffer, this);
+		}
+
+		inline net::ioError Send(const WSABUF& buffer, Context* const& context) noexcept
+		{
+			return mySocket.Send(buffer, context);
+		}
 	};
 }
