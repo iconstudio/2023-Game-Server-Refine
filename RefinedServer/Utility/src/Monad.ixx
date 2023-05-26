@@ -361,14 +361,14 @@ export namespace util
 			}
 		}
 
-		template<invocables<T&> Lfn, invocables<T&> Rfn>
+		template<invocables<T&> Lfn, invocables Rfn>
 		inline constexpr
 			monad_result_t<Lfn, T&>
 			transform(Lfn&& safe_action, Rfn&& fail_action) &
-			noexcept(noexcept(forward<Lfn>(safe_action)(declval<T&>())) && noexcept(forward<Rfn>(fail_action)(declval<T&>())))
+			noexcept(noexcept(forward<Lfn>(safe_action)(declval<T&>())) && noexcept(forward<Rfn>(fail_action)()))
 		{
 			using safe_result_t = monad_result_t<Lfn, T&>;
-			using fail_result_t = monad_result_t<Rfn, T&>;
+			using fail_result_t = monad_result_t<Rfn>;
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
@@ -387,23 +387,23 @@ export namespace util
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(value());
+					forward<Rfn>(fail_action)();
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(value());
+					return forward<Rfn>(fail_action)();
 				}
 			}
 		}
 
-		template<invocables<const T&> Lfn, invocables<const T&> Rfn>
+		template<invocables<const T&> Lfn, invocables Rfn>
 		inline constexpr
 			monad_result_t<Lfn, const T&&>
 			transform(Lfn&& safe_action, Rfn&& fail_action) const&
-			noexcept(noexcept(forward<Lfn>(safe_action)(declval<const T&>())) && noexcept(forward<Rfn>(fail_action)(declval<const T&>())))
+			noexcept(noexcept(forward<Lfn>(safe_action)(declval<const T&>())) && noexcept(forward<Rfn>(fail_action)()))
 		{
 			using safe_result_t = monad_result_t<Lfn, const T&>;
-			using fail_result_t = monad_result_t<Rfn, const T&>;
+			using fail_result_t = monad_result_t<Rfn>;
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
@@ -422,23 +422,23 @@ export namespace util
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(value());
+					forward<Rfn>(fail_action)();
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(value());
+					return forward<Rfn>(fail_action)();
 				}
 			}
 		}
 
-		template<invocables<T&&> Lfn, invocables<T&&> Rfn>
+		template<invocables<T&&> Lfn, invocables Rfn>
 		inline constexpr
 			monad_result_t<Lfn, T&>
 			transform(Lfn&& safe_action, Rfn&& fail_action) &&
-			noexcept(noexcept(forward<Lfn>(safe_action)(declval<T&&>())) && noexcept(forward<Rfn>(fail_action)(declval<T&&>())))
+			noexcept(noexcept(forward<Lfn>(safe_action)(declval<T&&>())) && noexcept(forward<Rfn>(fail_action)()))
 		{
 			using safe_result_t = monad_result_t<Lfn, T&&>;
-			using fail_result_t = monad_result_t<Rfn, T&&>;
+			using fail_result_t = monad_result_t<Rfn>;
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
@@ -457,23 +457,23 @@ export namespace util
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(static_cast<T&&>(value()));
+					forward<Rfn>(fail_action)();
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(static_cast<T&&>(value()));
+					return forward<Rfn>(fail_action)();
 				}
 			}
 		}
 
-		template<invocables<const T&&> Lfn, invocables<const T&&> Rfn>
+		template<invocables<const T&&> Lfn, invocables Rfn>
 		inline constexpr
 			monad_result_t<Lfn, const T&&>
 			transform(Lfn&& safe_action, Rfn&& fail_action) const&&
-			noexcept(noexcept(forward<Lfn>(safe_action)(declval<const T&&>())) && noexcept(forward<Rfn>(fail_action)(declval<const T&&>())))
+			noexcept(noexcept(forward<Lfn>(safe_action)(declval<const T&&>())) && noexcept(forward<Rfn>(fail_action)()))
 		{
 			using safe_result_t = monad_result_t<Lfn, const T&&>;
-			using fail_result_t = monad_result_t<Rfn, const T&&>;
+			using fail_result_t = monad_result_t<Rfn>;
 
 			static_assert(same_as<safe_result_t, fail_result_t> || (same_as<safe_result_t, void> && same_as<fail_result_t, void>));
 
@@ -492,11 +492,11 @@ export namespace util
 			{
 				if constexpr (is_same_v<fail_result_t, void>)
 				{
-					forward<Rfn>(fail_action)(static_cast<const T&&>(value()));
+					forward<Rfn>(fail_action)();
 				}
 				else
 				{
-					return forward<Rfn>(fail_action)(static_cast<const T&&>(value()));
+					return forward<Rfn>(fail_action)();
 				}
 			}
 		}
