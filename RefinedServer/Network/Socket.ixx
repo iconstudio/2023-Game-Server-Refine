@@ -10,51 +10,12 @@ import Net.Addressing;
 import Net.EndPoint;
 import Net.Context;
 import Net.Promise;
+import Net.Intrinsics;
 export import Net.Socket.ABI;
 export import Net.Socket.Basic;
 
 namespace net
 {
-	export inline ioError CheckIO(const int& socket_fn_result) noexcept
-	{
-		if (debug::CheckError(socket_fn_result))
-		{
-			int error = WSAGetLastError();
-			if (debug::CheckPending(error))
-			{
-				return io::defered;
-			}
-			else
-			{
-				return static_cast<int&&>(error);
-			}
-		}
-		else
-		{
-			return io::success;
-		}
-	}
-
-	export inline ioError CheckBool(const int& bool_fn_result) noexcept
-	{
-		if (0 == bool_fn_result)
-		{
-			int error = WSAGetLastError();
-			if (debug::CheckPending(error))
-			{
-				return io::defered;
-			}
-			else
-			{
-				return static_cast<int&&>(error);
-			}
-		}
-		else
-		{
-			return io::success;
-		}
-	}
-
 	export class [[nodiscard]] Socket : public BasicSocket
 	{
 	public:
