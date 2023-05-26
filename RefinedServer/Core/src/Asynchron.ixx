@@ -4,6 +4,8 @@ import Core.Session;
 
 export namespace core
 {
+	using net::Operation;
+
 	template<typename T, typename ID>
 	class Asynchron
 		: public Session<T, ID>
