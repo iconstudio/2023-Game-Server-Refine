@@ -11,6 +11,7 @@ import Net.EndPoint;
 import Net.Context;
 import Net.Promise;
 export import Net.Socket.ABI;
+export import Net.Socket.Basic;
 
 export namespace net
 {

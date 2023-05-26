@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Addressing.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)BasicSocket.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CompletionPort.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Context.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Intrinsics.ixx" />

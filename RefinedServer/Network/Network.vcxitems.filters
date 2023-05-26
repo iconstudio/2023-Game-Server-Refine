@@ -18,6 +18,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IoState.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Worker.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SocketABi.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)BasicSocket.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)Network.natvis" />
