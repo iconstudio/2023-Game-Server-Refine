@@ -13,9 +13,9 @@ import Net.Promise;
 export import Net.Socket.ABI;
 export import Net.Socket.Basic;
 
-export namespace net
+namespace net
 {
-	inline ioError CheckIO(const int& socket_fn_result) noexcept
+	export inline ioError CheckIO(const int& socket_fn_result) noexcept
 	{
 		if (debug::CheckError(socket_fn_result))
 		{
@@ -35,7 +35,7 @@ export namespace net
 		}
 	}
 
-	inline ioError CheckBool(const int& bool_fn_result) noexcept
+	export inline ioError CheckBool(const int& bool_fn_result) noexcept
 	{
 		if (0 == bool_fn_result)
 		{
@@ -55,88 +55,30 @@ export namespace net
 		}
 	}
 
-	class [[nodiscard]] Socket
+	export class [[nodiscard]] Socket : public BasicSocket
 	{
-		struct init_t {};
-
-		constexpr Socket(init_t) noexcept
-		{
-			optDebug.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::Debug, flag);
-			});
-
-			optReuseAddress.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::Recyclable, flag);
-			});
-
-			optDontRoute.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::DontRoute, flag);
-			});
-
-			optBroadcast.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::Broadcast, flag);
-			});
-
-			optUseLoopback.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::UseLoopback, flag);
-			});
-
-			optReuseAddress.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::Recyclable, flag);
-			});
-
-			optLinger.AddListener([this](const SoLinger& linger) {
-				SetOptionByValue(SocketOptions::Linger, linger);
-			});
-
-			optNoDelay.AddListener([this](const bool& flag) {
-				SetOption(SocketOptions::NoDelay, flag);
-			});
-
-			optUpdateContext.AddListener([this](Socket& other) {
-				SetOptionByHandle(SocketOptions::UseLoopback, other);
-			});
-		}
-
 	public:
 		constexpr Socket() noexcept
-			: Socket(init_t{})
-		{}
+			: BasicSocket()
+		{
+			InitializeOptions();
+		}
 
 		constexpr Socket(Socket&& other) noexcept
-			: Socket(init_t{})
+			: BasicSocket(static_cast<BasicSocket&&>(other))
 		{
-			myHandle = static_cast<::SOCKET&&>(other.myHandle);
-			myEndPoint = static_cast<EndPoint&&>(other.myEndPoint);
-			other.isOut = true;
+			InitializeOptions();
 		}
 
 		explicit constexpr Socket(const SOCKET& handle) noexcept
-			: isOut(false), myHandle(handle)
-			, myEndPoint()
+			: BasicSocket(handle)
 		{}
 
 		explicit constexpr Socket(SOCKET&& handle) noexcept
-			: isOut(false), myHandle(static_cast<SOCKET&&>(handle))
-			, myEndPoint()
+			: BasicSocket(static_cast<SOCKET&&>(handle))
 		{}
 
-		constexpr Socket& operator=(Socket&& other) noexcept
-		{
-			myHandle = static_cast<SOCKET&&>(other.myHandle);
-			other.isOut = true;
-
-			return *this;
-		}
-
-		~Socket() noexcept
-		{
-			if (!isOut && IsValid())
-			{
-				::closesocket(myHandle);
-				myHandle = abi::InvalidSocket;
-			}
-		}
+		~Socket() noexcept = default;
 
 		inline ioError Bind(const EndPoint& target) noexcept
 		{
@@ -214,52 +156,6 @@ export namespace net
 			return CheckIO(::WSASend(myHandle, util::addressof(buffer), 1UL, nullptr, flags, context, routine));
 		}
 
-		inline ioError SetOption(const SocketOptions& option, const bool& flag)
-		{
-			const int iflag = flag; // BOOL
-
-			return CheckIO(::setsockopt(myHandle, SOL_SOCKET
-				, static_cast<int>(option)
-				, reinterpret_cast<const char*>(&iflag), static_cast<int>(sizeof(iflag)))
-			);
-		}
-
-		inline ioError SetOptionByHandle(const SocketOptions& option, Socket& other) noexcept
-		{
-			return CheckIO(::setsockopt(myHandle, SOL_SOCKET
-				, static_cast<int>(option)
-				, reinterpret_cast<const char*>(&other.myHandle), static_cast<int>(sizeof(SOCKET)))
-			);
-		}
-
-		template<typename T>
-		inline ioError SetOptionByValue(const SocketOptions& option, const T& value)
-		{
-			return CheckIO(::setsockopt(myHandle, SOL_SOCKET
-				, static_cast<int>(option)
-				, reinterpret_cast<const char*>(&value), static_cast<int>(sizeof(T)))
-			);
-		}
-
-		/// <returns>SOCKET</returns>
-		[[nodiscard]]
-		constexpr unsigned long long Handle() const noexcept
-		{
-			return myHandle;
-		}
-
-		[[nodiscard]]
-		constexpr bool IsValid() const noexcept
-		{
-			return myHandle != abi::InvalidSocket;
-		}
-
-		[[nodiscard]]
-		constexpr bool IsValid() const volatile noexcept
-		{
-			return myHandle != abi::InvalidSocket;
-		}
-
 		[[nodiscard]]
 		static inline
 			Promise<Socket, int>
@@ -303,11 +199,8 @@ export namespace net
 		}
 
 		Socket(const Socket& other) = delete;
-		Socket(const volatile Socket& other) = delete;
 		Socket& operator=(const Socket& other) = delete;
-		Socket& operator=(const volatile Socket& other) = delete;
-		Socket& operator=(const Socket& other) volatile = delete;
-		Socket& operator=(const volatile Socket& other) volatile = delete;
+		Socket& operator=(Socket&& other) = default;
 
 		util::Option<bool> optDebug{ false };
 		util::Option<bool> optReuseAddress{ false };
@@ -321,20 +214,45 @@ export namespace net
 		util::Option<Socket&> optUpdateContext{};
 
 	private:
-		[[nodiscard]]
-		inline constexpr bool IsOut() const noexcept
+		constexpr void InitializeOptions() noexcept
 		{
-			return isOut;
+			optDebug.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Debug, flag);
+			});
+
+			optReuseAddress.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Recyclable, flag);
+			});
+
+			optDontRoute.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::DontRoute, flag);
+			});
+
+			optBroadcast.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Broadcast, flag);
+			});
+
+			optUseLoopback.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::UseLoopback, flag);
+			});
+
+			optReuseAddress.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::Recyclable, flag);
+			});
+
+			optLinger.AddListener([this](const SoLinger& linger) {
+				SetOptionByValue(SocketOptions::Linger, linger);
+			});
+
+			optNoDelay.AddListener([this](const bool& flag) {
+				SetOption(SocketOptions::NoDelay, flag);
+			});
+
+			optUpdateContext.AddListener([this](Socket& other) {
+				SetOptionByHandle(SocketOptions::UseLoopback, other);
+			});
 		}
 
-		[[nodiscard]]
-		inline constexpr bool IsOut() const volatile noexcept
-		{
-			return isOut;
-		}
-
-		volatile bool isOut{ false };
-		SOCKET myHandle{ abi::InvalidSocket };
 		EndPoint myEndPoint{};
 	};
 }

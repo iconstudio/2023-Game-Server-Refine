@@ -106,7 +106,7 @@ export namespace net
 			return ::listen(myHandle, backlog);
 		}
 
-		inline int Accept(const SOCKET& socket, void* const& buffer, Context& context, unsigned long& result_bytes)
+		inline int Accept(const BasicSocket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
 		{
 			return Accept(client, buffer
 				, util::addressof(context)
@@ -114,9 +114,9 @@ export namespace net
 			);
 		}
 
-		inline int Accept(const BasicSocket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
+		inline int Accept(const SOCKET& target, void* const& buffer, Context& context, unsigned long& result_bytes)
 		{
-			return Accept(client, buffer
+			return Accept(target, buffer
 				, util::addressof(context)
 				, util::addressof(result_bytes)
 			);
@@ -250,7 +250,7 @@ export namespace net
 		BasicSocket(const BasicSocket& other) = delete;
 		BasicSocket& operator=(const BasicSocket& other) = delete;
 
-	private:
+	protected:
 		[[nodiscard]]
 		inline constexpr bool IsOut() const noexcept
 		{
