@@ -139,17 +139,6 @@ void Framework::EndFailedAccept(core::User* const& newbie) noexcept
 	return userManager.EndFailedAccept(newbie);
 }
 
-Proxy Framework::BeginWelcome()
-{
-	return Proxy{};
-}
-
-void Framework::EndWelcome() noexcept
-{}
-
-void Framework::EndFailedWelcome() noexcept
-{}
-
 Proxy Framework::BeginDispose()
 {
 	return Proxy{};

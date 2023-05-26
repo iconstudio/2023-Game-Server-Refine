@@ -36,10 +36,6 @@ public:
 	void EndAccept(core::User* const& newbie) noexcept;
 	void EndFailedAccept(core::User* const& newbie) noexcept;
 
-	net::Proxy BeginWelcome();
-	void EndWelcome() noexcept;
-	void EndFailedWelcome() noexcept;
-
 	net::Proxy BeginDispose();
 	void EndDispose() noexcept;
 	void EndFailedDispose() noexcept;
