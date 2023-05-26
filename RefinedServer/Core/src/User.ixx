@@ -1,11 +1,13 @@
 export module Core.User;
 import Net.Socket;
+import Net.Context;
+import Net.Promise;
 import Core.User.Basic;
 export import Core.User.Identifier;
 
 export namespace core
 {
-	class [[nodiscard]] User
+	class User
 		: public BasicUser
 	{
 	protected:
@@ -18,6 +20,47 @@ export namespace core
 		{}
 
 		~User() noexcept = default;
+
+		inline net::Proxy Welcome() noexcept
+		{
+			return BeginWelcome().if_then([this]() noexcept {
+				// end immediately (sent welcome message just now)
+				EndWelcome();
+			}).or_else([this]() noexcept {
+				// end failure immediately
+				EndFailedWelcome();
+			});
+		}
+
+		net::Proxy BeginWelcome() noexcept
+		{
+			if (!IsTaken())
+			{
+				return net::io::failure;
+			}
+
+			if (!SetOperation(Operation::NONE, Operation::WELCOME))
+			{
+				return net::io::failure;
+			}
+
+			// immediately send welcome message
+			return net::io::success;
+		}
+
+		inline bool EndWelcome() noexcept
+		{
+			Clear();
+
+			return SetOperation(Operation::WELCOME, Operation::NONE);
+		}
+
+		void EndFailedWelcome() noexcept
+		{
+			Clear();
+
+			SetOperation(Operation::NONE);
+		}
 
 		void Cleanup() noexcept
 		{
