@@ -1,6 +1,8 @@
 module;
 #include <exception>
 #include <string_view>
+#include <algorithm>
+#include <ranges>
 
 module Core.Service.UserManager;
 import Utility;
@@ -79,9 +81,18 @@ void UserManager::Start() noexcept
 
 ioError UserManager::BeginAccept(const userid_t& start)
 {
-	auto test_socket = Socket::CreateTCP();
+	const size_t index = static_cast<size_t>(start - userid_t::begin);
 
-	return nameListener.Accept(test_socket.GetResult(), acceptBuffer, acceptContext, accceptResultSize);
+	return UserAt(index).transform(
+		[&](User* const& user) noexcept -> ioError {
+		return nameListener.Accept(user->mySocket
+			, acceptBuffer, accceptResultSize
+			, acceptContext);
+	}, [&start]() noexcept -> ioError {
+		util::Println("유저 {}을(를) 찾을 수 없습니다.", start);
+
+		return -1;
+	});
 }
 
 void UserManager::EndAccept() noexcept
