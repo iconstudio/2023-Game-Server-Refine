@@ -86,7 +86,7 @@ namespace net
 
 		inline ioError Bind(const EndPoint& target) noexcept
 		{
-			return CheckIO(::bind(myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()));
+			return CheckIO(BasicSocket::Bind(reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize()));
 		}
 
 		inline ioError Connect(const EndPoint& target) noexcept

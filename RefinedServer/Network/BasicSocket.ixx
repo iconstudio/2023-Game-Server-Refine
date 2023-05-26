@@ -48,28 +48,26 @@ export namespace net
 			}
 		}
 
-		inline int Bind(const SOCKADDR& target) noexcept
+		inline int Bind(const SOCKADDR& target, const int& size = sizeof(SOCKADDR)) noexcept
 		{
 			return ::bind(myHandle
-				, &target, sizeof(SOCKADDR));
+				, &target, size);
 		}
 
 		inline int Bind(const SOCKADDR_IN& target) noexcept
 		{
-			return ::bind(myHandle
-				, reinterpret_cast<const ::SOCKADDR*>(&target), sizeof(SOCKADDR_IN));
+			return Bind(reinterpret_cast<const SOCKADDR*>(&target), sizeof(SOCKADDR_IN));
 		}
 
-		inline int Bind(const SOCKADDR* const& target) noexcept
+		inline int Bind(const SOCKADDR* const& target, const int& size = sizeof(SOCKADDR)) noexcept
 		{
 			return ::bind(myHandle
-				, target, sizeof(SOCKADDR));
+				, target, size);
 		}
 
 		inline int Bind(const SOCKADDR_IN* const& target) noexcept
 		{
-			return ::bind(myHandle
-				, reinterpret_cast<const ::SOCKADDR*>(target), sizeof(SOCKADDR_IN));
+			return Bind(reinterpret_cast<const SOCKADDR*>(target), sizeof(SOCKADDR_IN));
 		}
 
 		inline int Connect(const SOCKADDR& address) noexcept
