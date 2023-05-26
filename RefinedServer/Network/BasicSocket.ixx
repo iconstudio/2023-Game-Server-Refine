@@ -104,32 +104,24 @@ export namespace net
 			return ::listen(myHandle, backlog);
 		}
 
-		inline int Accept(const BasicSocket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
-		{
-			return Accept(client, buffer
-				, util::addressof(context)
-				, util::addressof(result_bytes)
-			);
-		}
-
-		inline int Accept(const SOCKET& target, void* const& buffer, Context& context, unsigned long& result_bytes)
+		inline int Accept(const SOCKET& target, void* const& buffer, unsigned long& result_bytes, Context* const& context)
 		{
 			return Accept(target, buffer
-				, util::addressof(context)
 				, util::addressof(result_bytes)
+				, context
 			);
 		}
 
-		inline int Accept(const BasicSocket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
+		inline int Accept(const BasicSocket& client, void* const& buffer, unsigned long* result_bytes, Context* const& context)
 		{
 			return Accept(client.myHandle
 				, buffer
-				, context
 				, result_bytes
+				, context
 			);
 		}
 
-		inline int Accept(const SOCKET& target, void* const& buffer, Context* const& context, unsigned long* result_bytes)
+		inline int Accept(const SOCKET& target, void* const& buffer, unsigned long* result_bytes, Context* const& context)
 		{
 			return ::AcceptEx(myHandle, target
 				, buffer, 0UL

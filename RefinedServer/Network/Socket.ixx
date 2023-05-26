@@ -106,15 +106,22 @@ namespace net
 			return CheckIO(BasicSocket::Listen(backlog));
 		}
 
-		inline ioError Accept(const Socket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
+		inline ioError Accept(const Socket& client, void* const& buffer, unsigned long& result_bytes, Context& context)
 		{
-			return Accept(client, buffer, util::addressof(context), util::addressof(result_bytes));
+			return Accept(client, buffer, util::addressof(result_bytes), context);
 		}
 
-		inline ioError Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
+		inline ioError Accept(const Socket& client, void* const& buffer, unsigned long* const& result_bytes, Context& context)
 		{
 			return CheckBool(
-				BasicSocket::Accept(client.Handle(), buffer, context, result_bytes)
+				BasicSocket::Accept(client.Handle(), buffer, result_bytes, util::addressof(context))
+			);
+		}
+
+		inline ioError Accept(const Socket& client, void* const& buffer, unsigned long* const& result_bytes, Context* const& context)
+		{
+			return CheckBool(
+				BasicSocket::Accept(client.Handle(), buffer, result_bytes, context)
 			);
 		}
 
