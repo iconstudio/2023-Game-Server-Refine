@@ -129,14 +129,14 @@ ioError Framework::BeginAccept(const userid_t& start)
 	return userManager.BeginAccept(start);
 }
 
-void Framework::EndAccept() noexcept
+void Framework::EndAccept(core::User* const& newbie) noexcept
 {
-	userManager.EndAccept();
+	return userManager.EndAccept(newbie);
 }
 
-void Framework::EndFailedAccept() noexcept
+void Framework::EndFailedAccept(core::User* const& newbie) noexcept
 {
-	userManager.EndFailedAccept();
+	return userManager.EndFailedAccept(newbie);
 }
 
 Proxy Framework::BeginWelcome()

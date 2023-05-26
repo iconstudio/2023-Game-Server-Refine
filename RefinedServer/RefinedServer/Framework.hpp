@@ -33,8 +33,8 @@ public:
 	void UpdateOnce(const float& delta_time) noexcept;
 
 	net::ioError BeginAccept(const core::userid_t& start);
-	void EndAccept() noexcept;
-	void EndFailedAccept() noexcept;
+	void EndAccept(core::User* const& newbie) noexcept;
+	void EndFailedAccept(core::User* const& newbie) noexcept;
 
 	net::Proxy BeginWelcome();
 	void EndWelcome() noexcept;
