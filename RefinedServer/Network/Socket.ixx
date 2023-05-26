@@ -72,11 +72,15 @@ namespace net
 
 		explicit constexpr Socket(const SOCKET& handle) noexcept
 			: BasicSocket(handle)
-		{}
+		{
+			InitializeOptions();
+		}
 
 		explicit constexpr Socket(SOCKET&& handle) noexcept
 			: BasicSocket(static_cast<SOCKET&&>(handle))
-		{}
+		{
+			InitializeOptions();
+		}
 
 		~Socket() noexcept = default;
 

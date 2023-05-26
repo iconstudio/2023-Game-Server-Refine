@@ -19,7 +19,7 @@ export namespace net
 		constexpr BasicSocket(BasicSocket&& other) noexcept
 			: BasicSocket()
 		{
-			myHandle = static_cast<::SOCKET&&>(other.myHandle);
+			myHandle = static_cast<SOCKET&&>(other.myHandle);
 			other.isOut = true;
 		}
 
@@ -48,25 +48,25 @@ export namespace net
 			}
 		}
 
-		inline int Bind(const ::SOCKADDR& target) noexcept
+		inline int Bind(const SOCKADDR& target) noexcept
 		{
 			return ::bind(myHandle
 				, &target, sizeof(SOCKADDR));
 		}
 
-		inline int Bind(const ::SOCKADDR_IN& target) noexcept
+		inline int Bind(const SOCKADDR_IN& target) noexcept
 		{
 			return ::bind(myHandle
 				, reinterpret_cast<const ::SOCKADDR*>(&target), sizeof(SOCKADDR_IN));
 		}
 
-		inline int Bind(const ::SOCKADDR* const& target) noexcept
+		inline int Bind(const SOCKADDR* const& target) noexcept
 		{
 			return ::bind(myHandle
 				, target, sizeof(SOCKADDR));
 		}
 
-		inline int Bind(const ::SOCKADDR_IN* const& target) noexcept
+		inline int Bind(const SOCKADDR_IN* const& target) noexcept
 		{
 			return ::bind(myHandle
 				, reinterpret_cast<const ::SOCKADDR*>(target), sizeof(SOCKADDR_IN));
