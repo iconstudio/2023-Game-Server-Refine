@@ -10,6 +10,7 @@ import Net.Addressing;
 import Net.EndPoint;
 import Net.Context;
 import Net.Promise;
+export import Net.Socket.ABI;
 
 export namespace net
 {
