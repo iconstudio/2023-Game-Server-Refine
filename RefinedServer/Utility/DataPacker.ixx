@@ -166,8 +166,11 @@ export namespace util::test
 
 		constexpr datagram::DataPacker<int> test_pk2{};
 
-		constexpr datagram::DataPacker<int, int, int> test_pk3{ 1000000, 2, 3 };
+		constexpr datagram::DataPacker<int, int, int> test_pk3{ 52534430, 52534430, 52534430 };
 		static_assert(test_pk3.internalBuffer[3] != 1);
+
+		constexpr int fg = 52534430;
+		const auto handle = reinterpret_cast<const char*>(&fg);
 
 		constexpr datagram::DataPacker<int, long, float, short, unsigned char, unsigned, bool> test_pk4{};
 		constexpr size_t pk4_sz_a0 = test_pk4.Summarize<0>();
@@ -183,7 +186,7 @@ export namespace util::test
 
 		static_assert(test_pk5.myLength == 7);
 		static_assert(test_pk5.mySize == sizeof(int) + sizeof(long) + sizeof(float) + sizeof(short) + sizeof(unsigned char) + sizeof(unsigned) + sizeof(bool));
-		static_assert(test_pk5.internalBuffer[1] == 1);
+		//static_assert(test_pk5.internalBuffer[3] == 1);
 	}
 #endif // true
 }

@@ -3,13 +3,14 @@
 #include <utility>
 #include <bit>
 
+import Utility.Constraints;
 import Utility.Array;
 
 namespace util
 {
 	static inline constexpr unsigned char Byte = 0XFFU;
 
-	template<typename T>
+	template<basic_arithmeticals T>
 	[[nodiscard]]
 	constexpr char RShift(const T& value, const size_t& times) noexcept
 	{
@@ -65,6 +66,19 @@ namespace util::serialization
 	}
 
 	/// <summary>
+	/// 부호 없는 16비트 정수를 직렬화합니다.
+	/// </summary>
+	constexpr Array<char, 2> Serialize(unsigned short&& value) noexcept
+	{
+		const unsigned longer = static_cast<unsigned>(value);
+
+		return Array<char, 2>
+		{
+			RShift(longer, 0), RShift(longer, 1)
+		};
+	}
+
+	/// <summary>
 	/// 16비트 정수를 직렬화합니다.
 	/// </summary>
 	constexpr Array<char, 2> Serialize(const short& value) noexcept
@@ -105,6 +119,22 @@ namespace util::serialization
 	}
 
 	/// <summary>
+	/// 부호 없는 32비트 정수를 직렬화합니다.
+	/// </summary>
+	constexpr Array<char, 4> Serialize(unsigned int&& value) noexcept
+	{
+		const unsigned long long longer = static_cast<unsigned long long>(value);
+
+		return Array<char, 4>
+		{
+			RShift(longer, 0),
+			RShift(longer, 1),
+			RShift(longer, 2),
+			RShift(longer, 3),
+		};
+	}
+
+	/// <summary>
 	/// 32비트 정수를 직렬화합니다.
 	/// </summary>
 	constexpr Array<char, 4> Serialize(const int& value) noexcept
@@ -116,6 +146,22 @@ namespace util::serialization
 	/// 부호 없는 32비트 정수를 직렬화합니다.
 	/// </summary>
 	constexpr Array<char, 4> Serialize(const unsigned long& value) noexcept
+	{
+		const unsigned long long longer = static_cast<unsigned long long>(value);
+
+		return Array<char, 4>
+		{
+			RShift(longer, 0),
+			RShift(longer, 1),
+			RShift(longer, 2),
+			RShift(longer, 3),
+		};
+	}
+
+	/// <summary>
+	/// 부호 없는 32비트 정수를 직렬화합니다.
+	/// </summary>
+	constexpr Array<char, 4> Serialize(unsigned long&& value) noexcept
 	{
 		const unsigned long long longer = static_cast<unsigned long long>(value);
 
