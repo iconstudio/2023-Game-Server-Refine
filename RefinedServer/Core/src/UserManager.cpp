@@ -21,6 +21,7 @@ UserManager::UserManager(Socket& listener) noexcept
 	: Singleton(this)
 	, nameListener(listener)
 	, everySession(), everyUser(), everyNPCs()
+	, lastUserID(userid_t::begin)
 	, acceptContext(Operation::ACCEPT), acceptBuffer(), accceptResultSize(0)
 {}
 
@@ -95,11 +96,24 @@ ioError UserManager::BeginAccept(const userid_t& start)
 	});
 }
 
-void UserManager::EndAccept() noexcept
-{}
+void UserManager::EndAccept(core::User* const& newbie) noexcept
+{
+	if (!newbie->IsTaken()) [[unlikely]]
+	{
+		return EndFailedAccept(newbie);
+	};
 
-void UserManager::EndFailedAccept() noexcept
-{}
+	util::Println("새로운 유저 {}이(가) 접속했습니다.", newbie->MyID());
+
+	lastUserID = newbie->MyID() + 1;
+}
+
+void UserManager::EndFailedAccept(core::User* const& newbie) noexcept
+{
+	util::Println("새로운 유저 {}에 문제가 있어 수용할 수 없습니다.", newbie->MyID());
+
+	newbie->Cleanup();
+}
 
 util::Monad<core::BasicUser*> UserManager::SessionAt(const size_t& index) noexcept
 {

@@ -26,8 +26,8 @@ export namespace core::service
 		void Start() noexcept;
 
 		net::ioError BeginAccept(const userid_t& start);
-		void EndAccept() noexcept;
-		void EndFailedAccept() noexcept;
+		void EndAccept(core::User* const& newbie) noexcept;
+		void EndFailedAccept(core::User* const& newbie) noexcept;
 
 		util::Monad<BasicUser*> SessionAt(const size_t& index) noexcept;
 		util::Monad<User*> UserAt(const size_t& index) noexcept;
@@ -44,6 +44,7 @@ export namespace core::service
 		util::Array<User*, maxUsers> everyUser;
 		util::Array<BasicUser*, maxNPCs> everyNPCs;
 
+		core::userid_t lastUserID;
 		net::Context acceptContext;
 		char acceptBuffer[64];
 		unsigned long accceptResultSize;
