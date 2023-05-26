@@ -23,9 +23,9 @@ export extern "C++" namespace net
 		{}
 
 		template<typename Fn>
-			requires (util::invocables<Fn, Context*, unsigned long long, unsigned long>)
+			requires (util::invocables<Fn, Context*, unsigned long long, unsigned long, bool>)
 		inline void Start(Fn&& fn, CompletionPort& port)
-			noexcept(noexcept(std::forward<Fn>(fn)(std::declval<Context*>(), std::declval<unsigned long long>(), std::declval<unsigned long>())))
+			noexcept(noexcept(std::forward<Fn>(fn)(std::declval<Context*>(), std::declval<unsigned long long>(), std::declval<unsigned long>(), std::declval<bool>())))
 		{
 			while (true)
 			{
@@ -37,11 +37,7 @@ export extern "C++" namespace net
 				};
 
 				// Await infinitely
-				const auto success = port.Wait(localHandle, std::addressof(localKey), std::addressof(localBytes));
-
-				if (!success.IsSuccess()) [[unlikely]] {
-					return;
-				};
+				const auto result = port.Wait(localHandle, std::addressof(localKey), std::addressof(localBytes));
 
 				if (nullptr == localHandle) [[unlikely]] {
 					return;
@@ -52,7 +48,7 @@ export extern "C++" namespace net
 					return;
 				};
 
-				std::forward<Fn>(fn)(context, localKey, localBytes);
+				std::forward<Fn>(fn)(context, localKey, localBytes, result.IsSuccess());
 			}
 		}
 
