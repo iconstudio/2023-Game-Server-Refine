@@ -91,19 +91,19 @@ namespace net
 
 		inline ioError Connect(const EndPoint& target) noexcept
 		{
-			return CheckIO(::connect(myHandle, reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize())).else_then([&]() {
+			return CheckIO(BasicSocket::Connect(reinterpret_cast<const ::SOCKADDR*>(target.GetAddress()), target.GetiSize())).else_then([&]() {
 				myEndPoint = target;
 			});
 		}
 
 		inline ioError Connect(const ::SOCKADDR* const& address, const int& addrlen) const noexcept
 		{
-			return CheckIO(::connect(myHandle, address, addrlen));
+			return CheckIO(BasicSocket::Connect(address, addrlen));
 		}
 
 		inline ioError Listen(const int& backlog = constants::LISTEN_MAX) noexcept
 		{
-			return CheckIO(::listen(myHandle, backlog));
+			return CheckIO(BasicSocket::Listen(backlog));
 		}
 
 		inline ioError Accept(const Socket& client, void* const& buffer, Context& context, unsigned long& result_bytes)
@@ -114,9 +114,7 @@ namespace net
 		inline ioError Accept(const Socket& client, void* const& buffer, Context* const& context, unsigned long* result_bytes)
 		{
 			return CheckBool(
-				::AcceptEx(myHandle, client.myHandle, buffer, 0UL
-				, abi::DEFAULT_ACCEPT_SIZE, abi::DEFAULT_ACCEPT_SIZE, result_bytes
-				, context)
+				BasicSocket::Accept(client.myHandle, buffer, context, result_bytes)
 			);
 		}
 
@@ -127,7 +125,7 @@ namespace net
 				return -1;
 			}
 
-			return CheckIO(::WSARecv(myHandle, util::addressof(buffer), 1UL, bytes, &flags, context, nullptr));
+			return CheckIO(BasicSocket::Recv(buffer, context, bytes, flags));
 		}
 
 		inline ioError Send(WSABUF buffer, Context* const& context, unsigned long* bytes = nullptr, const unsigned long& flags = 0) noexcept
@@ -137,7 +135,7 @@ namespace net
 				return -1;
 			}
 
-			return CheckIO(::WSASend(myHandle, util::addressof(buffer), 1UL, bytes, flags, context, nullptr));
+			return CheckIO(BasicSocket::Send(buffer, context, bytes, flags));
 		}
 
 		inline ioError BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long flags = 0) noexcept
