@@ -16,6 +16,7 @@ import Core.User.Identifier;
 
 using namespace ::net;
 using namespace ::core::service;
+using namespace ::core;
 
 UserManager::UserManager(Socket& listener) noexcept
 	: Singleton(this)
@@ -96,7 +97,7 @@ ioError UserManager::BeginAccept(const userid_t& start)
 	});
 }
 
-void UserManager::EndAccept(core::User* const& newbie) noexcept
+void UserManager::EndAccept(User* const& newbie) noexcept
 {
 	if (!newbie->IsTaken()) [[unlikely]]
 	{
@@ -108,14 +109,14 @@ void UserManager::EndAccept(core::User* const& newbie) noexcept
 	lastUserID = newbie->MyID() + 1;
 }
 
-void UserManager::EndFailedAccept(core::User* const& newbie) noexcept
+void UserManager::EndFailedAccept(User* const& newbie) noexcept
 {
 	util::Println("새로운 유저 {}에 문제가 있어 수용할 수 없습니다.", newbie->MyID());
 
 	newbie->Cleanup();
 }
 
-util::Monad<core::BasicUser*> UserManager::SessionAt(const size_t& index) noexcept
+util::Monad<BasicUser*> UserManager::SessionAt(const size_t& index) noexcept
 {
 	if (index < maxSessions)
 		return everySession[index];
@@ -123,7 +124,7 @@ util::Monad<core::BasicUser*> UserManager::SessionAt(const size_t& index) noexce
 		return util::nullopt;
 }
 
-util::Monad<core::User*> UserManager::UserAt(const size_t& index) noexcept
+util::Monad<User*> UserManager::UserAt(const size_t& index) noexcept
 {
 	if (index < maxUsers)
 		return everyUser[index];
@@ -131,7 +132,7 @@ util::Monad<core::User*> UserManager::UserAt(const size_t& index) noexcept
 		return util::nullopt;
 }
 
-util::Monad<core::BasicUser*> UserManager::NpcAt(const size_t& index) noexcept
+util::Monad<BasicUser*> UserManager::NpcAt(const size_t& index) noexcept
 {
 	if (index < maxNPCs)
 		return everyNPCs[index];
@@ -139,17 +140,17 @@ util::Monad<core::BasicUser*> UserManager::NpcAt(const size_t& index) noexcept
 		return util::nullopt;
 }
 
-util::Monad<core::BasicUser*> UserManager::SessionOf(const userid_t& id) noexcept
+util::Monad<BasicUser*> UserManager::SessionOf(const userid_t& id) noexcept
 {
 	return SessionAt(CastID(id));
 }
 
-util::Monad<core::User*> UserManager::UserOf(const userid_t& id) noexcept
+util::Monad<User*> UserManager::UserOf(const userid_t& id) noexcept
 {
 	return UserAt(CastID(id));
 }
 
-util::Monad<core::BasicUser*> UserManager::NpcOf(const userid_t& id) noexcept
+util::Monad<BasicUser*> UserManager::NpcOf(const userid_t& id) noexcept
 {
 	return NpcAt(CastID(id));
 }
