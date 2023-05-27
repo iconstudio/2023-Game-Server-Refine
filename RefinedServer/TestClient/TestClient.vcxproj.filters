@@ -24,7 +24,7 @@
     <ClInclude Include="pch.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Framewokr.hpp">
+    <ClInclude Include="Framework.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Framewokr.cpp">
+    <ClCompile Include="Framework.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -150,13 +150,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Framewokr.hpp" />
+    <ClInclude Include="Framework.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="System.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Framewokr.cpp" />
+    <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.hpp</PrecompiledHeaderFile>
