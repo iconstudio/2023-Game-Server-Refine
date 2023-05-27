@@ -1,6 +1,6 @@
-export module PipelineObject;
+export module System.PipelineObject;
 
-export extern "C++"
+export extern "C++" namespace sys
 {
 	template<typename T>
 	concept PseudoPipelineObjs = requires(T object)

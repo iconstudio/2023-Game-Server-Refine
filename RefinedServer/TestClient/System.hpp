@@ -1,12 +1,12 @@
 #pragma once
-import PipelineObject;
 import Net;
 import Net.Socket;
 import Net.EndPoint;
 import Net.Promise;
-import Camera;
+import System.PipelineObject;
+import Game.Camera;
 
-class System : PipelineObject
+class System : sys::PipelineObject
 {
 public:
 	System() noexcept;
@@ -21,5 +21,5 @@ public:
 	net::EndPoint myAddress;
 	net::EndPoint serverAddress;
 
-	Camera myCamera;
+	game::Camera myCamera;
 };
