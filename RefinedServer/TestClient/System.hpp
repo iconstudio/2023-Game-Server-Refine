@@ -1,4 +1,5 @@
 #pragma once
+import PipelineObject;
 import Net;
 import Net.Socket;
 import Net.EndPoint;
@@ -6,19 +7,26 @@ import Net.Promise;
 
 // @brief Class representing a camera orbiting around its target.
 // @ingroup gl_utils
-class Camera
+class Camera : PipelineObject
 {
 public:
 	Camera() noexcept
 	{}
 
-	~Camera() noexcept
+	virtual ~Camera() noexcept
 	{}
 
-	void Awake();
-	void Start();
-	void Update(const float& delta_time);
-	void LateUpdate(const float& delta_time);
+	void Awake()
+	{}
+
+	void Start()
+	{}
+
+	void Update(const float& delta_time)
+	{}
+
+	void LateUpdate(const float& delta_time)
+	{}
 
 	void SetCameraTarget(const glm::vec3& target);
 	void SetCameraDistance(const float& distance);
@@ -34,7 +42,7 @@ public:
 	glm::mat4 getViewMatrix() const;
 };
 
-class System
+class System : PipelineObject
 {
 public:
 	System() noexcept;
