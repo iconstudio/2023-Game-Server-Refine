@@ -180,6 +180,7 @@
     </ClCompile>
     <ClCompile Include="PipelineObject.ixx" />
     <ClCompile Include="Scene.ixx" />
+    <ClCompile Include="SceneManagement.ixx" />
     <ClCompile Include="System.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.hpp</PrecompiledHeaderFile>
