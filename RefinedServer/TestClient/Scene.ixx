@@ -1,18 +1,14 @@
 module;
 #include "pch.hpp"
 #include <memory>
-#include <string>
-#include <string_view>
 
 export module Game.Scene;
 export import Game.Camera;
+export import Game.Scene.Basis;
 import Utility.Singleton;
-import System.PipelineObject;
 
 export extern "C++" namespace game
 {
-	class SceneBasis;
-
 	template<typename S>
 	class Scene;
 
@@ -23,41 +19,6 @@ export extern "C++" namespace game
 		using wrapper = Scene<type>;
 		using singletone = util::Singleton<type>;
 		using pointer = std::shared_ptr<SceneBasis>;
-	};
-
-	class SceneBasis
-		: public sys::PipelineObject
-		, public std::enable_shared_from_this<SceneBasis>
-	{
-	public:
-		constexpr SceneBasis() noexcept = default;
-
-		constexpr SceneBasis(std::string_view name) noexcept
-			: PipelineObject()
-			, std::enable_shared_from_this<SceneBasis>()
-			, myName(name)
-		{}
-
-		~SceneBasis() noexcept
-		{}
-
-		constexpr const std::string& GetName() const& noexcept
-		{
-			return myName;
-		}
-
-		constexpr std::string&& GetName() && noexcept
-		{
-			return static_cast<std::string&&>(myName);
-		}
-
-		SceneBasis(const SceneBasis& other) = delete;
-		SceneBasis(SceneBasis&& other) = delete;
-		SceneBasis& operator=(const SceneBasis& other) = delete;
-		SceneBasis& operator=(SceneBasis&& other) = delete;
-
-	private:
-		std::string myName;
 	};
 
 	template<typename S>

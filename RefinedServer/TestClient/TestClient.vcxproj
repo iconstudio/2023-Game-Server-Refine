@@ -84,6 +84,7 @@
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableModules>true</EnableModules>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,6 +104,7 @@
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableModules>true</EnableModules>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,6 +124,7 @@
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableModules>true</EnableModules>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +144,7 @@
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableModules>true</EnableModules>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -180,6 +184,7 @@
     </ClCompile>
     <ClCompile Include="PipelineObject.ixx" />
     <ClCompile Include="Scene.ixx" />
+    <ClCompile Include="SceneBasis.ixx" />
     <ClCompile Include="SceneManagement.ixx" />
     <ClCompile Include="MainScene.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
