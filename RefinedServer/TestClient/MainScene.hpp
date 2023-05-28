@@ -5,8 +5,10 @@ import Net.EndPoint;
 import Net.Promise;
 import System.PipelineObject;
 import Game.Camera;
+import Game.Scene;
 
-class MainScene : sys::PipelineObject
+class MainScene final
+	: public game::Scene<MainScene>
 {
 public:
 	MainScene() noexcept;
