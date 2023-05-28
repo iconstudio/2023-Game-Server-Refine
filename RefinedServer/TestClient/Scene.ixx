@@ -7,18 +7,23 @@ export import Game.Camera;
 import Utility.Singleton;
 import System.PipelineObject;
 
-export extern "C" namespace game
+export extern "C++" namespace game
 {
+	template<typename S>
 	class Scene
-		: public util::Singleton<Scene>
+		: public util::Singleton<S>
 		, public sys::PipelineObject
-		, public std::enable_shared_from_this<Scene>
+		, public std::enable_shared_from_this<Scene<S>>
 	{
 	public:
-		constexpr Scene() noexcept
-			: Singleton(this)
+		using type = Scene<S>;
+		using scene_type = S;
+		using ptr_type = std::shared_ptr<type>;
+
+		constexpr Scene(S *const& scene) noexcept
+			: util::Singleton(scene)
 			, PipelineObject()
-			, enable_shared_from_this()
+			, std::enable_shared_from_this()
 		{}
 
 		virtual constexpr ~Scene() noexcept = default;
