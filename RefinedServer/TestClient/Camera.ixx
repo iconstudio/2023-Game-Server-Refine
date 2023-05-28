@@ -4,7 +4,7 @@ module;
 export module Game.Camera;
 import System.PipelineObject;
 
-export extern "C++" namespace game
+export extern "C" namespace game
 {
 	// @brief Class representing a camera orbiting around its target.
 	// @ingroup gl_utils
