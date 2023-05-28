@@ -18,6 +18,7 @@ export namespace game
 	class SceneManager : public util::Singleton<SceneManager>
 	{
 	public:
+			scenesMap[scene->GetName()] = scene;
 		static std::vector<SceneHandle> everyScene;
 		static std::unordered_map<std::string, SceneHandle> scenesMap;
 	};

@@ -41,9 +41,14 @@ export extern "C++" namespace game
 		~SceneBasis() noexcept
 		{}
 
-		constexpr std::string_view GetName() const noexcept
+		constexpr const std::string& GetName() const& noexcept
 		{
 			return myName;
+		}
+
+		constexpr std::string&& GetName() && noexcept
+		{
+			return static_cast<std::string&&>(myName);
 		}
 
 		SceneBasis(const SceneBasis& other) = delete;
