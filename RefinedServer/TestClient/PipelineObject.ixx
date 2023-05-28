@@ -14,10 +14,10 @@ export extern "C++" namespace sys
 	class [[nodiscard]] PipelineObject
 	{
 	public:
-		PipelineObject() noexcept
+		constexpr PipelineObject() noexcept
 		{}
 
-		virtual ~PipelineObject() noexcept
+		virtual constexpr ~PipelineObject() noexcept
 		{}
 
 		virtual void Awake() = 0;
@@ -25,11 +25,11 @@ export extern "C++" namespace sys
 		virtual void Update(const float& delta_time) = 0;
 		virtual void LateUpdate(const float& delta_time) = 0;
 
-		bool operator==(const PipelineObject& other) const noexcept = default;
+		constexpr bool operator==(const PipelineObject& other) const noexcept = default;
 
 		PipelineObject(const PipelineObject& other) noexcept = delete;
-		PipelineObject(PipelineObject&& other) noexcept = default;
+		constexpr PipelineObject(PipelineObject&& other) noexcept = default;
 		PipelineObject& operator=(const PipelineObject& other) noexcept = delete;
-		PipelineObject& operator=(PipelineObject&& other) noexcept = default;
+		virtual constexpr PipelineObject& operator=(PipelineObject&& other) noexcept = default;
 	};
 }
