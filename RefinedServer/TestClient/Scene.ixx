@@ -1,6 +1,8 @@
 module;
 #include "pch.hpp"
 #include <memory>
+#include <string>
+#include <string_view>
 
 export module Game.Scene;
 export import Game.Camera;
@@ -9,6 +11,8 @@ import System.PipelineObject;
 
 export extern "C++" namespace game
 {
+	class SceneBasis;
+
 	template<typename S>
 	class Scene;
 
@@ -18,14 +22,43 @@ export extern "C++" namespace game
 		using type = S;
 		using wrapper = Scene<type>;
 		using singletone = util::Singleton<type>;
-		using pointer = std::shared_ptr<wrapper>;
+		using pointer = std::shared_ptr<SceneBasis>;
+	};
+
+	class SceneBasis
+		: public sys::PipelineObject
+		, public std::enable_shared_from_this<SceneBasis>
+	{
+	public:
+		constexpr SceneBasis() noexcept = default;
+
+		constexpr SceneBasis(std::string_view name) noexcept
+			: PipelineObject()
+			, std::enable_shared_from_this<SceneBasis>()
+			, myName(name)
+		{}
+
+		~SceneBasis() noexcept
+		{}
+
+		constexpr std::string_view GetName() const noexcept
+		{
+			return myName;
+		}
+
+		SceneBasis(const SceneBasis& other) = delete;
+		SceneBasis(SceneBasis&& other) = delete;
+		SceneBasis& operator=(const SceneBasis& other) = delete;
+		SceneBasis& operator=(SceneBasis&& other) = delete;
+
+	private:
+		std::string myName;
 	};
 
 	template<typename S>
 	class Scene
-		: public SceneTraits<S>::singletone
-		, public sys::PipelineObject
-		, public std::enable_shared_from_this<Scene<S>>
+		: public SceneBasis
+		, public SceneTraits<S>::singletone
 	{
 	public:
 		using scene_type = SceneTraits<S>::type;
@@ -34,24 +67,19 @@ export extern "C++" namespace game
 		using handle_type = SceneTraits<S>::pointer;
 
 		constexpr Scene(S *const& scene) noexcept
-			: singletone(scene)
-			, PipelineObject()
-			, std::enable_shared_from_this<wrapper_type>()
+			: SceneBasis()
+			, singletone(scene)
 		{}
 
-		virtual constexpr ~Scene() noexcept = default;
-
-		virtual void Awake() override
+		constexpr Scene(S* const& scene, std::string_view name) noexcept
+			: SceneBasis(name)
+			, singletone(scene)
 		{}
 
-		virtual void Start() override
-		{}
-
-		virtual void Update(const float& delta_time) override
-		{}
-
-		virtual void LateUpdate(const float& delta_time) override
-		{}
+		~Scene() noexcept
+		{
+			SceneBasis::~SceneBasis();
+		}
 
 		Scene(const Scene& other) = delete;
 		Scene(Scene&& other) = delete;
