@@ -13,7 +13,8 @@ using namespace std;
 
 export namespace game
 {
-	using SceneHandle = std::shared_ptr<Scene>;
+	template<typename S>
+	using SceneHandle = std::shared_ptr<Scene<S>>;
 
 	class SceneManager : public util::Singleton<SceneManager>
 	{
