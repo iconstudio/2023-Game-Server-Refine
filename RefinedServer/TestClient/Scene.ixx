@@ -10,20 +10,33 @@ import System.PipelineObject;
 export extern "C++" namespace game
 {
 	template<typename S>
+	class Scene;
+
+	template<typename S>
+	struct SceneTraits
+	{
+		using type = S;
+		using wrapper = Scene<type>;
+		using singletone = util::Singleton<type>;
+		using pointer = std::shared_ptr<wrapper>;
+	};
+
+	template<typename S>
 	class Scene
-		: public util::Singleton<S>
+		: public SceneTraits<S>::singletone
 		, public sys::PipelineObject
 		, public std::enable_shared_from_this<Scene<S>>
 	{
 	public:
-		using type = Scene<S>;
-		using scene_type = S;
-		using ptr_type = std::shared_ptr<type>;
+		using scene_type = SceneTraits<S>::type;
+		using wrapper_type = SceneTraits<S>::wrapper;
+		using singletone = SceneTraits<S>::singletone;
+		using handle_type = SceneTraits<S>::pointer;
 
 		constexpr Scene(S *const& scene) noexcept
-			: util::Singleton(scene)
+			: singletone(scene)
 			, PipelineObject()
-			, std::enable_shared_from_this()
+			, std::enable_shared_from_this<wrapper_type>()
 		{}
 
 		virtual constexpr ~Scene() noexcept = default;

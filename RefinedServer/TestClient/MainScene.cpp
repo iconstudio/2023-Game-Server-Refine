@@ -3,14 +3,6 @@
 
 import Utility;
 
-MainScene::MainScene() noexcept
-	: mySocket()
-	, myAddress(), myCamera()
-{}
-
-MainScene::~MainScene() noexcept
-{}
-
 void MainScene::Awake()
 {
 	myAddress = net::EndPoint::CreateStaticTCP(net::IPv4, 54000);

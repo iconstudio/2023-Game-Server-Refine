@@ -11,8 +11,14 @@ class MainScene final
 	: public game::Scene<MainScene>
 {
 public:
-	MainScene() noexcept;
-	~MainScene() noexcept;
+	MainScene() noexcept
+		: Scene(this)
+		, mySocket()
+		, myAddress(), myCamera()
+	{}
+
+	~MainScene() noexcept
+	{}
 
 	void Awake();
 	void Start();
