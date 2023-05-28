@@ -8,7 +8,7 @@ export extern "C++" namespace game
 {
 	// @brief Class representing a camera orbiting around its target.
 	// @ingroup gl_utils
-	class Camera : sys::PipelineObject
+	class Camera : public sys::PipelineObject
 	{
 	public:
 		Camera() noexcept

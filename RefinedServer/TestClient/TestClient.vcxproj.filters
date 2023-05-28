@@ -47,6 +47,9 @@
     <ClCompile Include="Camera.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Scene.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
