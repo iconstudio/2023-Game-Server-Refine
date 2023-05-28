@@ -6,11 +6,11 @@ import Net.Promise;
 import System.PipelineObject;
 import Game.Camera;
 
-class System : sys::PipelineObject
+class MainScene : sys::PipelineObject
 {
 public:
-	System() noexcept;
-	~System() noexcept;
+	MainScene() noexcept;
+	~MainScene() noexcept;
 
 	void Awake();
 	void Start();

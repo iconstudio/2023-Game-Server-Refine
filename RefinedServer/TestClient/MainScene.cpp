@@ -1,17 +1,17 @@
 #include "pch.hpp"
-#include "System.hpp"
+#include "MainScene.hpp"
 
 import Utility;
 
-System::System() noexcept
+MainScene::MainScene() noexcept
 	: mySocket()
 	, myAddress(), myCamera()
 {}
 
-System::~System() noexcept
+MainScene::~MainScene() noexcept
 {}
 
-void System::Awake()
+void MainScene::Awake()
 {
 	myAddress = net::EndPoint::CreateStaticTCP(net::IPv4, 54000);
 
@@ -20,13 +20,13 @@ void System::Awake()
 	});
 }
 
-void System::Start()
+void MainScene::Start()
 {
 
 }
 
-void System::Update(const float& delta_time)
+void MainScene::Update(const float& delta_time)
 {}
 
-void System::LateUpdate(const float& delta_time)
+void MainScene::LateUpdate(const float& delta_time)
 {}

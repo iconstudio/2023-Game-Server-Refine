@@ -18,7 +18,7 @@
     <ClInclude Include="Main.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="System.hpp">
+    <ClInclude Include="MainScene.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="pch.hpp">
@@ -32,7 +32,7 @@
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="System.cpp">
+    <ClCompile Include="MainScene.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
