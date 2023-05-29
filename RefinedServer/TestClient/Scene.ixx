@@ -31,15 +31,14 @@ export extern "C++" namespace game
 		using singletone = SceneTraits<S>::singletone;
 
 		constexpr Scene(S *const& scene) noexcept
-			: SceneBasis()
-			, pipeline()
-			, singletone(scene)
+			: Scene(scene, "Scene")
 		{}
 
 		constexpr Scene(S* const& scene, std::string_view name) noexcept
 			: SceneBasis(name)
 			, pipeline()
 			, singletone(scene)
+			, mainCamera(nullptr)
 		{}
 
 		~Scene() noexcept
@@ -58,13 +57,13 @@ export extern "C++" namespace game
 		[[nodiscard]]
 		constexpr S* Cast() noexcept
 		{
-			return static_cast<S*>(this);
+			return pipeline::Cast();
 		}
 
 		[[nodiscard]]
 		constexpr const S* Cast() const noexcept
 		{
-			return static_cast<const S*>(this);
+			return pipeline::Cast();
 		}
 	};
 }
