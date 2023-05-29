@@ -14,7 +14,8 @@ export import Game.GameObject;
 export extern "C++" namespace game
 {
 	class Scene
-		: public util::Named
+		: public sys::PipelineModel
+		, public util::Named
 		, public util::Indexer<Scene>
 	{
 	public:
@@ -28,21 +29,6 @@ export extern "C++" namespace game
 		{
 			gameObjects.reserve(10ULL);
 		}
-
-		virtual void Awake()
-		{}
-
-		virtual void Start() noexcept
-		{}
-
-		virtual void Update(const float& delta_time)
-		{}
-
-		virtual void LateUpdate(const float& delta_time)
-		{}
-
-		virtual void Destroy()
-		{}
 
 		Scene(const Scene& other) = delete;
 		Scene(Scene&& other) = delete;
