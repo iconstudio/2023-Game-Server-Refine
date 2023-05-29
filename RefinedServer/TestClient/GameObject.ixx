@@ -61,6 +61,9 @@ export namespace game
 		constexpr GameObject() noexcept = default;
 		constexpr ~GameObject() noexcept = default;
 
+		virtual constexpr void Reset() noexcept
+		{}
+
 		constexpr void SetChild(std::unique_ptr<GameObject>&& child) noexcept
 		{
 			myChild = std::move(child);
