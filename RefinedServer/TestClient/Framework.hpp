@@ -19,8 +19,23 @@ public:
 
 	}
 
-	void Awake();
-	void Start();
-	void Update();
-	void UpdateOnce(const float& delta_time);
+	void Awake()
+	{
+
+	}
+
+	void Start()
+	{
+
+	}
+
+	void Update()
+	{
+
+	}
+
+	void UpdateOnce(const float& delta_time)
+	{
+
+	}
 };
