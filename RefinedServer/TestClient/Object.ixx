@@ -20,6 +20,9 @@ export namespace game
 
 		[[nodiscard]]
 		constexpr bool operator==(const Object& other) const noexcept = default;
+
+		Object(const Object& other) = delete;
+		Object& operator=(const Object& other) = delete;
 	};
 }
 
