@@ -14,7 +14,6 @@ void MainScene::Awake()
 
 void MainScene::Start()
 {
-
 }
 
 void MainScene::Update(const float& delta_time)

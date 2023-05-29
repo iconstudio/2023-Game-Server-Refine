@@ -38,4 +38,11 @@ public:
 	{
 
 	}
+
+	void LateUpdateOnce(const float& delta_time)
+	{
+
+	}
+
+	std::vector<game::SceneBasis*> everyScene;
 };

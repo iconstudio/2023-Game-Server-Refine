@@ -5,11 +5,11 @@ import Net.EndPoint;
 import Net.Promise;
 import Game.Scene;
 
-class MainScene final : public game::Scene<MainScene>
+class MainScene final : public game::Scene
 {
 public:
 	MainScene() noexcept
-		: Scene<MainScene>(this)
+		: Scene(this)
 		, mySocket()
 		, myAddress()
 	{}

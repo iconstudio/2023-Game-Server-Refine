@@ -13,72 +13,49 @@ export import Game.GameObject;
 export extern "C++" namespace game
 {
 	template<typename S>
-	class Scene;
-
-	template<typename S>
 	struct SceneTraits
 	{
 		using type = S;
-		using wrapper = Scene<type>;
 		using pipeline = sys::PipelineObject<type>;
 		using singletone = util::Singleton<type>;
 	};
 
-	template<typename S>
-	class Scene
-		: public SceneBasis
-		, public SceneTraits<S>::pipeline
-		, public SceneTraits<S>::singletone
+	class Scene : public SceneBasis
 	{
 	public:
-		using scene_type = SceneTraits<S>::type;
-		using wrapper_type = SceneTraits<S>::wrapper;
-		using pipeline = SceneTraits<S>::pipeline;
-		using singletone = SceneTraits<S>::singletone;
-
-		constexpr Scene(S* const& scene) noexcept
-			: Scene(scene, "Scene")
+		constexpr Scene() noexcept
+			: Scene("Scene")
 		{}
 
-		constexpr Scene(S* const& scene, const std::string_view& name) noexcept
+		constexpr Scene(const std::string_view& name) noexcept
 			: SceneBasis(name)
-			, pipeline()
-			, singletone(scene)
 			, gameObjects()
 		{
 			gameObjects.reserve(10ULL);
 		}
 
-		void Destroy() noexcept(noexcept(Cast()->Destroy()))
-		{
-			Cast()->Destroy();
-		}
+		virtual void Awake() noexcept
+		{}
 
-		inline ~Scene() noexcept(noexcept(Cast()->Destroy()))
-		{
-			Cast()->Destroy();
-			SceneBasis::~SceneBasis();
-		}
+		virtual void Start() noexcept
+		{}
+
+		void Update(const float delta_time) noexcept
+		{}
+
+		void LateUpdate(const float delta_time) noexcept
+		{}
+
+		virtual void Destroy() noexcept
+		{}
 
 		Scene(const Scene& other) = delete;
 		Scene(Scene&& other) = delete;
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
+		virtual ~Scene() noexcept = default;
 
-	private:
+	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects;
-
-	private:
-		[[nodiscard]]
-		constexpr S* Cast() noexcept
-		{
-			return pipeline::Cast();
-		}
-
-		[[nodiscard]]
-		constexpr const S* Cast() const noexcept
-		{
-			return pipeline::Cast();
-		}
 	};
 }
