@@ -5,15 +5,13 @@ import <string>;
 import <string_view>;
 import <memory>;
 import <algorithm>;
-import Utility;
-import Utility.Singleton;
 import Game.Scene;
 
 using namespace std;
 
 export namespace game
 {
-	class SceneManager : public util::Singleton<SceneManager>
+	class SceneManager
 	{
 	public:
 		static void AddScene(const SceneHandle& scene) noexcept
