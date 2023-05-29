@@ -56,9 +56,9 @@ export extern "C++" namespace game
 			Cast()->Destroy();
 		}
 
-		inline ~Scene() noexcept(noexcept(Destroy()))
+		inline ~Scene() noexcept(noexcept(Cast()->Destroy()))
 		{
-			Destroy();
+			Cast()->Destroy();
 			SceneBasis::~SceneBasis();
 		}
 
