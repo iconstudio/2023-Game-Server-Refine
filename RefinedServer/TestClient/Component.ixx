@@ -1,5 +1,5 @@
 export module Game.Component;
-import <memory>;
+import Utility.Classifier;
 export import Game.Object;
 
 export namespace game
