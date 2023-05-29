@@ -12,6 +12,17 @@ export namespace game
 		constexpr Object() noexcept = default;
 		constexpr ~Object() noexcept = default;
 
+		constexpr void SetEnabled(const bool enabled) noexcept
+		{
+			isEnabled = enabled;
+		}
+
+		[[nodiscard]]
+		constexpr bool IsEnabled() const noexcept
+		{
+			return isEnabled;
+		}
+
 		[[nodiscard]]
 		constexpr size_t GetID() const noexcept
 		{
@@ -25,6 +36,9 @@ export namespace game
 		constexpr Object(Object&& other) noexcept = default;
 		Object& operator=(const Object& other) = delete;
 		constexpr Object& operator=(Object&& other) noexcept = default;
+
+	protected:
+		bool isEnabled = true;
 	};
 }
 
