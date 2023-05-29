@@ -34,19 +34,19 @@ export extern "C++" namespace game
 			gameObjects.reserve(10ULL);
 		}
 
-		virtual void Awake() noexcept
+		virtual void Awake()
 		{}
 
 		virtual void Start() noexcept
 		{}
 
-		void Update(const float delta_time) noexcept
+		virtual void Update(const float& delta_time)
 		{}
 
-		void LateUpdate(const float delta_time) noexcept
+		virtual void LateUpdate(const float& delta_time)
 		{}
 
-		virtual void Destroy() noexcept
+		virtual void Destroy()
 		{}
 
 		Scene(const Scene& other) = delete;
