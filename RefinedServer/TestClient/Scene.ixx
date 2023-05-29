@@ -1,7 +1,3 @@
-module;
-#include "pch.hpp"
-#include <memory>
-
 export module Game.Scene;
 export import Game.Camera;
 export import Game.Scene.Basis;
@@ -18,7 +14,6 @@ export extern "C++" namespace game
 		using type = S;
 		using wrapper = Scene<type>;
 		using singletone = util::Singleton<type>;
-		using pointer = std::shared_ptr<SceneBasis>;
 	};
 
 	template<typename S>
@@ -30,7 +25,6 @@ export extern "C++" namespace game
 		using scene_type = SceneTraits<S>::type;
 		using wrapper_type = SceneTraits<S>::wrapper;
 		using singletone = SceneTraits<S>::singletone;
-		using handle_type = SceneTraits<S>::pointer;
 
 		constexpr Scene(S *const& scene) noexcept
 			: SceneBasis()

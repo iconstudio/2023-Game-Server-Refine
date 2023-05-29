@@ -39,4 +39,6 @@ export namespace game
 	private:
 		std::string myName;
 	};
+
+	using SceneHandle = std::shared_ptr<SceneBasis>;
 }
