@@ -1,6 +1,7 @@
 export module Game.Scene.Basis;
 import <string>;
 import <memory>;
+import Utility.Indexer;
 
 export namespace game
 {
@@ -9,12 +10,14 @@ export namespace game
 	/// </summary>
 	class SceneBasis
 		: public std::enable_shared_from_this<SceneBasis>
+		, public util::Indexer<SceneBasis>
 	{
 	public:
 		constexpr SceneBasis() noexcept = default;
 
 		constexpr SceneBasis(std::string_view name) noexcept
 			: std::enable_shared_from_this<SceneBasis>()
+			, util::Indexer<SceneBasis>()
 			, myName(name)
 		{}
 
