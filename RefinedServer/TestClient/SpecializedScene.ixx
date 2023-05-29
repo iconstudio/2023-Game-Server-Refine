@@ -14,7 +14,7 @@ export namespace game
 	};
 
 	template<typename S>
-	class NamedScene final
+	class NamedScene
 		: public Scene
 		, public SceneTraits<S>::singletone
 	{
