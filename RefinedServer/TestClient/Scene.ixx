@@ -1,5 +1,6 @@
 export module Game.Scene;
 import <memory>;
+import <string>;
 import <string_view>;
 import <vector>;
 import <algorithm>;
@@ -30,8 +31,8 @@ export extern "C++" namespace game
 			: Scene("Scene")
 		{}
 
-		constexpr Scene(const std::string_view& name) noexcept
-			: util::Named(name), util::Indexer<Scene>()
+		constexpr Scene(std::string_view name) noexcept
+			: Named(name), Indexer<Scene>()
 			, gameObjects()
 		{
 			gameObjects.reserve(10ULL);
