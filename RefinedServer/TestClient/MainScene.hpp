@@ -9,13 +9,13 @@ class MainScene final : public game::Scene
 {
 public:
 	MainScene() noexcept
-		: Scene(this)
+		: Scene()
 		, mySocket()
 		, myAddress()
 	{}
 
 	void Awake();
-	void Start();
+	void Start() noexcept;
 	void Update(const float& delta_time);
 	void LateUpdate(const float& delta_time);
 	void Destroy();

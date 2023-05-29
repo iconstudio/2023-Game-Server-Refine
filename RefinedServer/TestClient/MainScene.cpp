@@ -12,7 +12,7 @@ void MainScene::Awake()
 	});
 }
 
-void MainScene::Start()
+void MainScene::Start() noexcept
 {
 }
 
