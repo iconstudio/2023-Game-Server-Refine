@@ -14,7 +14,7 @@ public:
 	MainScene() noexcept
 		: Scene(this)
 		, mySocket()
-		, myAddress(), myCamera()
+		, myAddress()
 	{}
 
 	~MainScene() noexcept
@@ -28,6 +28,4 @@ public:
 	net::Socket mySocket;
 	net::EndPoint myAddress;
 	net::EndPoint serverAddress;
-
-	game::Camera myCamera;
 };
