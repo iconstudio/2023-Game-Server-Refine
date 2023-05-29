@@ -26,9 +26,15 @@ export extern "C++" namespace sys
 		object.Destroy();
 	};
 
+	/// <summary>
+	/// Will not be used until deducing this is not implemented.
+	/// </summary>
+	/// <typeparam name="O"></typeparam>
 	template<util::classes O>
 	class [[nodiscard]] PipelineObject
 	{
+		static_assert(util::always_false<O>, "Don't use it for now.");
+
 	public:
 		constexpr PipelineObject() noexcept = default;
 		constexpr ~PipelineObject() noexcept = default;
