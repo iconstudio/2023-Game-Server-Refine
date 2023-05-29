@@ -14,15 +14,15 @@ export namespace util
 			: myName()
 		{}
 
-		constexpr Named(const std::string& name) noexcept
+		explicit constexpr Named(const std::string& name) noexcept
 			: myName(name)
 		{}
 
-		constexpr Named(std::string&& name) noexcept
+		explicit constexpr Named(std::string&& name) noexcept
 			: myName(static_cast<std::string&&>(name))
 		{}
 
-		constexpr Named(std::string_view name) noexcept
+		explicit constexpr Named(std::string_view name) noexcept
 			: myName(name)
 		{}
 
