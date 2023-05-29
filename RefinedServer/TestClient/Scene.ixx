@@ -4,7 +4,6 @@ import <string>;
 import <string_view>;
 import <vector>;
 import <algorithm>;
-import Utility.Singleton;
 import Utility.Named;
 import Utility.Indexer;
 import Utility.Constraints;
@@ -14,14 +13,6 @@ export import Game.GameObject;
 
 export extern "C++" namespace game
 {
-	template<typename S>
-	struct SceneTraits
-	{
-		using type = S;
-		using pipeline = sys::PipelineObject<type>;
-		using singletone = util::Singleton<type>;
-	};
-
 	class Scene
 		: public util::Named
 		, public util::Indexer<Scene>

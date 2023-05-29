@@ -53,7 +53,7 @@
     <ClCompile Include="SceneManagement.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SceneBasis.ixx">
+    <ClCompile Include="SpecializedScene.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="Object.ixx">

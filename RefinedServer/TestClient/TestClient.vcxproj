@@ -187,7 +187,7 @@
     </ClCompile>
     <ClCompile Include="PipelineObject.ixx" />
     <ClCompile Include="Scene.ixx" />
-    <ClCompile Include="SceneBasis.ixx" />
+    <ClCompile Include="SpecializedScene.ixx" />
     <ClCompile Include="SceneManagement.ixx" />
     <ClCompile Include="MainScene.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
