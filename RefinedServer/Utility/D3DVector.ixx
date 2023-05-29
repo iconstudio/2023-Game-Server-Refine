@@ -1,5 +1,7 @@
 module;
 #include <DirectXMath.h>
+#include <utility>
+
 export module Utility.D3D.Vector;
 
 export namespace d3d::vec
@@ -24,6 +26,33 @@ export namespace d3d::vec
 	using DirectX::operator*=;
 	using DirectX::operator/;
 	using DirectX::operator/=;
+
+	[[nodiscard]]
+	constexpr XMVECTOR Zero() noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			return { 0.0f, 0.0f, 0.0f, 0.0f };
+		}
+		else
+		{
+			return DirectX::XMVectorZero();
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR One() noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			return { 1.0f, 1.0f, 1.0f, 1.0f };
+		}
+		else
+		{
+			return DirectX::XMVectorSplatOne();
+		}
+	}
+
 
 	using DirectX::XMVectorSet;
 	using DirectX::XMVectorReplicate;

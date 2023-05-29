@@ -1,3 +1,6 @@
+module;
+#include <glm/ext.hpp>
+
 export module Game.GameObject;
 import <type_traits>;
 import <new>;

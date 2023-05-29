@@ -15,7 +15,8 @@ export extern "C" namespace game
 		: public Component
 	{
 	public:
-		Camera() noexcept
+		constexpr Camera() noexcept
+			: Component()
 		{}
 
 		~Camera() noexcept = default;
