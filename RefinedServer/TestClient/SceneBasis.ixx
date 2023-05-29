@@ -9,19 +9,17 @@ export namespace game
 	/// satisfies sys::PipelineModel
 	/// </summary>
 	class SceneBasis
-		: public std::enable_shared_from_this<SceneBasis>
-		, public util::Indexer<SceneBasis>
+		: public util::Indexer<SceneBasis>
 	{
 	public:
 		constexpr SceneBasis() noexcept = default;
 
 		constexpr SceneBasis(std::string_view name) noexcept
-			: std::enable_shared_from_this<SceneBasis>()
-			, util::Indexer<SceneBasis>()
+			: util::Indexer<SceneBasis>()
 			, myName(name)
 		{}
 
-		~SceneBasis() noexcept = default;
+		constexpr ~SceneBasis() noexcept = default;
 
 		constexpr const std::string& GetName() const& noexcept
 		{
