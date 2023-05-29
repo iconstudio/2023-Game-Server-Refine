@@ -21,9 +21,9 @@ export namespace game
 	public:
 		using singleton = SceneTraits<S>::singletone;
 
-		constexpr NamedScene(std::string_view name) noexcept
+		constexpr NamedScene(S* const& scene, std::string_view name) noexcept
 			: Scene(name)
-			, singleton(this)
+			, singleton(scene)
 		{}
 
 		constexpr ~NamedScene() noexcept = default;
