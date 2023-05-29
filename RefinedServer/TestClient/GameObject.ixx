@@ -1,8 +1,10 @@
 export module Game.GameObject;
+import <type_traits>;
 import <new>;
 import <string_view>;
 import <memory>;
 import <vector>;
+import Utility.Constraints;
 import Utility.Named;
 import System.PipelineObject;
 import Game.Object;
@@ -16,6 +18,43 @@ export namespace game
 		, public util::Classifier<GameObject>
 	{
 	public:
+		template<typename T>
+		[[nodiscard]]
+		static constexpr
+			std::unique_ptr<T>
+			Instantiate()
+			noexcept(util::nothrow_default_constructibles<T>)
+		{
+			static_assert(std::is_base_of_v<GameObject, util::clean_t<T>>, "T must be derived from GameObject!");
+
+			return std::unique_ptr<GameObject>(new T());
+		}
+
+		template<typename T>
+			requires(util::copyable<T>)
+		[[nodiscard]]
+		static constexpr
+			std::unique_ptr<T>
+			Instantiate(T* original)
+			noexcept(util::nothrow_copy_constructibles<T>)
+		{
+			static_assert(std::is_base_of_v<GameObject, util::clean_t<T>>, "T must be derived from GameObject!");
+
+			return std::unique_ptr<GameObject>(new T(*original));
+		}
+
+		template<typename T>
+		[[nodiscard]]
+		static constexpr
+			std::unique_ptr<T>
+			Instantiate(const std::unique_ptr<T>& original)
+			noexcept(util::nothrow_copy_constructibles<T>)
+		{
+			static_assert(std::is_base_of_v<GameObject, T>, "T must be derived from GameObject!");
+
+			return std::unique_ptr<GameObject>(new T(*original.get()));
+		}
+
 		constexpr GameObject() noexcept = default;
 		constexpr ~GameObject() noexcept = default;
 
