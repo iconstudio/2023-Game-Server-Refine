@@ -79,6 +79,19 @@ export namespace game
 			}
 		}
 
+		constexpr void AddComponent(std::unique_ptr<Component>&& component) noexcept
+		{
+			myComponents.push_back(std::move(component));
+		}
+
+		template<typename C>
+		constexpr void AddComponent(std::unique_ptr<C>&& component) noexcept
+		{
+			static_assert(std::is_base_of_v<Component, C>);
+
+			myComponents.emplace_back(component.release());
+		}
+
 		constexpr void DestroyChildren() noexcept
 		{
 			if (HasChild())
