@@ -7,13 +7,13 @@ export extern "C++" namespace sys
 	struct PipelineModel
 	{
 		constexpr PipelineModel() noexcept = default;
-		constexpr ~PipelineModel() noexcept = default;
+		virtual constexpr ~PipelineModel() noexcept = default;
 
-		void Awake() noexcept {}
-		void Start() noexcept {}
-		void Update(float) noexcept {}
-		void LateUpdate(float) noexcept {}
-		void Destroy() noexcept {}
+		virtual void Awake() {}
+		virtual void Start() noexcept {}
+		virtual void Update(const float delta_time) {}
+		virtual void LateUpdate(const float delta_time) {}
+		virtual void Destroy() {}
 	};
 
 	template<typename O>
