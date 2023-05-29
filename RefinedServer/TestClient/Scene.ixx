@@ -39,6 +39,10 @@ export extern "C++" namespace game
 
 	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects;
+
+		bool isAwaken = false;
+		bool isPaused = false;
+		bool isComplete = false;
 	};
 
 	using SceneHandle = std::shared_ptr<Scene>;
