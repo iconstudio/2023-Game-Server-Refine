@@ -3,12 +3,9 @@ import Net;
 import Net.Socket;
 import Net.EndPoint;
 import Net.Promise;
-import System.PipelineObject;
-import Game.Camera;
 import Game.Scene;
 
-class MainScene final
-	: public game::Scene<MainScene>
+class MainScene final : public game::Scene<MainScene>
 {
 public:
 	MainScene() noexcept
