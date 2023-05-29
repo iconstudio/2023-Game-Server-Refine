@@ -19,6 +19,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)DataUnit.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Deserialization.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Indexer.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Named.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Serialization.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Array.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Atomic.ixx" />
