@@ -1,6 +1,6 @@
 export module Game.Object;
 import Utility.Indexer;
-import Utility.Classifier;
+export import Utility.Classifier;
 
 export namespace game
 {

@@ -59,6 +59,9 @@
     <ClCompile Include="Object.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

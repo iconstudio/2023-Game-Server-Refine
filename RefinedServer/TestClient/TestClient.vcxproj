@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.ixx" />
     <ClCompile Include="Framework.cpp" />
+    <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="Main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.hpp</PrecompiledHeaderFile>
