@@ -33,6 +33,9 @@ export namespace util
 	template<typename... Ts>
 	concept classes = make_conjunction<std::is_class, clean_t<Ts>...>;
 
+	template<typename T>
+	concept finalized = classes<T> && std::is_final_v<clean_t<T>>;
+
 	template<typename T, typename... Args>
 	concept invocables = !std::is_abstract_v<clean_t<T>> && std::invocable<T, Args...>;
 
