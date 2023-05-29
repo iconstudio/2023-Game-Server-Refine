@@ -9,8 +9,15 @@ import Game.Camera;
 class Framework
 {
 public:
-	Framework() noexcept;
-	~Framework() noexcept;
+	Framework() noexcept
+	{
+
+	}
+
+	~Framework() noexcept
+	{
+
+	}
 
 	void Awake();
 	void Start();
