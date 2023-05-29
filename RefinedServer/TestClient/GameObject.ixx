@@ -10,7 +10,6 @@ export namespace game
 {
 	class GameObject
 		: public Object
-		, public sys::PipelineModel
 		, public util::Named
 		, public util::Classifier<GameObject>
 	{
@@ -120,10 +119,10 @@ export namespace game
 			return nullptr != mySibling;
 		}
 
-		constexpr GameObject(GameObject&& other) noexcept = default;
-		constexpr GameObject& operator=(GameObject&& other) noexcept = default;
 		GameObject(const GameObject& other) = delete;
+		constexpr GameObject(GameObject&& other) noexcept = default;
 		GameObject& operator=(const GameObject& other) = delete;
+		constexpr GameObject& operator=(GameObject&& other) noexcept = default;
 
 	protected:
 		std::unique_ptr<GameObject> myChild = nullptr;
