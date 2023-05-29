@@ -13,7 +13,6 @@ export namespace util
 			: myIndex(_index++)
 		{}
 
-		constexpr ~Indexer() noexcept = default;
 
 		[[nodiscard]]
 		constexpr size_t GetIndex() const noexcept
@@ -21,9 +20,14 @@ export namespace util
 			return myIndex;
 		}
 
-		const size_t myIndex;
+		constexpr Indexer(Indexer&& other) noexcept = default;
+		constexpr Indexer& operator=(Indexer&& other) noexcept = default;
+		constexpr Indexer(const Indexer& other) noexcept = default;
+		constexpr Indexer& operator=(const Indexer& other) noexcept = default;
+		constexpr ~Indexer() noexcept = default;
 
 	private:
+		size_t myIndex;
 		inline constinit static size_t _index = 0;
 	};
 }
