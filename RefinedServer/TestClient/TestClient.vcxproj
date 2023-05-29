@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.ixx" />
+    <ClCompile Include="Component.ixx" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="Main.cpp">
