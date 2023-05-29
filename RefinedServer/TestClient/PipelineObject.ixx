@@ -1,14 +1,16 @@
 export module System.PipelineObject;
 import Utility;
+import Utility.Constraints;
 
 export extern "C++" namespace sys
 {
 	struct PipelineModel
 	{
-		void Awake() {}
-		void Start() {}
-		void Update(float) {}
-		void LateUpdate(float) {}
+		void Awake() noexcept {}
+		void Start() noexcept {}
+		void Update(float) noexcept {}
+		void LateUpdate(float) noexcept {}
+		void Destroy() noexcept {}
 	};
 
 	template<typename O>
@@ -18,9 +20,10 @@ export extern "C++" namespace sys
 		object.Start();
 		object.Update(0.0f);
 		object.LateUpdate(0.0f);
+		object.Destroy();
 	};
 
-	template<typename O>
+	template<util::classes O>
 	class [[nodiscard]] PipelineObject
 	{
 	public:
@@ -49,6 +52,12 @@ export extern "C++" namespace sys
 			noexcept(noexcept(util::declval<O>().LateUpdate(util::declval<float>())))
 		{
 			Cast()->LateUpdate(delta_time);
+		}
+
+		void Destroy()
+			noexcept(noexcept(util::declval<O>().Destroy()))
+		{
+			Cast()->Destroy();
 		}
 
 		[[nodiscard]]
