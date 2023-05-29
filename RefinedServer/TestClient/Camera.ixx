@@ -9,7 +9,7 @@ export extern "C" namespace game
 {
 	// @brief Class representing a camera orbiting around its target.
 	// @ingroup game
-	class Camera : public sys::PipelineObject<Camera>
+	class Camera final : public sys::PipelineObject<Camera>
 	{
 	public:
 		Camera() noexcept

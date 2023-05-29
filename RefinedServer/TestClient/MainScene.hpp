@@ -9,7 +9,7 @@ class MainScene final : public game::Scene<MainScene>
 {
 public:
 	MainScene() noexcept
-		: Scene(this)
+		: Scene<MainScene>(this)
 		, mySocket()
 		, myAddress()
 	{}

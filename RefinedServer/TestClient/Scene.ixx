@@ -1,10 +1,11 @@
 export module Game.Scene;
 import <memory>;
 import <string_view>;
+import Utility.Singleton;
+import Utility.Constraints;
 import System.PipelineObject;
 export import Game.Camera;
 export import Game.Scene.Basis;
-import Utility.Singleton;
 
 export extern "C++" namespace game
 {
