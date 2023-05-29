@@ -9,8 +9,8 @@ export namespace game
 		, public util::Classifier<Object>
 	{
 	public:
-		constexpr Object() noexcept;
-		constexpr ~Object() noexcept;
+		constexpr Object() noexcept = default;
+		constexpr ~Object() noexcept = default;
 
 		[[nodiscard]]
 		constexpr size_t GetID() const noexcept
