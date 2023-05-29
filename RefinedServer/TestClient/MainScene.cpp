@@ -22,3 +22,6 @@ void MainScene::Update(const float& delta_time)
 
 void MainScene::LateUpdate(const float& delta_time)
 {}
+
+void MainScene::Destroy()
+{}
