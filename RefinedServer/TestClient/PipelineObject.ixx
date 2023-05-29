@@ -3,35 +3,41 @@ import Utility;
 
 export extern "C++" namespace sys
 {
-	template<typename T>
-	concept PipelineModel = requires(T object)
+	struct PipelineModel
 	{
-		object.Awake();
-		object.Start();
-		object.Update(0.0f);
-		object.LateUpdate(0.0f);
-	};
-
-	template<typename T>
-	concept PipelineModel = requires(T object)
-	{
-		object.Awake();
-		object.Start();
-		object.Update(0.0f);
-		object.LateUpdate(0.0f);
+		void Awake() {}
+		void Start() {}
+		void Update(float) {}
+		void LateUpdate(float) {}
 	};
 
 	template<typename O>
+	concept pipelines = requires(O object)
+	{
+		object.Awake();
+		object.Start();
+		object.Update(0.0f);
+		object.LateUpdate(0.0f);
+	};
+
+	template<pipelines O>
 	class [[nodiscard]] PipelineObject
 	{
 	public:
 		constexpr PipelineObject() noexcept = default;
 		constexpr ~PipelineObject() noexcept = default;
 
-		void Awake() = 0;
-		void Start() = 0;
-		void Update(const float& delta_time) = 0;
-		void LateUpdate(const float& delta_time) = 0;
+		void Awake()
+		{}
+
+		void Start()
+		{}
+
+		void Update(const float& delta_time)
+		{}
+
+		void LateUpdate(const float& delta_time)
+		{}
 
 		[[nodiscard]]
 		constexpr bool operator==(const PipelineObject& other) const

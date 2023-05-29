@@ -9,8 +9,7 @@ export namespace game
 	/// satisfies sys::PipelineModel
 	/// </summary>
 	class SceneBasis
-		: public sys::PipelineObject
-		, public std::enable_shared_from_this<SceneBasis>
+		: public std::enable_shared_from_this<SceneBasis>
 	{
 	public:
 		constexpr SceneBasis() noexcept = default;
