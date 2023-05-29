@@ -24,18 +24,23 @@ public:
 
 	void Awake()
 	{
-
+		for (auto& scene : everyScene)
+		{
+			scene->Awake();
+		}
 	}
 
 	void Start()
 	{
+		auto& scene = everyScene[roomIndex];
 
+		scene->Start();
 	}
 
 	void Update()
 	{
 		long long start_time = 0;
-		long long current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		long long current_time = 0;
 
 		while (true)
 		{
@@ -55,13 +60,20 @@ public:
 
 	void UpdateOnce(const float& delta_time)
 	{
-
+		for (auto& scene : everyScene)
+		{
+			scene->Update(delta_time);
+		}
 	}
 
 	void LateUpdateOnce(const float& delta_time)
 	{
-
+		for (auto& scene : everyScene)
+		{
+			scene->LateUpdate(delta_time);
+		}
 	}
 
 	std::vector<std::unique_ptr<game::Scene>> everyScene;
+	size_t roomIndex = 0;
 };
