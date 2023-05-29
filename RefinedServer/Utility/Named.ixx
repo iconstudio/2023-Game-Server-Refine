@@ -26,8 +26,6 @@ export namespace util
 			: myName(name)
 		{}
 
-		constexpr ~Named() noexcept = default;
-
 		constexpr void SetName(const std::string& name) noexcept
 		{
 			myName = name;
@@ -54,6 +52,12 @@ export namespace util
 		{
 			return static_cast<std::string&&>(myName);
 		}
+
+		constexpr Named(const Named& other) noexcept = default;
+		constexpr Named(Named&& other) noexcept = default;
+		constexpr Named& operator=(const Named& other) noexcept = default;
+		constexpr Named& operator=(Named&& other) noexcept = default;
+		constexpr ~Named() noexcept = default;
 
 	private:
 		std::string myName;

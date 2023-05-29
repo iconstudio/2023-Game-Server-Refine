@@ -30,6 +30,10 @@ export namespace util
 	class Classifier<void>
 	{
 		constexpr Classifier() noexcept = default;
+		constexpr Classifier(const Classifier& other) noexcept = default;
+		constexpr Classifier(Classifier&& other) noexcept = default;
+		constexpr Classifier& operator=(const Classifier& other) noexcept = default;
+		constexpr Classifier& operator=(Classifier&& other) noexcept = default;
 		constexpr ~Classifier() noexcept = default;
 
 		template<typename T>
