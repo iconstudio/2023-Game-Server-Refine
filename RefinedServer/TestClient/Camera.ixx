@@ -4,33 +4,21 @@ module;
 export module Game.Camera;
 import <memory>;
 import System.PipelineObject;
+import Game.Component;
+import Game.GameObject;
 
 export extern "C" namespace game
 {
 	// @brief Class representing a camera orbiting around its target.
 	// @ingroup game
-	class Camera final : public sys::PipelineObject<Camera>
+	class Camera final
+		: public Component
 	{
 	public:
 		Camera() noexcept
 		{}
 
 		~Camera() noexcept = default;
-
-		void Awake()
-		{}
-
-		void Start()
-		{}
-
-		void Update(const float& delta_time)
-		{}
-
-		void LateUpdate(const float& delta_time)
-		{}
-
-		void Destroy()
-		{}
 
 		void SetCameraTarget(const glm::vec3& target);
 		void SetCameraDistance(const float& distance);
