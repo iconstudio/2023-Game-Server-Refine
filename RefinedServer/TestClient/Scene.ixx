@@ -34,7 +34,7 @@ export extern "C++" namespace game
 		Scene(Scene&& other) = delete;
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
-		virtual ~Scene() noexcept = default;
+		virtual constexpr ~Scene() noexcept = default;
 
 	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects;
