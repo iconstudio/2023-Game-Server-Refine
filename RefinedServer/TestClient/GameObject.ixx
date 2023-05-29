@@ -16,13 +16,6 @@ export namespace game
 	{
 	public:
 		constexpr GameObject() noexcept = default;
-
-		constexpr GameObject(std::string_view name) noexcept
-			: Object(), PipelineModel()
-			, Classifier<GameObject>()
-			, Named(name)
-		{}
-
 		constexpr ~GameObject() noexcept = default;
 
 		constexpr void SetChild(std::unique_ptr<GameObject>&& child) noexcept

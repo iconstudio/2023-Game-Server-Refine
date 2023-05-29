@@ -11,10 +11,6 @@ export namespace game
 	public:
 		constexpr Object() noexcept = default;
 		constexpr ~Object() noexcept = default;
-		constexpr Object(Object&& other) noexcept = default;
-		constexpr Object& operator=(Object&& other) noexcept = default;
-		Object(const Object& other) = delete;
-		Object& operator=(const Object& other) = delete;
 
 		[[nodiscard]]
 		constexpr size_t GetID() const noexcept
@@ -24,6 +20,11 @@ export namespace game
 
 		[[nodiscard]]
 		constexpr bool operator==(const Object& other) const noexcept = default;
+
+		constexpr Object(Object&& other) noexcept = default;
+		constexpr Object& operator=(Object&& other) noexcept = default;
+		Object(const Object& other) = delete;
+		Object& operator=(const Object& other) = delete;
 	};
 }
 
