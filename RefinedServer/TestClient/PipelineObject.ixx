@@ -6,6 +6,9 @@ export extern "C++" namespace sys
 {
 	struct PipelineModel
 	{
+		constexpr PipelineModel() noexcept = default;
+		constexpr ~PipelineModel() noexcept = default;
+
 		void Awake() noexcept {}
 		void Start() noexcept {}
 		void Update(float) noexcept {}
