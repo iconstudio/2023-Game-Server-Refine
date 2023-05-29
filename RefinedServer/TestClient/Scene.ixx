@@ -1,6 +1,8 @@
 export module Game.Scene;
 import <memory>;
 import <string_view>;
+import <vector>;
+import <algorithm>;
 import Utility.Singleton;
 import Utility.Constraints;
 import System.PipelineObject;
