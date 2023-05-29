@@ -27,5 +27,10 @@ export namespace game
 		{}
 
 		constexpr ~NamedScene() noexcept = default;
+
+		NamedScene(const NamedScene& other) = delete;
+		constexpr NamedScene(NamedScene&& other) noexcept = default;
+		NamedScene& operator=(const NamedScene& other) = delete;
+		constexpr NamedScene& operator=(NamedScene&& other) noexcept = default;
 	};
 }

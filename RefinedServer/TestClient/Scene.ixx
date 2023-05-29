@@ -30,11 +30,12 @@ export extern "C++" namespace game
 			gameObjects.reserve(10ULL);
 		}
 
-		Scene(const Scene& other) = delete;
-		Scene(Scene&& other) = delete;
-		Scene& operator=(const Scene& other) = delete;
-		Scene& operator=(Scene&& other) = delete;
 		virtual constexpr ~Scene() noexcept = default;
+
+		Scene(const Scene& other) = delete;
+		constexpr Scene(Scene&& other) noexcept = default;
+		Scene& operator=(const Scene& other) = delete;
+		constexpr Scene& operator=(Scene&& other) noexcept = default;
 
 	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects;
