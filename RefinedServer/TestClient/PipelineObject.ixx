@@ -20,7 +20,7 @@ export extern "C++" namespace sys
 		object.LateUpdate(0.0f);
 	};
 
-	template<pipelines O>
+	template<typename O>
 	class [[nodiscard]] PipelineObject
 	{
 	public:
@@ -28,16 +28,28 @@ export extern "C++" namespace sys
 		constexpr ~PipelineObject() noexcept = default;
 
 		void Awake()
-		{}
+			noexcept(noexcept(util::declval<O>().Awake()))
+		{
+			Cast()->Awake();
+		}
 
 		void Start()
-		{}
+			noexcept(noexcept(util::declval<O>().Start()))
+		{
+			Cast()->Start();
+		}
 
-		void Update(const float& delta_time)
-		{}
+		void Update(float delta_time)
+			noexcept(noexcept(util::declval<O>().Update(util::declval<float>())))
+		{
+			Cast()->Update(delta_time);
+		}
 
-		void LateUpdate(const float& delta_time)
-		{}
+		void LateUpdate(float delta_time)
+			noexcept(noexcept(util::declval<O>().LateUpdate(util::declval<float>())))
+		{
+			Cast()->LateUpdate(delta_time);
+		}
 
 		[[nodiscard]]
 		constexpr bool operator==(const PipelineObject& other) const
