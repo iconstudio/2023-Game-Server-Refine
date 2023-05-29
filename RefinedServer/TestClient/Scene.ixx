@@ -4,10 +4,11 @@ import <string_view>;
 import <vector>;
 import <algorithm>;
 import Utility.Singleton;
+import Utility.Named;
+import Utility.Indexer;
 import Utility.Constraints;
 import System.PipelineObject;
 export import Game.Camera;
-export import Game.Scene.Basis;
 export import Game.GameObject;
 
 export extern "C++" namespace game
@@ -20,7 +21,9 @@ export extern "C++" namespace game
 		using singletone = util::Singleton<type>;
 	};
 
-	class Scene : public SceneBasis
+	class Scene
+		: public util::Named
+		, public util::Indexer<Scene>
 	{
 	public:
 		constexpr Scene() noexcept
@@ -28,7 +31,7 @@ export extern "C++" namespace game
 		{}
 
 		constexpr Scene(const std::string_view& name) noexcept
-			: SceneBasis(name)
+			: util::Named(name), util::Indexer<Scene>()
 			, gameObjects()
 		{
 			gameObjects.reserve(10ULL);
@@ -58,4 +61,6 @@ export extern "C++" namespace game
 	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects;
 	};
+
+	using SceneHandle = std::shared_ptr<Scene>;
 }

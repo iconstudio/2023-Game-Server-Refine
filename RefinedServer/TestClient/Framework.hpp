@@ -2,7 +2,6 @@
 import <memory>;
 import <vector>;
 
-import Game.Scene.Management;
 import Game.Scene;
 import Game.Camera;
 
@@ -10,6 +9,7 @@ class Framework
 {
 public:
 	Framework() noexcept
+		: everyScene()
 	{
 
 	}
@@ -44,5 +44,5 @@ public:
 
 	}
 
-	std::vector<game::SceneBasis*> everyScene;
+	std::vector<std::unique_ptr<game::Scene>> everyScene;
 };
