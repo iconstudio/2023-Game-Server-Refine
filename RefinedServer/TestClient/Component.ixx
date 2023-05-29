@@ -1,7 +1,6 @@
 export module Game.Component;
 import <memory>;
 export import Game.Object;
-export import Game.GameObject;
 
 export namespace game
 {
@@ -10,25 +9,26 @@ export namespace game
 		, public util::Classifier<Component>
 	{
 	public:
-		Component() = default;
-		Component(const Component&) = delete;
-		Component(Component&&) = default;
-		Component& operator=(const Component&) = delete;
-		Component& operator=(Component&&) = default;
+		constexpr Component() = default;
 		constexpr ~Component() = default;
 
-		constexpr void SetGameObject(GameObject* object) noexcept
+		constexpr void SetOwner(Object* object) noexcept
 		{
-			gameObject = object;
+			myOwner = object;
 		}
 
 		[[nodiscard]]
-		constexpr GameObject* const& GetGameObject() const noexcept
+		constexpr Object* const& GetOwner() const noexcept
 		{
-			return gameObject;
+			return myOwner;
 		}
 
-		GameObject* gameObject = nullptr;
+		Component(const Component&) = delete;
+		constexpr Component(Component&&) = default;
+		Component& operator=(const Component&) = delete;
+		constexpr Component& operator=(Component&&) = default;
+
+		Object* myOwner = nullptr;
 	};
 }
 
