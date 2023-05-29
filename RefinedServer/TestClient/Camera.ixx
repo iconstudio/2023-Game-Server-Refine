@@ -7,15 +7,14 @@ import System.PipelineObject;
 export extern "C" namespace game
 {
 	// @brief Class representing a camera orbiting around its target.
-	// @ingroup gl_utils
-	class Camera : public sys::PipelineObject
+	// @ingroup game
+	class Camera : public sys::PipelineObject<Camera>
 	{
 	public:
 		Camera() noexcept
 		{}
 
-		virtual ~Camera() noexcept
-		{}
+		~Camera() noexcept = default;
 
 		void Awake()
 		{}

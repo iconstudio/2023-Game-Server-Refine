@@ -5,6 +5,9 @@ import System.PipelineObject;
 
 export namespace game
 {
+	/// <summary>
+	/// satisfies sys::PipelineModel
+	/// </summary>
 	class SceneBasis
 		: public sys::PipelineObject
 		, public std::enable_shared_from_this<SceneBasis>
@@ -18,8 +21,7 @@ export namespace game
 			, myName(name)
 		{}
 
-		~SceneBasis() noexcept
-		{}
+		~SceneBasis() noexcept = default;
 
 		constexpr const std::string& GetName() const& noexcept
 		{
