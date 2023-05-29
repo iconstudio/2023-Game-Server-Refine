@@ -13,6 +13,8 @@ export namespace util
 			: myIndex(_index++)
 		{}
 
+		constexpr ~Indexer() noexcept = default;
+
 		[[nodiscard]]
 		constexpr size_t GetIndex() const noexcept
 		{
