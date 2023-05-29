@@ -1,4 +1,6 @@
 export module Game.Scene;
+import <memory>;
+import <string_view>;
 import System.PipelineObject;
 export import Game.Camera;
 export import Game.Scene.Basis;
@@ -49,7 +51,7 @@ export extern "C++" namespace game
 			, mainCamera(camera)
 		{}
 
-		~Scene() noexcept
+		inline ~Scene() noexcept
 		{
 			SceneBasis::~SceneBasis();
 		}

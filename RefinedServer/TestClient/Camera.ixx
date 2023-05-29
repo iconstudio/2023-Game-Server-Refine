@@ -2,6 +2,7 @@ module;
 #include "pch.hpp"
 
 export module Game.Camera;
+import <memory>;
 import System.PipelineObject;
 
 export extern "C" namespace game
