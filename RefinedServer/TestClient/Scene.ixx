@@ -30,15 +30,23 @@ export extern "C++" namespace game
 		using pipeline = SceneTraits<S>::pipeline;
 		using singletone = SceneTraits<S>::singletone;
 
-		constexpr Scene(S *const& scene) noexcept
-			: Scene(scene, "Scene")
+		constexpr Scene(S* const& scene) noexcept
+			: Scene(scene, "Scene", nullptr)
 		{}
 
-		constexpr Scene(S* const& scene, std::string_view name) noexcept
+		constexpr Scene(S* const& scene, const std::string_view& name) noexcept
+			: Scene(scene, name, nullptr)
+		{}
+
+		constexpr Scene(S* const& scene, const std::shared_ptr<Camera>& camera) noexcept
+			: Scene(scene, "Scene", camera)
+		{}
+
+		constexpr Scene(S* const& scene, const std::string_view& name, const std::shared_ptr<Camera>& camera) noexcept
 			: SceneBasis(name)
 			, pipeline()
 			, singletone(scene)
-			, mainCamera(nullptr)
+			, mainCamera(camera)
 		{}
 
 		~Scene() noexcept
