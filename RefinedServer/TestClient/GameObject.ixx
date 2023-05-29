@@ -55,7 +55,7 @@ export namespace game
 			}
 		}
 
-		void AddChild(std::unique_ptr<GameObject>&& child) noexcept
+		constexpr void AddChild(std::unique_ptr<GameObject>&& child) noexcept
 		{
 			if (!HasChild())
 			{
@@ -67,7 +67,22 @@ export namespace game
 			}
 		}
 
-		void AddSibling(std::unique_ptr<GameObject>&& sibling) noexcept
+		template<typename O>
+		constexpr void AddChild(std::unique_ptr<O>&& child) noexcept
+		{
+			static_assert(std::is_base_of_v<GameObject, O>);
+
+			if (!HasChild())
+			{
+				SetChild(std::unique_ptr<GameObject>(child.release()));
+			}
+			else
+			{
+				myChild->AddSibling(std::move(child));
+			}
+		}
+
+		constexpr void AddSibling(std::unique_ptr<GameObject>&& sibling) noexcept
 		{
 			if (HasSibling())
 			{
@@ -76,6 +91,21 @@ export namespace game
 			else
 			{
 				SetSibling(std::move(sibling));
+			}
+		}
+
+		template<typename O>
+		constexpr void AddSibling(std::unique_ptr<O>&& sibling) noexcept
+		{
+			static_assert(std::is_base_of_v<GameObject, O>);
+
+			if (HasSibling())
+			{
+				mySibling->AddSibling(std::unique_ptr<GameObject>(sibling.release()));
+			}
+			else
+			{
+				SetSibling(std::unique_ptr<GameObject>(sibling.release()));
 			}
 		}
 
