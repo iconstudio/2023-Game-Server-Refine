@@ -1,6 +1,7 @@
 #pragma once
-import <memory>;
-import <vector>;
+#include <memory>
+#include <chrono>
+#include <vector>
 
 import Game.Scene;
 import Game.Camera;
@@ -11,7 +12,9 @@ public:
 	Framework() noexcept
 		: everyScene()
 	{
+		everyScene.emplace_back(std::make_unique<game::Scene>());
 
+		//auto camera = game::GameObject::Instantiate<game::Camera>();
 	}
 
 	~Framework() noexcept
@@ -31,7 +34,23 @@ public:
 
 	void Update()
 	{
+		long long start_time = 0;
+		long long current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
+		while (true)
+		{
+			UpdateOnce(current_time - start_time);
+
+			start_time = current_time;
+			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+			LateUpdateOnce(current_time - start_time);
+
+			start_time = current_time;
+			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+			//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 	}
 
 	void UpdateOnce(const float& delta_time)
