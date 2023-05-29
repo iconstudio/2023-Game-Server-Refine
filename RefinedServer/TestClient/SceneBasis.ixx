@@ -1,7 +1,6 @@
 export module Game.Scene.Basis;
 import <string>;
 import <memory>;
-import System.PipelineObject;
 
 export namespace game
 {
@@ -15,8 +14,7 @@ export namespace game
 		constexpr SceneBasis() noexcept = default;
 
 		constexpr SceneBasis(std::string_view name) noexcept
-			: PipelineObject()
-			, std::enable_shared_from_this<SceneBasis>()
+			: std::enable_shared_from_this<SceneBasis>()
 			, myName(name)
 		{}
 
