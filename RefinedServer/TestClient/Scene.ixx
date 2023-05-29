@@ -51,8 +51,14 @@ export extern "C++" namespace game
 			, mainCamera(camera)
 		{}
 
+		void Destroy() noexcept
+		{
+			Cast()->Destroy();
+		}
+
 		inline ~Scene() noexcept
 		{
+			Destroy();
 			SceneBasis::~SceneBasis();
 		}
 

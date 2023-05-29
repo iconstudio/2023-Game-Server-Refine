@@ -29,6 +29,9 @@ export extern "C" namespace game
 		void LateUpdate(const float& delta_time)
 		{}
 
+		void Destroy()
+		{}
+
 		void SetCameraTarget(const glm::vec3& target);
 		void SetCameraDistance(const float& distance);
 		void SetCameraRotation(const float& rotation);
