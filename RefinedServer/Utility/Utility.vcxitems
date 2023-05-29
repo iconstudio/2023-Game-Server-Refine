@@ -16,6 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Classifier.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)D3DVector.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)D3DMatrix.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)DataPacker.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)DataUnit.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Deserialization.ixx" />
@@ -43,6 +45,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utility.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\String.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\ThreadUnit.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Transform.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)Utility.natvis" />

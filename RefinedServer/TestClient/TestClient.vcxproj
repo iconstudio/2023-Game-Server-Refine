@@ -207,6 +207,11 @@
     <Natvis Include="TestClient.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Update="D:\yoyof\Documents\Git\iconstudio\2023-Game-Server-Refine\RefinedServer\Utility\D3DVector.ixx">
+      <FileType>Document</FileType>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="C:\Users\yoyof\Documents\2023-Game-Server-Refine\RefinedServer\Utility\Serialization.inl">
       <FileType>Document</FileType>
     </None>
