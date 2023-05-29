@@ -2,9 +2,11 @@ export module Game.GameObject;
 import <new>;
 import <string_view>;
 import <memory>;
+import <vector>;
 import Utility.Named;
 import System.PipelineObject;
 import Game.Object;
+import Game.Component;
 
 export namespace game
 {
@@ -127,6 +129,8 @@ export namespace game
 	protected:
 		std::unique_ptr<GameObject> myChild = nullptr;
 		std::unique_ptr<GameObject> mySibling = nullptr;
+
+		std::vector<std::unique_ptr<Component>> myComponents;
 	};
 }
 
