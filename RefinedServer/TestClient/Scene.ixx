@@ -8,6 +8,7 @@ import Utility.Constraints;
 import System.PipelineObject;
 export import Game.Camera;
 export import Game.Scene.Basis;
+export import Game.GameObject;
 
 export extern "C++" namespace game
 {
@@ -36,23 +37,17 @@ export extern "C++" namespace game
 		using singletone = SceneTraits<S>::singletone;
 
 		constexpr Scene(S* const& scene) noexcept
-			: Scene(scene, "Scene", nullptr)
+			: Scene(scene, "Scene")
 		{}
 
 		constexpr Scene(S* const& scene, const std::string_view& name) noexcept
-			: Scene(scene, name, nullptr)
-		{}
-
-		constexpr Scene(S* const& scene, const std::shared_ptr<Camera>& camera) noexcept
-			: Scene(scene, "Scene", camera)
-		{}
-
-		constexpr Scene(S* const& scene, const std::string_view& name, const std::shared_ptr<Camera>& camera) noexcept
 			: SceneBasis(name)
 			, pipeline()
 			, singletone(scene)
-			, mainCamera(camera)
-		{}
+			, gameObjects()
+		{
+			gameObjects.reserve(10ULL);
+		}
 
 		void Destroy() noexcept(noexcept(Cast()->Destroy()))
 		{
@@ -70,7 +65,8 @@ export extern "C++" namespace game
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
 
-		std::shared_ptr<Camera> mainCamera;
+	private:
+		std::vector<std::unique_ptr<GameObject>> gameObjects;
 
 	private:
 		[[nodiscard]]
