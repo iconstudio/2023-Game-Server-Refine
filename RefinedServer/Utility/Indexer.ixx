@@ -24,6 +24,6 @@ export namespace util
 		const size_t myIndex;
 
 	private:
-		static size_t _index;
+		inline constinit static size_t _index = 0;
 	};
 }
