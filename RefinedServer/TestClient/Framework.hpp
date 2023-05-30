@@ -3,6 +3,7 @@
 #include <chrono>
 #include <vector>
 
+import Utility.Print;
 import Game.Scene;
 import Game.Camera;
 
@@ -24,6 +25,8 @@ public:
 
 	void Awake()
 	{
+		util::Println("시스템을 초기화합니다.");
+
 		for (auto& scene : everyScene)
 		{
 			scene->Awake();
@@ -32,6 +35,8 @@ public:
 
 	void Start()
 	{
+		util::Println("프레임워크를 준비합니다.");
+
 		auto& scene = everyScene[roomIndex];
 
 		scene->Start();
@@ -39,21 +44,28 @@ public:
 
 	void Update()
 	{
+		util::Println("프레임워크를 시작합니다.");
+
 		long long start_time = 0;
 		long long current_time = 0;
 
 		while (true)
 		{
 			auto& scene = everyScene[roomIndex];
-			float est = static_cast<float>((current_time - start_time) / 1000);
+
+			long long between = current_time - start_time;
+			float est = static_cast<float>(between) / 1000.0f;
 
 			UpdateOnce(scene.get(), est);
+			util::debug::Println("씬 업데이트 1 (시간: {}밀리초)", est);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			est = static_cast<float>((current_time - start_time) / 1000);
+			between = current_time - start_time;
+			est = static_cast<float>(between) / 1000.0f;
 			LateUpdateOnce(scene.get(), est);
+			util::debug::Println("씬 업데이트 2 (시간: {}밀리초)", est);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -64,11 +76,14 @@ public:
 
 				if (everyScene.size() <= roomIndex)
 				{
+					util::Println("다음 씬이 없습니다.");
 					break;
 				}
 				else
 				{
 					auto& scene = everyScene[roomIndex];
+
+					util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
 					scene->Start();
 				}
 			}
