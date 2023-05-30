@@ -58,7 +58,20 @@ public:
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			if (scene->IsCompleted())
+			{
+				roomIndex++;
+
+				if (everyScene.size() <= roomIndex)
+				{
+					break;
+				}
+				else
+				{
+					auto& scene = everyScene[roomIndex];
+					scene->Start();
+				}
+			}
 		}
 	}
 
