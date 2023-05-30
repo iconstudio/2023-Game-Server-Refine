@@ -153,8 +153,6 @@ export extern "C++" namespace game
 		std::atomic_bool isPaused = false;
 		std::atomic_bool isCompleted = false;
 	};
-
-	using SceneHandle = std::shared_ptr<Scene>;
 }
 
 export namespace std

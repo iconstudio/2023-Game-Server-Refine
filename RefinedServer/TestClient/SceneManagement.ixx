@@ -14,13 +14,15 @@ export namespace game
 	class SceneManager
 	{
 	public:
-		static void AddScene(const SceneHandle& scene) noexcept
-		{
-			everyScene.push_back(scene);
-			auto lt = std::unique(everyScene.begin(), everyScene.end());
-			everyScene.erase(lt, everyScene.end());
+		using SceneHandle = std::unique_ptr<Scene>;
 
-			scenesMap[scene->GetName()] = scene;
+		static void AddScene(SceneHandle&& scene) noexcept
+		{
+			//everyScene.push_back(scene);
+			auto lt = std::unique(everyScene.begin(), everyScene.end());
+			//everyScene.erase(lt, everyScene.end());
+
+			scenesMap[scene->GetName()] = std::move(scene);
 		}
 
 		static std::vector<SceneHandle> everyScene;
