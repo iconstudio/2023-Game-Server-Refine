@@ -35,8 +35,7 @@ export namespace game
 			return std::unique_ptr<GameObject>(new T());
 		}
 
-		template<typename T>
-			requires(util::copyable<T>)
+		template<util::copyable T>
 		[[nodiscard]]
 		static constexpr
 			std::unique_ptr<T>
