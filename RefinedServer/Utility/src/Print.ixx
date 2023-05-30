@@ -371,20 +371,20 @@ noexcept
 	{
 		if constexpr (std::is_same_v<Char, char>)
 		{
-			return std::fputs(fmt.get().data(), stream);
+			std::fputs(fmt.get().data(), stream);
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
 		{
-			return std::fputws(fmt.get().data(), stream);
+			std::fputws(fmt.get().data(), stream);
 		}
 	}
 	else if constexpr (std::is_same_v<Char, char>)
 	{
-		return internal_vprint(stream, fmt.get(), std::make_format_args(std::forward<Args>(args)...));
+		internal_vprint(stream, fmt.get(), std::make_format_args(std::forward<Args>(args)...));
 	}
 	else if constexpr (std::is_same_v<Char, wchar_t>)
 	{
-		return internal_wprint(stream, fmt.get(), std::make_wformat_args(std::forward<Args>(args)...));
+		internal_wprint(stream, fmt.get(), std::make_wformat_args(std::forward<Args>(args)...));
 	}
 }
 
