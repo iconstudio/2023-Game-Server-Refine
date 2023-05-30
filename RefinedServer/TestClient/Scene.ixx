@@ -3,11 +3,11 @@ module;
 export module Game.Scene;
 
 #if SCENE_ATOMIC_FLAGS
-import <atomic>;
+import Utility.Atomic;
 
 #define SCENE_CONSTEXPR inline
-#define GET_FLAG(flag) flag.load(std::memory_order_relaxed)
-using FLAG_T = std::atomic_bool;
+#define GET_FLAG(flag) flag.load(util::memory_order_relaxed)
+using FLAG_T = util::atomic_bool;
 
 #else // SCENE_ATOMIC_FLAGS
 
@@ -16,15 +16,14 @@ using FLAG_T = std::atomic_bool;
 using FLAG_T = bool;
 #endif // !SCENE_ATOMIC_FLAGS
 
-import <memory>;
-import <string>;
-import <string_view>;
 import <vector>;
 import <algorithm>;
 import <ranges>;
+import Utility;
+import Utility.Constraints;
 import Utility.Named;
 import Utility.Indexer;
-import Utility.Constraints;
+import Utility.String;
 import System.PipelineObject;
 export import Game.Camera;
 export import Game.GameObject;
@@ -41,7 +40,7 @@ export extern "C++" namespace game
 			: Scene("Scene")
 		{}
 
-		explicit constexpr Scene(std::string_view name) noexcept
+		constexpr Scene(std::string_view name) noexcept
 			: Named(name), Indexer<Scene>()
 		{
 			gameObjects.reserve(10ULL);
@@ -49,8 +48,9 @@ export extern "C++" namespace game
 
 #if SCENE_ATOMIC_FLAGS
 		inline Scene(Scene&& other) noexcept
-			: Named(std::move(other).GetName()), Indexer<Scene>(std::move(other))
-			, gameObjects(std::move(other.gameObjects))
+			: Named(static_cast<Scene&&>(other).GetName())
+			, Indexer<Scene>(static_cast<Indexer<Scene>&&>(other))
+			, gameObjects(static_cast<std::vector<GameObjectHandle>&&>(other.gameObjects))
 			, isAwaken(other.IsAwaken())
 			, isPaused(other.IsPaused())
 			, isCompleted(other.IsCompleted())
@@ -69,23 +69,23 @@ export extern "C++" namespace game
 
 		virtual SCENE_CONSTEXPR ~Scene() noexcept = default;
 
-		constexpr void AddInstance(std::unique_ptr<GameObject>&& gameObject) noexcept
+		constexpr void AddInstance(GameObjectHandle&& gameObject) noexcept
 		{
-			gameObjects.emplace_back(std::move(gameObject));
+			gameObjects.emplace_back(static_cast<GameObjectHandle&&>(gameObject));
 		}
 
 		constexpr void RemoveInstance(const GameObject& gameObject) noexcept
 		{
 			(void)std::ranges::remove_if(gameObjects
-				, [&gameObject](const std::unique_ptr<GameObject>& ptr) {
-				return ptr.get() == std::addressof(gameObject);
+				, [&gameObject](const GameObjectHandle& ptr) {
+				return ptr.get() == util::addressof(gameObject);
 			});
 		}
 
 		constexpr void RemoveInstance(std::string_view name) noexcept
 		{
 			(void)std::ranges::remove_if(gameObjects
-				, [&name](const std::unique_ptr<GameObject>& ptr) {
+				, [&name](const GameObjectHandle& ptr) {
 				return ptr->GetName() == name;
 			});
 		}
@@ -94,7 +94,7 @@ export extern "C++" namespace game
 			void
 			Swap(Scene& other) noexcept
 		{
-			std::swap(gameObjects, other.gameObjects);
+			gameObjects.swap(other.gameObjects);
 
 			bool temp1 = IsAwaken();
 			isAwaken = other.IsAwaken();
@@ -123,7 +123,7 @@ export extern "C++" namespace game
 			}
 
 			std::ranges::for_each(gameObjects
-				, [](const std::unique_ptr<GameObject>& ptr) {
+				, [](const GameObjectHandle& ptr) {
 				ptr->Reset();
 			});
 
@@ -170,7 +170,7 @@ export extern "C++" namespace game
 		Scene& operator=(const Scene& other) = delete;
 
 	protected:
-		std::vector<std::unique_ptr<GameObject>> gameObjects{};
+		std::vector<GameObjectHandle> gameObjects{};
 
 		FLAG_T isAwaken = false;
 		FLAG_T isPaused = false;

@@ -3,9 +3,12 @@
 #include <chrono>
 #include <vector>
 
+import Utility;
+import Utility.Constraints;
 import Game.Camera;
 import Game.GameObject;
 import Game.Scene;
+import Game.Scene.Specialized;
 
 class Framework
 {
@@ -20,6 +23,12 @@ public:
 
 	~Framework() noexcept
 	{}
+
+	template<typename S>
+	void AddScene() noexcept
+	{
+		everyScene.emplace_back(std::make_unique<S>());
+	}
 
 	void Awake();
 	void Start();
