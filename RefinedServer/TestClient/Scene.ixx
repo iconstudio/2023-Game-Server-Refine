@@ -2,9 +2,9 @@ module;
 #define SCENE_ATOMIC_FLAGS false
 export module Game.Scene;
 
-#if SCENE_ATOMIC_FLAGS
 import Utility.Atomic;
 
+#if SCENE_ATOMIC_FLAGS
 #define SCENE_CONSTEXPR inline
 #define GET_FLAG(flag) flag.load(util::memory_order_relaxed)
 using FLAG_T = util::atomic_bool;

@@ -47,6 +47,12 @@ void Framework::Update()
 
 		const auto& scene = *scene_ptr;
 
+		if (scene->IsPaused())
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			continue;
+		}
+
 		long long between = current_time - start_time;
 		float est = static_cast<float>(between) / 1000.0f;
 
