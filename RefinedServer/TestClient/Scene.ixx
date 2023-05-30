@@ -69,7 +69,7 @@ export extern "C++" namespace game
 			});
 		}
 
-		inline void Swap(Scene& other) noexcept
+		virtual inline void Swap(Scene& other) noexcept
 		{
 			std::swap(gameObjects, other.gameObjects);
 
@@ -155,4 +155,12 @@ export extern "C++" namespace game
 	};
 
 	using SceneHandle = std::shared_ptr<Scene>;
+}
+
+export namespace std
+{
+	inline void swap(game::Scene& lhs, game::Scene& rhs) noexcept
+	{
+		lhs.Swap(rhs);
+	}
 }
