@@ -2,14 +2,16 @@
 
 import Utility.Print;
 
+using namespace game;
+
 void Framework::Awake()
 {
 	util::Println("시스템을 초기화합니다.");
 
-	game::SceneManager::AddScene(std::make_unique<game::Scene>("씬 1"));
-	game::SceneManager::AddScene(std::make_unique<game::Scene>("씬 2"));
+	SceneManager::AddScene(SceneManager::CreateScene("씬 1"));
+	SceneManager::AddScene(SceneManager::CreateScene("씬 2"));
 
-	for (std::unique_ptr<game::Scene>& scene : game::SceneManager::everyScene)
+	for (SceneHandle& scene : SceneManager::everyScene)
 	{
 		scene->Awake();
 	}
@@ -19,7 +21,7 @@ void Framework::Start() noexcept
 {
 	util::Println("프레임워크를 준비합니다.");
 
-	CurrentScene().if_then([](game::Scene* scene) {
+	CurrentScene().if_then([](Scene* scene) {
 		scene->Start();
 	}).else_then([]() noexcept {
 		util::Println("첫번째 씬이 없습니다.");
@@ -72,7 +74,7 @@ void Framework::Update()
 			}
 			else
 			{
-				auto scene_wrapper = game::SceneManager::GetScene(roomIndex);
+				auto scene_wrapper = SceneManager::GetScene(roomIndex);
 
 				if (scene_wrapper.has_value())
 				{
@@ -91,12 +93,12 @@ void Framework::Update()
 	}
 }
 
-void Framework::UpdateOnce(game::Scene* const& scene, const float delta_time)
+void Framework::UpdateOnce(Scene* const& scene, const float delta_time)
 {
 	scene->Update(delta_time);
 }
 
-void Framework::LateUpdateOnce(game::Scene* const& scene, const float delta_time)
+void Framework::LateUpdateOnce(Scene* const& scene, const float delta_time)
 {
 	scene->LateUpdate(delta_time);
 }
