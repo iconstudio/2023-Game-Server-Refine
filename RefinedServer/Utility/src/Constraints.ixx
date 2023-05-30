@@ -6,8 +6,17 @@ export import Utility.Traits;
 
 export namespace util
 {
-	template<typename Derived>
-	concept crtp = std::is_class_v<Derived> && std::same_as<Derived, remove_cv_t<Derived>>;
+	template<typename... Ts>
+	concept classes = make_conjunction<std::is_class, clean_t<Ts>...>;
+
+	template<typename T>
+	concept finalized = classes<T> && std::is_final_v<clean_t<T>>;
+
+	template<typename Derived, typename Parent>
+	concept hierachy = classes<Derived, Parent> && std::derived_from<Derived, remove_cv_t<Parent>>;
+
+	template<typename D>
+	concept crtp = classes<D> && std::same_as<D, remove_cv_t<D>>;
 
 	template<typename T>
 	using not_void = std::negation<std::is_same<clean_t<T>, void>>;
@@ -29,12 +38,6 @@ export namespace util
 
 	template<typename... Ts>
 	concept hard_enumerations = enumerations<Ts...> && make_conjunction<std::is_scoped_enum, clean_t<Ts>...>;
-
-	template<typename... Ts>
-	concept classes = make_conjunction<std::is_class, clean_t<Ts>...>;
-
-	template<typename T>
-	concept finalized = classes<T> && std::is_final_v<clean_t<T>>;
 
 	template<typename T, typename... Args>
 	concept invocables = !std::is_abstract_v<clean_t<T>> && std::invocable<T, Args...>;
