@@ -23,10 +23,10 @@ export namespace game
 			return myOwner;
 		}
 
-		Component(const Component&) = delete;
-		constexpr Component(Component&&) noexcept = default;
-		Component& operator=(const Component&) = delete;
-		constexpr Component& operator=(Component&&) noexcept = default;
+		constexpr Component(const Component& other) noexcept = default;
+		constexpr Component(Component&& other) noexcept = default;
+		constexpr Component& operator=(const Component& other) noexcept = default;
+		constexpr Component& operator=(Component&& other) noexcept = default;
 
 		Object* myOwner = nullptr;
 	};
