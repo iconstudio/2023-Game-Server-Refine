@@ -6,8 +6,6 @@ import Utility.Constraints;
 import Utility.Monad;
 import Game.Scene;
 
-using namespace std;
-
 export namespace game
 {
 	using SceneHandle = std::unique_ptr<Scene>;
@@ -28,7 +26,7 @@ export namespace game
 			AddScene(SceneHandle(scene));
 		}
 
-		template<typename S, typename... Args>
+		template<typename S = Scene, typename... Args>
 		[[nodiscard]]
 		static constexpr SceneHandle CreateScene(Args&&... args)
 			noexcept(util::nothrow_constructibles<S, Args...>)
