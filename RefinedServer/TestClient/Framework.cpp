@@ -16,13 +16,12 @@ void Framework::Start()
 {
 	util::Println("프레임워크를 준비합니다.");
 
-	std::unique_ptr<game::Scene>& scene = everyScene[roomIndex];
+	std::unique_ptr<game::Scene>& scene = CurrentScene();
 
 	scene->Start();
 }
 
 void Framework::Update()
-
 {
 	util::Println("프레임워크를 시작합니다.");
 
@@ -31,7 +30,7 @@ void Framework::Update()
 
 	while (true)
 	{
-		auto& scene = everyScene[roomIndex];
+		auto& scene = CurrentScene();
 
 		long long between = current_time - start_time;
 		float est = static_cast<float>(between) / 1000.0f;
