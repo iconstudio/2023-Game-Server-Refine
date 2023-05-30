@@ -42,7 +42,7 @@ export extern "C++" namespace game
 		{
 			(void)std::ranges::remove_if(gameObjects
 				, [&gameObject](const std::unique_ptr<GameObject>& ptr) {
-				return ptr.get() == &gameObject;
+				return ptr.get() == std::addressof(gameObject);
 			});
 		}
 
