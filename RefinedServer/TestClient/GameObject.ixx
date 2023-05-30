@@ -39,12 +39,12 @@ export namespace game
 		[[nodiscard]]
 		static inline
 			std::unique_ptr<T>
-			Instantiate(T* original)
+			Instantiate(const T* const& original)
 			noexcept(util::nothrow_copy_constructibles<T>)
 		{
 			static_assert(std::is_base_of_v<GameObject, util::clean_t<T>>, "T must be derived from GameObject!");
 
-			return std::unique_ptr<GameObject>(new T(*original));
+			return std::unique_ptr<GameObject>(DeepCopy(original));
 		}
 
 		template<typename T>
@@ -56,7 +56,7 @@ export namespace game
 		{
 			static_assert(std::is_base_of_v<GameObject, T>, "T must be derived from GameObject!");
 
-			return std::unique_ptr<GameObject>(new T(*original.get()));
+			return std::unique_ptr<GameObject>(DeepCopy(original.get()));
 		}
 
 		constexpr void Reset() noexcept
