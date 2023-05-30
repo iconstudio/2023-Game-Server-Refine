@@ -68,7 +68,7 @@ void Framework::Update()
 		{
 			roomIndex++;
 
-			if (game::SceneManager::everyScene.size() <= roomIndex)
+			if (game::SceneManager::NumberOfScenes() <= roomIndex)
 			{
 				util::Println("다음 씬이 없습니다.");
 				break;
@@ -79,10 +79,10 @@ void Framework::Update()
 
 				if (scene_wrapper.has_value())
 				{
-					auto& scene = *scene_wrapper;
+					auto& next = *scene_wrapper;
 
 					util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
-					scene->Start();
+					next->Start();
 				}
 				else
 				{

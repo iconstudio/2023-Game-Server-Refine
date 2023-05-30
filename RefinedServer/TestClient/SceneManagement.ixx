@@ -49,6 +49,12 @@ export namespace game
 			}
 		}
 
+		[[nodiscard]]
+		static constexpr size_t NumberOfScenes() noexcept
+		{
+			return everyScene.size();
+		}
+
 		static std::vector<SceneHandle> everyScene;
 	};
 
