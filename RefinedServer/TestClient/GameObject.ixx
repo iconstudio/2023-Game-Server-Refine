@@ -189,21 +189,25 @@ export namespace game
 			}
 		}
 
+		[[nodiscard]]
 		constexpr GameObject* const& GetChild() const
 		{
 			return myChild.get();
 		}
 
+		[[nodiscard]]
 		constexpr GameObject* const& GetSibling() const
 		{
 			return mySibling.get();
 		}
 
+		[[nodiscard]]
 		constexpr bool HasChild() const noexcept
 		{
 			return nullptr != myChild;
 		}
 
+		[[nodiscard]]
 		constexpr bool HasSibling() const noexcept
 		{
 			return nullptr != mySibling;
@@ -215,37 +219,38 @@ export namespace game
 		constexpr GameObject& operator=(GameObject&& other) noexcept = default;
 
 	protected:
+		[[nodiscard]]
 		constexpr GameObject* DeepCopy(const GameObject* const& obj) const noexcept
 		{
 			GameObject* copied_child = nullptr;
 			GameObject* copied_sibling = nullptr;
 
-			if (obj->HasChild())
-			{
-				copied_child = DeepCopy(obj->GetChild());
-			}
-
-			if (obj->HasSibling())
-			{
-				copied_sibling = DeepCopy(obj->GetSibling());
-			}
-
-			std::vector<std::unique_ptr<Component>> temp_list{};
-			temp_list.reserve(obj->myComponents.size());
-
-			for (const std::unique_ptr<Component>& component : obj->myComponents)
-			{
-				temp_list.emplace_back(component->DeepCopy());
-			}
-
 			GameObject* result = new GameObject{};
 			try
 			{
+				if (obj->HasChild())
+				{
+					copied_child = DeepCopy(obj->GetChild());
+				}
+
+				if (obj->HasSibling())
+				{
+					copied_sibling = DeepCopy(obj->GetSibling());
+				}
+
+				std::vector<std::unique_ptr<Component>> temp_list{};
+				temp_list.reserve(obj->myComponents.size());
+
+				for (const std::unique_ptr<Component>& component : obj->myComponents)
+				{
+					temp_list.emplace_back(component->DeepCopy());
+				}
+
 				result->myChild = std::unique_ptr<GameObject>{ copied_child };
 				result->mySibling = std::unique_ptr<GameObject>{ copied_sibling };
 				result->myComponents = std::move(temp_list);
 			}
-			catch(...)
+			catch (...)
 			{
 				delete result;
 				throw;
