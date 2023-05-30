@@ -1,4 +1,5 @@
 export module Game.Scene;
+import <atomic>;
 import <memory>;
 import <string>;
 import <string_view>;
@@ -26,19 +27,18 @@ export extern "C++" namespace game
 
 		constexpr Scene(std::string_view name) noexcept
 			: Named(name), Indexer<Scene>()
-			, gameObjects()
 		{
 			gameObjects.reserve(10ULL);
 		}
 
 		virtual constexpr ~Scene() noexcept = default;
 
-		constexpr void AddGameObject(std::unique_ptr<GameObject>&& gameObject) noexcept
+		constexpr void AddInstance(std::unique_ptr<GameObject>&& gameObject) noexcept
 		{
 			gameObjects.emplace_back(std::move(gameObject));
 		}
 
-		constexpr void RemoveGameObject(const GameObject& gameObject) noexcept
+		constexpr void RemoveInstance(const GameObject& gameObject) noexcept
 		{
 			(void)std::ranges::remove_if(gameObjects
 				, [&gameObject](const std::unique_ptr<GameObject>& ptr) {
@@ -46,7 +46,7 @@ export extern "C++" namespace game
 			});
 		}
 
-		constexpr void RemoveGameObject(std::string_view name) noexcept
+		constexpr void RemoveInstance(std::string_view name) noexcept
 		{
 			(void)std::ranges::remove_if(gameObjects
 				, [&name](const std::unique_ptr<GameObject>& ptr) {
@@ -57,7 +57,7 @@ export extern "C++" namespace game
 		/// <summary>
 		/// Resetting the status to the moment of awakening.
 		/// </summary>
-		virtual constexpr void Reset() noexcept
+		virtual void Reset() noexcept
 		{
 			if (!isAwaken)
 			{
@@ -78,35 +78,35 @@ export extern "C++" namespace game
 			isComplete = false;
 		}
 
-		constexpr void MakeAwake() noexcept
+		void MakeAwake() noexcept
 		{
 			isAwaken = true;
 		}
 
-		constexpr bool SetPause(const bool flag) noexcept
+		bool SetPause(const bool flag) noexcept
 		{
 			return isPaused = flag;
 		}
 
-		constexpr bool SetCompletion(const bool done) noexcept
+		bool SetCompletion(const bool done) noexcept
 		{
 			return isComplete = done;
 		}
 
 		[[nodiscard]]
-		constexpr bool IsAwaken() const noexcept
+		bool IsAwaken() const noexcept
 		{
 			return isAwaken;
 		}
 
 		[[nodiscard]]
-		constexpr bool IsPaused() const noexcept
+		bool IsPaused() const noexcept
 		{
 			return isPaused;
 		}
 
 		[[nodiscard]]
-		constexpr bool IsComplete() const noexcept
+		bool IsComplete() const noexcept
 		{
 			return isComplete;
 		}
@@ -117,11 +117,11 @@ export extern "C++" namespace game
 		constexpr Scene& operator=(Scene&& other) noexcept = default;
 
 	protected:
-		std::vector<std::unique_ptr<GameObject>> gameObjects;
+		std::vector<std::unique_ptr<GameObject>> gameObjects{};
 
-		bool isAwaken = false;
-		bool isPaused = false;
-		bool isComplete = false;
+		std::atomic_bool isAwaken = false;
+		std::atomic_bool isPaused = false;
+		std::atomic_bool isComplete = false;
 	};
 
 	using SceneHandle = std::shared_ptr<Scene>;
