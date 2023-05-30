@@ -10,11 +10,11 @@ using namespace std;
 
 export namespace game
 {
+	using SceneHandle = std::unique_ptr<Scene>;
+
 	class SceneManager
 	{
 	public:
-		using SceneHandle = std::unique_ptr<Scene>;
-
 		static constexpr void AddScene(SceneHandle&& scene) noexcept
 		{
 			everyScene.push_back(std::move(scene));
@@ -32,7 +32,7 @@ export namespace game
 		{
 			static_assert(util::hierachy<S, Scene>, "S must be derived from Scene");
 
-			everyScene.push_back(SceneHandle(scene));
+			AddScene(SceneHandle(scene));
 		}
 
 		template<typename S, typename... Args>
