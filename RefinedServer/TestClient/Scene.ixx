@@ -25,10 +25,25 @@ export extern "C++" namespace game
 			: Scene("Scene")
 		{}
 
-		constexpr Scene(std::string_view name) noexcept
+		explicit constexpr Scene(std::string_view name) noexcept
 			: Named(name), Indexer<Scene>()
 		{
 			gameObjects.reserve(10ULL);
+		}
+
+		inline Scene(Scene&& other) noexcept
+			: Named(std::move(other).GetName()), Indexer<Scene>(std::move(other))
+			, gameObjects(std::move(other.gameObjects))
+			, isAwaken(other.IsAwaken())
+			, isPaused(other.IsPaused())
+			, isCompleted(other.IsCompleted())
+		{}
+
+		inline Scene& operator=(Scene&& other) noexcept
+		{
+			Swap(other);
+
+			return *this;
 		}
 
 		virtual constexpr ~Scene() noexcept = default;
@@ -52,6 +67,23 @@ export extern "C++" namespace game
 				, [&name](const std::unique_ptr<GameObject>& ptr) {
 				return ptr->GetName() == name;
 			});
+		}
+
+		inline void Swap(Scene& other) noexcept
+		{
+			std::swap(gameObjects, other.gameObjects);
+
+			bool temp1 = IsAwaken();
+			isAwaken = other.IsAwaken();
+			other.isAwaken = temp1;
+
+			bool temp2 = IsPaused();
+			isPaused = other.IsPaused();
+			other.isPaused = temp2;
+
+			bool temp3 = IsCompleted();
+			isCompleted = other.IsCompleted();
+			other.isCompleted = temp3;
 		}
 
 		/// <summary>
@@ -96,25 +128,23 @@ export extern "C++" namespace game
 		[[nodiscard]]
 		inline bool IsAwaken() const noexcept
 		{
-			return isAwaken;
+			return isAwaken.load(std::memory_order_relaxed);
 		}
 
 		[[nodiscard]]
 		inline bool IsPaused() const noexcept
 		{
-			return isPaused;
+			return isPaused.load(std::memory_order_relaxed);
 		}
 
 		[[nodiscard]]
 		inline bool IsCompleted() const noexcept
 		{
-			return isCompleted;
+			return isCompleted.load(std::memory_order_relaxed);
 		}
 
 		Scene(const Scene& other) = delete;
-		constexpr Scene(Scene&& other) noexcept = default;
 		Scene& operator=(const Scene& other) = delete;
-		constexpr Scene& operator=(Scene&& other) noexcept = default;
 
 	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects{};
