@@ -15,10 +15,10 @@ import Game.Scene.Management;
 class Framework
 {
 public:
-	Framework() noexcept
+	constexpr Framework() noexcept
 	{}
 
-	~Framework() noexcept = default;
+	constexpr ~Framework() noexcept = default;
 
 	void Awake();
 	void Start() noexcept;
