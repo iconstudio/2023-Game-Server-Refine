@@ -7,7 +7,7 @@ export import Game.Object;
 
 export namespace game
 {
-	class [[nodiscard]] Component
+	class [[nodiscard]] alignas(32) Component
 		: public Object
 		, public sys::PipelineModel
 		, public util::Classifier<Component>

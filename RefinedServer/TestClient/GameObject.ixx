@@ -14,7 +14,7 @@ import Game.Component;
 
 export namespace game
 {
-	class GameObject
+	class alignas(32) GameObject
 		: public Object
 		, public util::Named
 		, public util::Classifier<GameObject>

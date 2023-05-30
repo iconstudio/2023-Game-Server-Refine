@@ -14,7 +14,7 @@ export import Game.GameObject;
 
 export extern "C++" namespace game
 {
-	class Scene
+	class [[nodiscard]] alignas(64) Scene
 		: public sys::PipelineModel
 		, public util::Named
 		, public util::Indexer<Scene>

@@ -4,7 +4,7 @@ export import Utility.Classifier;
 
 export namespace game
 {
-	class Object
+	class alignas(32) Object
 		: private util::Indexer<Object>
 		, public util::Classifier<Object>
 	{

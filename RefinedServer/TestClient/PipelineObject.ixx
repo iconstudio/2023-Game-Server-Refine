@@ -4,7 +4,7 @@ import Utility.Constraints;
 
 export extern "C++" namespace sys
 {
-	struct PipelineModel
+	struct alignas(32) PipelineModel
 	{
 		constexpr PipelineModel() noexcept = default;
 		virtual constexpr ~PipelineModel() noexcept = default;
@@ -31,7 +31,7 @@ export extern "C++" namespace sys
 	/// </summary>
 	/// <typeparam name="O"></typeparam>
 	template<util::classes O>
-	class [[nodiscard]] PipelineObject
+	class [[nodiscard]] alignas(32) PipelineObject
 	{
 		static_assert(util::always_false<O>, "Don't use it for now.");
 

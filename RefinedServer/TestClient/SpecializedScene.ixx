@@ -14,7 +14,7 @@ export namespace game
 	};
 
 	template<typename S>
-	class NamedScene
+	class [[nodiscard]] alignas(64) NamedScene
 		: public Scene
 		, public SceneTraits<S>::singletone
 	{
