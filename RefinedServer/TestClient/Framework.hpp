@@ -14,20 +14,17 @@ class Framework
 {
 public:
 	Framework() noexcept
-		: everyScene()
-	{
-		everyScene.emplace_back(std::make_unique<game::Scene>());
-
-		//auto camera = game::GameObject::Instantiate<game::Camera>();
-	}
-
-	~Framework() noexcept
 	{}
 
-	template<typename S>
-	void AddScene() noexcept
+	~Framework() noexcept = default;
+
+	template<typename S, typename... Args>
+	constexpr void AddScene(Args&& ...args)
+		noexcept(util::trivials<S> && util::nothrow_constructibles<S, Args...>)
 	{
-		everyScene.emplace_back(std::make_unique<S>());
+		static_assert(util::hierachy<util::clean_t<S>, game::Scene>);
+
+		everyScene.emplace_back(std::make_unique<S>(util::forward<Args>(args)...));
 	}
 
 	void Awake();
@@ -37,6 +34,6 @@ public:
 	void UpdateOnce(game::Scene* scene, const float delta_time);
 	void LateUpdateOnce(game::Scene* scene, const float delta_time);
 
-	std::vector<std::unique_ptr<game::Scene>> everyScene;
+	std::vector<std::unique_ptr<game::Scene>> everyScene{};
 	size_t roomIndex = 0;
 };
