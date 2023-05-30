@@ -215,6 +215,45 @@ export namespace game
 		constexpr GameObject& operator=(GameObject&& other) noexcept = default;
 
 	protected:
+		constexpr GameObject* DeepCopy(const GameObject* const& obj) const noexcept
+		{
+			GameObject* copied_child = nullptr;
+			GameObject* copied_sibling = nullptr;
+
+			if (obj->HasChild())
+			{
+				copied_child = DeepCopy(obj->GetChild());
+			}
+
+			if (obj->HasSibling())
+			{
+				copied_sibling = DeepCopy(obj->GetSibling());
+			}
+
+			std::vector<std::unique_ptr<Component>> temp_list{};
+			temp_list.reserve(obj->myComponents.size());
+
+			for (const std::unique_ptr<Component>& component : obj->myComponents)
+			{
+				temp_list.emplace_back(component->DeepCopy());
+			}
+
+			GameObject* result = new GameObject{};
+			try
+			{
+				result->myChild = std::unique_ptr<GameObject>{ copied_child };
+				result->mySibling = std::unique_ptr<GameObject>{ copied_sibling };
+				result->myComponents = std::move(temp_list);
+			}
+			catch(...)
+			{
+				delete result;
+				throw;
+			}
+
+			return result;
+		}
+
 		std::unique_ptr<GameObject> myChild = nullptr;
 		std::unique_ptr<GameObject> mySibling = nullptr;
 
