@@ -15,12 +15,15 @@ import Game.Component;
 
 export namespace game
 {
-	class GameObject
+	class GameObject final
 		: public Object
 		, public util::Named
 		, public util::Classifier<GameObject>
 	{
 	public:
+		constexpr GameObject() noexcept = default;
+		constexpr ~GameObject() noexcept = default;
+
 		template<typename T>
 		[[nodiscard]]
 		static constexpr
@@ -58,10 +61,7 @@ export namespace game
 			return std::unique_ptr<GameObject>(new T(*original.get()));
 		}
 
-		constexpr GameObject() noexcept = default;
-		constexpr ~GameObject() noexcept = default;
-
-		virtual constexpr void Reset() noexcept
+		constexpr void Reset() noexcept
 		{}
 
 		constexpr void SetChild(std::unique_ptr<GameObject>&& child) noexcept
@@ -262,7 +262,7 @@ export namespace game
 		std::unique_ptr<GameObject> myChild = nullptr;
 		std::unique_ptr<GameObject> mySibling = nullptr;
 
-		std::vector<std::unique_ptr<Component>> myComponents;
+		std::vector<std::unique_ptr<Component>> myComponents{};
 	};
 }
 
