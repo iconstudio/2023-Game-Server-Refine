@@ -23,6 +23,12 @@ export namespace game
 			return myOwner;
 		}
 
+		[[nodiscard]]
+		constexpr Component DeepCopy(const Component& component) const noexcept
+		{
+			return Component(component);
+		}
+
 		constexpr Component(Component&& other) noexcept = default;
 		constexpr Component& operator=(Component&& other) noexcept = default;
 
