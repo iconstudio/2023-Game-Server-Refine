@@ -44,12 +44,14 @@ public:
 
 		while (true)
 		{
-			UpdateOnce(current_time - start_time);
+			auto& scene = everyScene[roomIndex];
+
+			UpdateOnce(*scene, current_time - start_time);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			LateUpdateOnce(current_time - start_time);
+			LateUpdateOnce(*scene, current_time - start_time);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -58,20 +60,14 @@ public:
 		}
 	}
 
-	void UpdateOnce(const float& delta_time)
+	void UpdateOnce(game::Scene* scene, const float& delta_time)
 	{
-		for (auto& scene : everyScene)
-		{
-			scene->Update(delta_time);
-		}
+		scene->Update(delta_time);
 	}
 
-	void LateUpdateOnce(const float& delta_time)
+	void LateUpdateOnce(game::Scene* scene, const float& delta_time)
 	{
-		for (auto& scene : everyScene)
-		{
-			scene->LateUpdate(delta_time);
-		}
+		scene->LateUpdate(delta_time);
 	}
 
 	std::vector<std::unique_ptr<game::Scene>> everyScene;
