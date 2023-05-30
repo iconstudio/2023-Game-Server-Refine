@@ -3,7 +3,6 @@ module;
 
 export module Game.GameObject;
 import <type_traits>;
-import <new>;
 import <string_view>;
 import <memory>;
 import <vector>;
