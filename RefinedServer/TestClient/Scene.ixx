@@ -75,40 +75,40 @@ export extern "C++" namespace game
 			// Awakening would not be called again.
 			isAwaken = true;
 			isPaused = false;
-			isComplete = false;
+			isCompleted = false;
 		}
 
-		void MakeAwake() noexcept
+		inline void MakeAwake() noexcept
 		{
 			isAwaken = true;
 		}
 
-		bool SetPause(const bool flag) noexcept
+		inline bool SetPause(const bool flag) noexcept
 		{
 			return isPaused = flag;
 		}
 
-		bool SetCompletion(const bool done) noexcept
+		inline bool SetCompletion(const bool done) noexcept
 		{
-			return isComplete = done;
+			return isCompleted = done;
 		}
 
 		[[nodiscard]]
-		bool IsAwaken() const noexcept
+		inline bool IsAwaken() const noexcept
 		{
 			return isAwaken;
 		}
 
 		[[nodiscard]]
-		bool IsPaused() const noexcept
+		inline bool IsPaused() const noexcept
 		{
 			return isPaused;
 		}
 
 		[[nodiscard]]
-		bool IsComplete() const noexcept
+		inline bool IsCompleted() const noexcept
 		{
-			return isComplete;
+			return isCompleted;
 		}
 
 		Scene(const Scene& other) = delete;
@@ -121,7 +121,7 @@ export extern "C++" namespace game
 
 		std::atomic_bool isAwaken = false;
 		std::atomic_bool isPaused = false;
-		std::atomic_bool isComplete = false;
+		std::atomic_bool isCompleted = false;
 	};
 
 	using SceneHandle = std::shared_ptr<Scene>;
