@@ -37,7 +37,7 @@ export namespace game
 
 		template<util::copyable T>
 		[[nodiscard]]
-		static constexpr
+		static inline
 			std::unique_ptr<T>
 			Instantiate(T* original)
 			noexcept(util::nothrow_copy_constructibles<T>)
@@ -49,7 +49,7 @@ export namespace game
 
 		template<typename T>
 		[[nodiscard]]
-		static constexpr
+		static inline
 			std::unique_ptr<T>
 			Instantiate(const std::unique_ptr<T>& original)
 			noexcept(util::nothrow_copy_constructibles<T>)
@@ -211,6 +211,12 @@ export namespace game
 			return nullptr != mySibling;
 		}
 
+		[[nodiscard]]
+		inline GameObject* Clone() const
+		{
+			return DeepCopy(this);
+		}
+
 		GameObject(const GameObject& other) = delete;
 		constexpr GameObject(GameObject&& other) noexcept = default;
 		GameObject& operator=(const GameObject& other) = delete;
@@ -218,7 +224,7 @@ export namespace game
 
 	protected:
 		[[nodiscard]]
-		constexpr GameObject* DeepCopy(const GameObject* const& obj) const
+		static inline GameObject* DeepCopy(const GameObject* const& obj)
 		{
 			GameObject* copied_child = nullptr;
 			GameObject* copied_sibling = nullptr;
