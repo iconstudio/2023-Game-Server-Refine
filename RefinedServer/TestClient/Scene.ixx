@@ -48,7 +48,7 @@ export extern "C++" namespace game
 		}
 
 #if SCENE_ATOMIC_FLAGS
-		SCENE_CONSTEXPR Scene(Scene&& other) noexcept
+		inline Scene(Scene&& other) noexcept
 			: Named(std::move(other).GetName()), Indexer<Scene>(std::move(other))
 			, gameObjects(std::move(other.gameObjects))
 			, isAwaken(other.IsAwaken())
@@ -56,7 +56,7 @@ export extern "C++" namespace game
 			, isCompleted(other.IsCompleted())
 		{}
 
-		SCENE_CONSTEXPR Scene& operator=(Scene&& other) noexcept
+		inline Scene& operator=(Scene&& other) noexcept
 		{
 			Swap(other);
 
