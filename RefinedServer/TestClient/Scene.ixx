@@ -41,7 +41,7 @@ export extern "C++" namespace game
 		constexpr void RemoveGameObject(const GameObject& gameObject) noexcept
 		{
 			(void)std::ranges::remove_if(gameObjects
-				, [&gameObject](const auto& ptr) {
+				, [&gameObject](const std::unique_ptr<GameObject>& ptr) {
 				return ptr.get() == &gameObject;
 			});
 		}
@@ -49,19 +49,31 @@ export extern "C++" namespace game
 		constexpr void RemoveGameObject(std::string_view name) noexcept
 		{
 			(void)std::ranges::remove_if(gameObjects
-				, [&name](const auto& ptr) {
+				, [&name](const std::unique_ptr<GameObject>& ptr) {
 				return ptr->GetName() == name;
 			});
 		}
 
+		/// <summary>
+		/// Resetting the status to the moment of awakening.
+		/// </summary>
 		virtual constexpr void Reset() noexcept
 		{
+			if (!isAwaken)
+			{
+				Awake();
+				isAwaken = true;
+
+				return;
+			}
+
 			std::ranges::for_each(gameObjects
-				, [](const auto& ptr) {
+				, [](const std::unique_ptr<GameObject>& ptr) {
 				ptr->Reset();
 			});
 
-			isAwaken = false;
+			// Awakening would not be called again.
+			isAwaken = true;
 			isPaused = false;
 			isComplete = false;
 		}
