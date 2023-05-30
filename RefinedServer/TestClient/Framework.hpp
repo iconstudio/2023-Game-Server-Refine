@@ -46,12 +46,12 @@ public:
 		{
 			auto& scene = everyScene[roomIndex];
 
-			UpdateOnce(*scene, current_time - start_time);
+			UpdateOnce(scene.get(), current_time - start_time);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			LateUpdateOnce(*scene, current_time - start_time);
+			LateUpdateOnce(scene.get(), current_time - start_time);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
