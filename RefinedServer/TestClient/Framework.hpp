@@ -3,8 +3,9 @@
 #include <chrono>
 #include <vector>
 
-import Game.Scene;
 import Game.Camera;
+import Game.GameObject;
+import Game.Scene;
 
 class Framework
 {
