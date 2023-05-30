@@ -1,4 +1,6 @@
 export module Game.Component;
+import <memory>;
+import Utility.Constraints;
 import Utility.Classifier;
 export import System.PipelineObject;
 export import Game.Object;
@@ -26,15 +28,26 @@ export namespace game
 		}
 
 		[[nodiscard]]
-		constexpr Component DeepCopy(const Component& component) const noexcept
+		virtual constexpr Component* Clone() const
+			noexcept(util::nothrow_copy_constructibles<util::clean_t<decltype(*this)>>)
 		{
-			return Component(component);
+			return DeepCopy(*this);
 		}
 
 		constexpr Component(Component&& other) noexcept = default;
 		constexpr Component& operator=(Component&& other) noexcept = default;
 
 	protected:
+		template<typename T = Component>
+		[[nodiscard]]
+		static constexpr T* DeepCopy(const util::clean_t<T>& component)
+			noexcept(util::nothrow_copy_constructibles<T>)
+		{
+			static_assert(util::hierachy<T, Component>, "T must be a Component");
+
+			return new T(component);
+		}
+
 		constexpr Component(const Component& other) noexcept = default;
 		constexpr Component& operator=(const Component& other) noexcept = default;
 

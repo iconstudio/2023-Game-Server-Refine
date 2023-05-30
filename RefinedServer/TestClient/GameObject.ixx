@@ -220,7 +220,7 @@ export namespace game
 
 	protected:
 		[[nodiscard]]
-		constexpr GameObject* DeepCopy(const GameObject* const& obj) const noexcept
+		constexpr GameObject* DeepCopy(const GameObject* const& obj) const
 		{
 			GameObject* copied_child = nullptr;
 			GameObject* copied_sibling = nullptr;
@@ -243,7 +243,7 @@ export namespace game
 
 				for (const std::unique_ptr<Component>& component : obj->myComponents)
 				{
-					temp_list.emplace_back(component->DeepCopy());
+					temp_list.emplace_back(component->Clone());
 				}
 
 				result->myChild = std::unique_ptr<GameObject>{ copied_child };
