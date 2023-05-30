@@ -29,9 +29,8 @@ export namespace game
 
 		[[nodiscard]]
 		virtual constexpr Component* Clone() const
-			noexcept(util::nothrow_copy_constructibles<util::clean_t<decltype(*this)>>)
 		{
-			return DeepCopy(*this);
+			return DeepCopy(this);
 		}
 
 		constexpr Component(Component&& other) noexcept = default;
@@ -40,12 +39,12 @@ export namespace game
 	protected:
 		template<typename T = Component>
 		[[nodiscard]]
-		static constexpr T* DeepCopy(const util::clean_t<T>& component)
+		static constexpr T* DeepCopy(const T* const& component)
 			noexcept(util::nothrow_copy_constructibles<T>)
 		{
 			static_assert(util::hierachy<T, Component>, "T must be a Component");
 
-			return new T(component);
+			return new T(*component);
 		}
 
 		constexpr Component(const Component& other) noexcept = default;
