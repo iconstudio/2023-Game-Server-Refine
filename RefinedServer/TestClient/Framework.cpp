@@ -12,13 +12,15 @@ void Framework::Awake()
 	}
 }
 
-void Framework::Start()
+void Framework::Start() noexcept
 {
 	util::Println("프레임워크를 준비합니다.");
 
-	std::unique_ptr<game::Scene>& scene = CurrentScene();
-
-	scene->Start();
+	CurrentScene().if_then([](game::Scene* scene) {
+		scene->Start();
+	}).else_then([]() noexcept {
+		util::Println("첫번째 씬이 없습니다.");
+	});
 }
 
 void Framework::Update()
@@ -30,12 +32,19 @@ void Framework::Update()
 
 	while (true)
 	{
-		auto& scene = CurrentScene();
+		const auto& scene_ptr = CurrentScene();
+		if (!scene_ptr.has_value())
+		{
+			util::Println("현재 가리키는 씬이 없습니다.");
+			break;
+		}
+
+		const auto& scene = *scene_ptr;
 
 		long long between = current_time - start_time;
 		float est = static_cast<float>(between) / 1000.0f;
 
-		UpdateOnce(scene.get(), est);
+		UpdateOnce(scene, est);
 		util::debug::Println("씬 업데이트 1 (시간: {:.3f}초)", est);
 
 		start_time = current_time;
@@ -43,7 +52,7 @@ void Framework::Update()
 
 		between = current_time - start_time;
 		est = static_cast<float>(between) / 1000.0f;
-		LateUpdateOnce(scene.get(), est);
+		LateUpdateOnce(scene, est);
 		util::debug::Println("씬 업데이트 2 (시간: {:.3f}초)", est);
 
 		start_time = current_time;

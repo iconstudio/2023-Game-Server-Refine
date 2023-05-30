@@ -29,7 +29,7 @@ public:
 	}
 
 	void Awake();
-	void Start();
+	void Start() noexcept;
 	void Update();
 
 	void UpdateOnce(game::Scene* const& scene, const float delta_time);
