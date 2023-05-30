@@ -45,13 +45,15 @@ public:
 		while (true)
 		{
 			auto& scene = everyScene[roomIndex];
+			float est = static_cast<float>((current_time - start_time) / 1000);
 
-			UpdateOnce(scene.get(), current_time - start_time);
+			UpdateOnce(scene.get(), est);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			LateUpdateOnce(scene.get(), current_time - start_time);
+			est = static_cast<float>((current_time - start_time) / 1000);
+			LateUpdateOnce(scene.get(), est);
 
 			start_time = current_time;
 			current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
