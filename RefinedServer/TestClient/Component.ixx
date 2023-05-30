@@ -1,16 +1,18 @@
 export module Game.Component;
 import Utility.Classifier;
+export import System.PipelineObject;
 export import Game.Object;
 
 export namespace game
 {
 	class [[nodiscard]] Component
 		: public Object
+		, public sys::PipelineModel
 		, public util::Classifier<Component>
 	{
 	public:
 		constexpr Component() = default;
-		constexpr ~Component() = default;
+		virtual constexpr ~Component() = default;
 
 		constexpr void SetOwner(Object* object) noexcept
 		{
