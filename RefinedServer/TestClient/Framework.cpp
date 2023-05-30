@@ -69,12 +69,12 @@ void Framework::Update()
 	}
 }
 
-void Framework::UpdateOnce(game::Scene* scene, const float delta_time)
+void Framework::UpdateOnce(game::Scene* const& scene, const float delta_time)
 {
 	scene->Update(delta_time);
 }
 
-void Framework::LateUpdateOnce(game::Scene* scene, const float delta_time)
+void Framework::LateUpdateOnce(game::Scene* const& scene, const float delta_time)
 {
 	scene->LateUpdate(delta_time);
 }

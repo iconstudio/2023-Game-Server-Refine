@@ -32,8 +32,8 @@ public:
 	void Start();
 	void Update();
 
-	void UpdateOnce(game::Scene* scene, const float delta_time);
-	void LateUpdateOnce(game::Scene* scene, const float delta_time);
+	void UpdateOnce(game::Scene* const& scene, const float delta_time);
+	void LateUpdateOnce(game::Scene* const& scene, const float delta_time);
 
 	constexpr util::Monad<game::Scene*> CurrentScene() const noexcept
 	{
