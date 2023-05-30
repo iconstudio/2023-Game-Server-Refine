@@ -143,9 +143,9 @@ export extern "C++" namespace game
 			return isPaused = flag;
 		}
 
-		SCENE_CONSTEXPR bool SetCompletion(const bool done) noexcept
+		SCENE_CONSTEXPR void MakeCompletion() noexcept
 		{
-			return isCompleted = done;
+			isCompleted = true;
 		}
 
 		[[nodiscard]]
