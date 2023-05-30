@@ -1,5 +1,21 @@
+module;
+#define SCENE_ATOMIC_FLAGS false
 export module Game.Scene;
+
+#if SCENE_ATOMIC_FLAGS
 import <atomic>;
+
+#define SCENE_CONSTEXPR inline
+#define GET_FLAG(flag) flag.load(std::memory_order_relaxed)
+using FLAG_T = std::atomic_bool;
+
+#else // SCENE_ATOMIC_FLAGS
+
+#define SCENE_CONSTEXPR constexpr
+#define GET_FLAG(flag) flag
+using FLAG_T = bool;
+#endif // !SCENE_ATOMIC_FLAGS
+
 import <memory>;
 import <string>;
 import <string_view>;
@@ -31,7 +47,8 @@ export extern "C++" namespace game
 			gameObjects.reserve(10ULL);
 		}
 
-		inline Scene(Scene&& other) noexcept
+#if SCENE_ATOMIC_FLAGS
+		SCENE_CONSTEXPR Scene(Scene&& other) noexcept
 			: Named(std::move(other).GetName()), Indexer<Scene>(std::move(other))
 			, gameObjects(std::move(other.gameObjects))
 			, isAwaken(other.IsAwaken())
@@ -39,14 +56,18 @@ export extern "C++" namespace game
 			, isCompleted(other.IsCompleted())
 		{}
 
-		inline Scene& operator=(Scene&& other) noexcept
+		SCENE_CONSTEXPR Scene& operator=(Scene&& other) noexcept
 		{
 			Swap(other);
 
 			return *this;
 		}
+#else
+		SCENE_CONSTEXPR Scene(Scene&& other) noexcept = default;
+		SCENE_CONSTEXPR Scene& operator=(Scene&& other) noexcept = default;
+#endif
 
-		virtual constexpr ~Scene() noexcept = default;
+		virtual SCENE_CONSTEXPR ~Scene() noexcept = default;
 
 		constexpr void AddInstance(std::unique_ptr<GameObject>&& gameObject) noexcept
 		{
@@ -69,7 +90,9 @@ export extern "C++" namespace game
 			});
 		}
 
-		virtual inline void Swap(Scene& other) noexcept
+		virtual SCENE_CONSTEXPR
+			void
+			Swap(Scene& other) noexcept
 		{
 			std::swap(gameObjects, other.gameObjects);
 
@@ -110,37 +133,37 @@ export extern "C++" namespace game
 			isCompleted = false;
 		}
 
-		inline void MakeAwake() noexcept
+		SCENE_CONSTEXPR void MakeAwake() noexcept
 		{
 			isAwaken = true;
 		}
 
-		inline bool SetPause(const bool flag) noexcept
+		SCENE_CONSTEXPR bool SetPause(const bool flag) noexcept
 		{
 			return isPaused = flag;
 		}
 
-		inline bool SetCompletion(const bool done) noexcept
+		SCENE_CONSTEXPR bool SetCompletion(const bool done) noexcept
 		{
 			return isCompleted = done;
 		}
 
 		[[nodiscard]]
-		inline bool IsAwaken() const noexcept
+		SCENE_CONSTEXPR bool IsAwaken() const noexcept
 		{
-			return isAwaken.load(std::memory_order_relaxed);
+			return GET_FLAG(isAwaken);
 		}
 
 		[[nodiscard]]
-		inline bool IsPaused() const noexcept
+		SCENE_CONSTEXPR bool IsPaused() const noexcept
 		{
-			return isPaused.load(std::memory_order_relaxed);
+			return GET_FLAG(isPaused);
 		}
 
 		[[nodiscard]]
-		inline bool IsCompleted() const noexcept
+		SCENE_CONSTEXPR bool IsCompleted() const noexcept
 		{
-			return isCompleted.load(std::memory_order_relaxed);
+			return GET_FLAG(isCompleted);
 		}
 
 		Scene(const Scene& other) = delete;
@@ -149,15 +172,17 @@ export extern "C++" namespace game
 	protected:
 		std::vector<std::unique_ptr<GameObject>> gameObjects{};
 
-		std::atomic_bool isAwaken = false;
-		std::atomic_bool isPaused = false;
-		std::atomic_bool isCompleted = false;
+		FLAG_T isAwaken = false;
+		FLAG_T isPaused = false;
+		FLAG_T isCompleted = false;
 	};
 }
 
 export namespace std
 {
-	inline void swap(game::Scene& lhs, game::Scene& rhs) noexcept
+	inline SCENE_CONSTEXPR
+		void swap(game::Scene& lhs, game::Scene& rhs)
+		noexcept(util::nothrow_swappables<game::Scene>)
 	{
 		lhs.Swap(rhs);
 	}
