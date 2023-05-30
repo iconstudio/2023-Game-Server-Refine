@@ -289,6 +289,8 @@ export namespace game
 
 		std::vector<std::unique_ptr<Component>> myComponents{};
 	};
+
+	using GameObjectHandle = std::unique_ptr<GameObject>;
 }
 
 export template<>
