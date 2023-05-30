@@ -40,7 +40,7 @@ export extern "C++" namespace game
 			: Scene("Scene")
 		{}
 
-		constexpr Scene(std::string_view name) noexcept
+		constexpr Scene(util::string_view name) noexcept
 			: Named(name), Indexer<Scene>()
 		{
 			gameObjects.reserve(10ULL);

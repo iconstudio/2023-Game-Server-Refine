@@ -1,6 +1,5 @@
 export module Utility.Named;
-import <string>;
-import <string_view>;
+import Utility.String;
 
 export namespace util
 {
@@ -14,43 +13,43 @@ export namespace util
 			: myName()
 		{}
 
-		explicit constexpr Named(const std::string& name) noexcept
+		explicit constexpr Named(const string& name) noexcept
 			: myName(name)
 		{}
 
-		explicit constexpr Named(std::string&& name) noexcept
-			: myName(static_cast<std::string&&>(name))
+		explicit constexpr Named(string&& name) noexcept
+			: myName(static_cast<string&&>(name))
 		{}
 
-		explicit constexpr Named(std::string_view name) noexcept
+		explicit constexpr Named(string_view name) noexcept
 			: myName(name)
 		{}
 
-		constexpr void SetName(const std::string& name) noexcept
+		constexpr void SetName(const string& name) noexcept
 		{
 			myName = name;
 		}
 
-		constexpr void SetName(std::string&& name) noexcept
+		constexpr void SetName(string&& name) noexcept
 		{
-			myName = static_cast<std::string&&>(name);
+			myName = static_cast<string&&>(name);
 		}
 
-		constexpr void SetName(std::string_view name) noexcept
+		constexpr void SetName(string_view name) noexcept
 		{
 			myName = name;
 		}
 
 		[[nodiscard]]
-		constexpr const std::string& GetName() const& noexcept
+		constexpr const string& GetName() const& noexcept
 		{
 			return myName;
 		}
 
 		[[nodiscard]]
-		constexpr std::string&& GetName() && noexcept
+		constexpr string&& GetName() && noexcept
 		{
-			return static_cast<std::string&&>(myName);
+			return static_cast<string&&>(myName);
 		}
 
 		constexpr Named(const Named& other) noexcept = default;
@@ -60,6 +59,6 @@ export namespace util
 		constexpr ~Named() noexcept = default;
 
 	private:
-		std::string myName;
+		string myName;
 	};
 }
