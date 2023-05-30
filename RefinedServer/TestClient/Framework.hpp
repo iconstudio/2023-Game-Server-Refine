@@ -10,6 +10,7 @@ import Game.Camera;
 import Game.GameObject;
 import Game.Scene;
 import Game.Scene.Specialized;
+import Game.Scene.Management;
 
 class Framework
 {
@@ -18,15 +19,6 @@ public:
 	{}
 
 	~Framework() noexcept = default;
-
-	template<typename S, typename... Args>
-	constexpr void AddScene(Args&& ...args)
-		noexcept(util::trivials<S>&& util::nothrow_constructibles<S, Args...>)
-	{
-		static_assert(util::hierachy<util::clean_t<S>, game::Scene>);
-
-		everyScene.emplace_back(std::make_unique<S>(util::forward<Args>(args)...));
-	}
 
 	void Awake();
 	void Start() noexcept;
@@ -37,9 +29,9 @@ public:
 
 	constexpr util::Monad<game::Scene*> CurrentScene() const noexcept
 	{
-		if (roomIndex < everyScene.size())
+		if (roomIndex < game::SceneManager::everyScene.size())
 		{
-			return everyScene[roomIndex].get();
+			return game::SceneManager::everyScene[roomIndex].get();
 		}
 		else
 		{
@@ -47,6 +39,5 @@ public:
 		}
 	}
 
-	std::vector<std::unique_ptr<game::Scene>> everyScene{};
 	size_t roomIndex = 0;
 };

@@ -1,7 +1,6 @@
 export module Game.Scene.Management;
 import <vector>;
 import <memory>;
-import <algorithm>;
 import Utility;
 import Utility.Constraints;
 import Game.Scene;
@@ -18,13 +17,6 @@ export namespace game
 		static constexpr void AddScene(SceneHandle&& scene) noexcept
 		{
 			everyScene.push_back(std::move(scene));
-
-			auto lt = std::unique(everyScene.begin(), everyScene.end());
-
-			if (everyScene.end() != lt)
-			{
-				everyScene.erase(lt, everyScene.end());
-			}
 		}
 
 		template<typename S>
@@ -46,4 +38,6 @@ export namespace game
 
 		static std::vector<SceneHandle> everyScene;
 	};
+
+	std::vector<SceneHandle> SceneManager::everyScene{};
 }

@@ -6,7 +6,10 @@ void Framework::Awake()
 {
 	util::Println("시스템을 초기화합니다.");
 
-	for (std::unique_ptr<game::Scene>& scene : everyScene)
+	game::SceneManager::AddScene(std::make_unique<game::Scene>("씬 1"));
+	game::SceneManager::AddScene(std::make_unique<game::Scene>("씬 2"));
+
+	for (std::unique_ptr<game::Scene>& scene : game::SceneManager::everyScene)
 	{
 		scene->Awake();
 	}
@@ -62,14 +65,14 @@ void Framework::Update()
 		{
 			roomIndex++;
 
-			if (everyScene.size() <= roomIndex)
+			if (game::SceneManager::everyScene.size() <= roomIndex)
 			{
 				util::Println("다음 씬이 없습니다.");
 				break;
 			}
 			else
 			{
-				auto& scene = everyScene[roomIndex];
+				auto& scene = game::SceneManager::everyScene[roomIndex];
 
 				util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
 				scene->Start();
