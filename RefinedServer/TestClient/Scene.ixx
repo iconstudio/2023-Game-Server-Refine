@@ -133,35 +133,35 @@ export extern "C++" namespace game
 			isCompleted = false;
 		}
 
-		SCENE_CONSTEXPR void MakeAwake() noexcept
+		SCENE_CONSTEXPR void MakeAwake() volatile noexcept
 		{
 			isAwaken = true;
 		}
 
-		SCENE_CONSTEXPR bool SetPause(const bool flag) noexcept
+		SCENE_CONSTEXPR bool SetPause(const bool flag) volatile noexcept
 		{
 			return isPaused = flag;
 		}
 
-		SCENE_CONSTEXPR void MakeCompletion() noexcept
+		SCENE_CONSTEXPR void MakeCompletion() volatile noexcept
 		{
 			isCompleted = true;
 		}
 
 		[[nodiscard]]
-		SCENE_CONSTEXPR bool IsAwaken() const noexcept
+		SCENE_CONSTEXPR bool IsAwaken() const volatile noexcept
 		{
 			return GET_FLAG(isAwaken);
 		}
 
 		[[nodiscard]]
-		SCENE_CONSTEXPR bool IsPaused() const noexcept
+		SCENE_CONSTEXPR bool IsPaused() const volatile noexcept
 		{
 			return GET_FLAG(isPaused);
 		}
 
 		[[nodiscard]]
-		SCENE_CONSTEXPR bool IsCompleted() const noexcept
+		SCENE_CONSTEXPR bool IsCompleted() const volatile noexcept
 		{
 			return GET_FLAG(isCompleted);
 		}
@@ -172,9 +172,9 @@ export extern "C++" namespace game
 	protected:
 		std::vector<GameObjectHandle> gameObjects{};
 
-		FLAG_T isAwaken = false;
-		FLAG_T isPaused = false;
-		FLAG_T isCompleted = false;
+		volatile FLAG_T isAwaken = false;
+		volatile FLAG_T isPaused = false;
+		volatile FLAG_T isCompleted = false;
 	};
 }
 
