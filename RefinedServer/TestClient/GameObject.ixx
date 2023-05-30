@@ -227,25 +227,43 @@ export namespace game
 		static inline GameObject* DeepCopy(const GameObject* const& obj)
 		{
 			GameObject* copied_child = nullptr;
-			GameObject* copied_sibling = nullptr;
-
-			GameObject* result = new GameObject{};
 			try
 			{
 				if (obj->HasChild())
 				{
 					copied_child = DeepCopy(obj->GetChild());
 				}
+			}
+			catch (...)
+			{
+				delete copied_child;
+				throw;
+			}
 
+			GameObject* copied_sibling = nullptr;
+			try
+			{
 				if (obj->HasSibling())
 				{
 					copied_sibling = DeepCopy(obj->GetSibling());
 				}
+			}
+			catch (...)
+			{
+				if (copied_child) delete copied_child;
+				delete copied_sibling;
+				throw;
+			}
+
+			GameObject* result = new GameObject{};
+			try
+			{
+				const std::vector<std::unique_ptr<Component>>& components = obj->myComponents;
 
 				std::vector<std::unique_ptr<Component>> temp_list{};
-				temp_list.reserve(obj->myComponents.size());
+				temp_list.reserve(components.size());
 
-				for (const std::unique_ptr<Component>& component : obj->myComponents)
+				for (const std::unique_ptr<Component>& component : components)
 				{
 					temp_list.emplace_back(component->Clone());
 				}
@@ -253,9 +271,12 @@ export namespace game
 				result->myChild = std::unique_ptr<GameObject>{ copied_child };
 				result->mySibling = std::unique_ptr<GameObject>{ copied_sibling };
 				result->myComponents = std::move(temp_list);
+
 			}
 			catch (...)
 			{
+				if (copied_child) delete copied_child;
+				if (copied_sibling) delete copied_sibling;
 				delete result;
 				throw;
 			}
