@@ -37,7 +37,7 @@ export namespace game
 		constexpr Component& operator=(Component&& other) noexcept = default;
 
 	protected:
-		template<typename T = Component>
+		template<typename T>
 		[[nodiscard]]
 		static constexpr T* DeepCopy(const T* const& component)
 			noexcept(util::nothrow_copy_constructibles<T>)
