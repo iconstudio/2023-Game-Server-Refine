@@ -29,14 +29,7 @@ public:
 
 	constexpr util::Monad<game::Scene*> CurrentScene() const noexcept
 	{
-		if (roomIndex < game::SceneManager::everyScene.size())
-		{
-			return game::SceneManager::everyScene[roomIndex].get();
-		}
-		else
-		{
-			return util::nullopt;
-		}
+		return game::SceneManager::GetScene(roomIndex);
 	}
 
 	size_t roomIndex = 0;

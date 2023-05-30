@@ -72,10 +72,20 @@ void Framework::Update()
 			}
 			else
 			{
-				auto& scene = game::SceneManager::everyScene[roomIndex];
+				auto scene_wrapper = game::SceneManager::GetScene(roomIndex);
 
-				util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
-				scene->Start();
+				if (scene_wrapper.has_value())
+				{
+					auto& scene = *scene_wrapper;
+
+					util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
+					scene->Start();
+				}
+				else
+				{
+					util::Println("오류! 다음 씬 {}에 문제가 있습니다.", roomIndex);
+					break;
+				}
 			}
 		}
 	}
