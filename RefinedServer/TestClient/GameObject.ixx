@@ -15,7 +15,7 @@ import Game.Component;
 
 export namespace game
 {
-	class GameObject final
+	class GameObject
 		: public Object
 		, public util::Named
 		, public util::Classifier<GameObject>
