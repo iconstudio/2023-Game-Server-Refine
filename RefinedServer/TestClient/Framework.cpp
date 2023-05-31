@@ -45,10 +45,11 @@ void Framework::Update()
 			break;
 		}
 
-		const auto& scene = *scene_ptr;
+		Scene* const& scene = *scene_ptr;
 
 		if (scene->IsPaused())
 		{
+			std::this_thread::yield();
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			continue;
 		}
@@ -85,7 +86,7 @@ void Framework::Update()
 
 				if (scene_wrapper.has_value())
 				{
-					auto& next = *scene_wrapper;
+					Scene* next = *scene_wrapper;
 
 					util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
 					next->Start();
@@ -98,7 +99,9 @@ void Framework::Update()
 			}
 		}
 
+#if _DEBUG
 		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+#endif
 	}
 }
 
