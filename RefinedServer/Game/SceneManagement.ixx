@@ -4,6 +4,7 @@ import <memory>;
 import Utility;
 import Utility.Constraints;
 import Utility.Monad;
+import Utility.Print;
 import Game.Scene;
 
 export namespace game
@@ -14,35 +15,13 @@ export namespace game
 	class SceneManager
 	{
 	public:
-		static inline void Awake()
+		static inline void AwakeScenes()
 		{
 			for (SceneHandle& scene : everyScene)
 			{
+				util::debug::Println("장면 '{}'을(를) 초기화하는 중...", scene->GetName());
+
 				scene->Awake();
-			}
-		}
-
-		static inline void Start()
-		{
-			for (SceneHandle& scene : everyScene)
-			{
-				scene->Start();
-			}
-		}
-
-		static inline void Update(const float& delta_time)
-		{
-			for (SceneHandle& scene : everyScene)
-			{
-				scene->Update(delta_time);
-			}
-		}
-
-		static inline void LateUpdate(const float& delta_time)
-		{
-			for (SceneHandle& scene : everyScene)
-			{
-				scene->LateUpdate(delta_time);
 			}
 		}
 
