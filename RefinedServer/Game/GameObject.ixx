@@ -2,12 +2,11 @@ module;
 #include <glm/ext.hpp>
 
 export module Game.GameObject;
-import <type_traits>;
-import <string_view>;
 import <memory>;
 import <vector>;
 import Utility.Constraints;
 import Utility.Named;
+import Utility.String;
 import System.PipelineObject;
 import Game.Object;
 import Game.Component;
@@ -30,7 +29,7 @@ export namespace game
 			Instantiate()
 			noexcept(util::nothrow_default_constructibles<T>)
 		{
-			static_assert(std::is_base_of_v<GameObject, util::clean_t<T>>, "T must be derived from GameObject!");
+			static_assert(util::hierachy<util::clean_t<T>, GameObject>, "T must be derived from GameObject!");
 
 			return std::unique_ptr<GameObject>(new T());
 		}
@@ -42,7 +41,7 @@ export namespace game
 			Instantiate(const T* const& original)
 			noexcept(util::nothrow_copy_constructibles<T>)
 		{
-			static_assert(std::is_base_of_v<GameObject, util::clean_t<T>>, "T must be derived from GameObject!");
+			static_assert(util::hierachy<util::clean_t<T>, GameObject>, "T must be derived from GameObject!");
 
 			return std::unique_ptr<GameObject>(DeepCopy(original));
 		}
@@ -54,7 +53,7 @@ export namespace game
 			Instantiate(const std::unique_ptr<T>& original)
 			noexcept(util::nothrow_copy_constructibles<T>)
 		{
-			static_assert(std::is_base_of_v<GameObject, T>, "T must be derived from GameObject!");
+			static_assert(util::hierachy<T, GameObject>, "T must be derived from GameObject!");
 
 			return std::unique_ptr<GameObject>(DeepCopy(original.get()));
 		}
