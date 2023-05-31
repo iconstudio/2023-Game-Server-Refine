@@ -183,7 +183,7 @@ export extern "C++" namespace game
 export template<>
 struct util::class_id<game::Scene>
 {
-	static constexpr size_t id = 3;
+	static inline constexpr size_t id = 3;
 };
 
 export namespace std

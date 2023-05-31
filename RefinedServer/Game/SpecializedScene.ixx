@@ -41,5 +41,5 @@ export namespace game
 export template<typename S>
 struct util::class_id<game::NamedScene<S>>
 {
-	static constexpr size_t id = 4;
+	static inline constexpr size_t id = 4;
 };

@@ -50,7 +50,7 @@ export namespace game
 		}
 
 		[[nodiscard]]
-		static constexpr size_t NumberOfScenes() noexcept
+		static inline constexpr size_t NumberOfScenes() noexcept
 		{
 			return everyScene.size();
 		}

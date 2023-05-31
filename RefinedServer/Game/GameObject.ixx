@@ -295,5 +295,5 @@ export namespace game
 export template<>
 struct util::class_id<game::GameObject>
 {
-	static constexpr size_t id = 2;
+	static inline constexpr size_t id = 2;
 };

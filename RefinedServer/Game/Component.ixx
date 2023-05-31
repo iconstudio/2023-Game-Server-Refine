@@ -57,5 +57,5 @@ export namespace game
 export template<>
 struct util::class_id<game::Component>
 {
-	static constexpr size_t id = 3;
+	static inline constexpr size_t id = 3;
 };
