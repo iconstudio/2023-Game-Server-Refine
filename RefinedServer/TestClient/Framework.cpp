@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "Framework.hpp"
+#include "MainScene.hpp"
 
 import Utility.Print;
 
@@ -9,7 +10,7 @@ void Framework::Awake()
 {
 	util::Println("시스템을 초기화합니다.");
 
-	SceneManager::AddScene(SceneManager::CreateScene("씬 1"));
+	SceneManager::AddScene(SceneManager::CreateScene<MainScene>());
 	SceneManager::AddScene(SceneManager::CreateScene("씬 2"));
 
 	for (SceneHandle& scene : SceneManager::everyScene)
