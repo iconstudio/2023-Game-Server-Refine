@@ -25,7 +25,7 @@ void Framework::Start() noexcept
 
 	if (Scene* const& intro = SceneManager::GetActiveScene(); intro != nullptr)
 	{
-		util::debug::Println("첫번째 씬으로 '{}'에서 게임을 시작합니다.", intro->GetName());
+		util::debug::Println("첫번째 씬으로 '{}'에서 게임을 시작합니다.", *intro);
 		intro->Start();
 	}
 	else
@@ -98,12 +98,12 @@ void Framework::Update()
 				{
 					Scene* const& next = *scene_wrapper;
 
-					util::Println("다음 씬 {}을(를) 시작합니다.", next->GetName());
+					util::Println("다음 씬 {}을(를) 시작합니다.", *next);
 					next->Start();
 				}
 				else
 				{
-					util::Println("오류! 씬 {}에 문제가 있습니다.", scene->GetName());
+					util::Println("오류! 씬 {}에 문제가 있습니다.", *scene);
 					break;
 				}
 			};

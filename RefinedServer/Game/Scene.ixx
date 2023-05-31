@@ -16,6 +16,8 @@ using FLAG_T = util::atomic_bool;
 using FLAG_T = bool;
 #endif // !SCENE_ATOMIC_FLAGS
 
+import <string>;
+import <format>;
 import <vector>;
 import <algorithm>;
 import <ranges>;
@@ -45,6 +47,7 @@ export extern "C++" namespace game
 		constexpr Scene(util::string_view name) noexcept
 			: Named(name), Indexer<Scene>()
 		{
+			std::formatter<std::string> a;
 			gameObjects.reserve(10ULL);
 		}
 
@@ -241,4 +244,19 @@ export namespace std
 	{
 		lhs.Swap(rhs);
 	}
+
+	template<>
+	struct formatter<game::Scene>
+	{
+		inline format_parse_context::iterator parse(format_parse_context& context) const noexcept
+		{
+			return context.begin();
+		}
+
+		template<int = 0>
+		inline auto format(const game::Scene& scene, format_context& context) const noexcept
+		{
+			return std::format_to(context.out(), "Scene[{}]", scene.GetName());
+		}
+	};
 }
