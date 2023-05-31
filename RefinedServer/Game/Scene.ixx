@@ -23,6 +23,7 @@ import Utility;
 import Utility.Constraints;
 import Utility.Named;
 import Utility.Indexer;
+import Utility.Classifier;
 import Utility.String;
 import System.PipelineObject;
 export import Game.Camera;
@@ -34,6 +35,7 @@ export extern "C++" namespace game
 		: public sys::PipelineModel
 		, public util::Named
 		, public util::Indexer<Scene>
+		, public util::Classifier<Scene>
 	{
 	public:
 		constexpr Scene() noexcept
@@ -177,6 +179,12 @@ export extern "C++" namespace game
 		volatile FLAG_T isCompleted = false;
 	};
 }
+
+export template<>
+struct util::class_id<game::Scene>
+{
+	static constexpr size_t id = 3;
+};
 
 export namespace std
 {

@@ -2,6 +2,7 @@ export module Game.Scene.Specialized;
 import <string>;
 import <memory>;
 import Utility.Singleton;
+import Utility.Classifier;
 import Game.Scene;
 
 export namespace game
@@ -17,6 +18,7 @@ export namespace game
 	class [[nodiscard]] alignas(64) NamedScene
 		: public Scene
 		, public SceneTraits<S>::singletone
+		, public util::Classifier<S>
 	{
 	public:
 		using singleton = SceneTraits<S>::singletone;
@@ -24,6 +26,7 @@ export namespace game
 		constexpr NamedScene(S* const& scene, std::string_view name) noexcept
 			: Scene(name)
 			, singleton(scene)
+			, Classifier<S>()
 		{}
 
 		constexpr ~NamedScene() noexcept = default;
@@ -34,3 +37,9 @@ export namespace game
 		constexpr NamedScene& operator=(NamedScene&& other) noexcept = default;
 	};
 }
+
+export template<typename S>
+struct util::class_id<game::NamedScene<S>>
+{
+	static constexpr size_t id = 4;
+};
