@@ -55,8 +55,9 @@ export namespace game
 			return everyScene.size();
 		}
 
-		static std::vector<SceneHandle> everyScene;
-	};
+		static inline std::vector<SceneHandle> everyScene{};
 
-	std::vector<SceneHandle> SceneManager::everyScene{};
+	private:
+		static inline Scene* activeScene = nullptr;
+	};
 }
