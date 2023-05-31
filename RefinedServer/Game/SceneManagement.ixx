@@ -44,6 +44,16 @@ export namespace game
 			});
 		}
 
+		static constexpr util::Monad<Scene*> GotoNextScene() noexcept
+		{
+			return SetActiveScene(activeIndex + 1ULL);
+		}
+
+		static constexpr util::Monad<Scene*> GotoPrevScene() noexcept
+		{
+			return SetActiveScene(activeIndex - 1ULL);
+		}
+
 		[[nodiscard]]
 		static constexpr util::Monad<Scene*> GetScene(const size_t index) noexcept
 		{
