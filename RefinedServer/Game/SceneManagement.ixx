@@ -9,10 +9,43 @@ import Game.Scene;
 export namespace game
 {
 	using SceneHandle = std::unique_ptr<Scene>;
+	using SceneContainer = std::vector<SceneHandle>;
 
 	class SceneManager
 	{
 	public:
+		static inline void Awake()
+		{
+			for (SceneHandle& scene : everyScene)
+			{
+				scene->Awake();
+			}
+		}
+
+		static inline void Start()
+		{
+			for (SceneHandle& scene : everyScene)
+			{
+				scene->Start();
+			}
+		}
+
+		static inline void Update(const float& delta_time)
+		{
+			for (SceneHandle& scene : everyScene)
+			{
+				scene->Update(delta_time);
+			}
+		}
+
+		static inline void LateUpdate(const float& delta_time)
+		{
+			for (SceneHandle& scene : everyScene)
+			{
+				scene->LateUpdate(delta_time);
+			}
+		}
+
 		static constexpr void AddScene(SceneHandle&& scene) noexcept
 		{
 			everyScene.push_back(static_cast<SceneHandle&&>(scene));
@@ -68,6 +101,12 @@ export namespace game
 		}
 
 		[[nodiscard]]
+		static constexpr const SceneContainer& GetScenes() noexcept
+		{
+			return everyScene;
+		}
+		
+		[[nodiscard]]
 		static constexpr Scene* const& GetActiveScene() noexcept
 		{
 			return activeScene;
@@ -103,7 +142,7 @@ export namespace game
 			return everyScene.size();
 		}
 
-		static inline std::vector<SceneHandle> everyScene{};
+		static inline SceneContainer everyScene{};
 
 	private:
 		static inline Scene* activeScene = nullptr;
