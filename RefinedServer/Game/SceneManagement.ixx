@@ -64,6 +64,18 @@ export namespace game
 		}
 
 		[[nodiscard]]
+		static constexpr util::Monad<Scene*> GetNextScene() noexcept
+		{
+			return GetScene(activeIndex + 1ULL);
+		}
+
+		[[nodiscard]]
+		static constexpr util::Monad<Scene*> GetPrevScene() noexcept
+		{
+			return GetScene(activeIndex - 1ULL);
+		}
+
+		[[nodiscard]]
 		static inline constexpr size_t NumberOfScenes() noexcept
 		{
 			return everyScene.size();
