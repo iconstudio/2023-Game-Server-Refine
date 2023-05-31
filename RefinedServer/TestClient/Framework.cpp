@@ -14,14 +14,9 @@ void Framework::Awake()
 	SceneManager::AddScene(SceneManager::CreateScene<MainScene>());
 	SceneManager::AddScene(SceneManager::CreateScene("씬 2"));
 
+	SceneManager::AwakeScenes();
+
 	SceneManager::SetActiveScene(0);
-
-	for (SceneHandle& scene : SceneManager::everyScene)
-	{
-		util::debug::Println("장면 '{}'을(를) 초기화하는 중...", scene->GetName());
-
-		scene->Awake();
-	}
 }
 
 void Framework::Start() noexcept
