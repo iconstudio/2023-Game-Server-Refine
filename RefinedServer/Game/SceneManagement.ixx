@@ -36,6 +36,13 @@ export namespace game
 			return SceneHandle(new S(util::forward<Args>(args)...));
 		}
 
+		static constexpr util::Monad<Scene*> SetActiveScene(const size_t index) noexcept
+		{
+			return GetScene(index).if_then([](Scene* scene) noexcept {
+				activeScene = scene;
+			});
+		}
+
 		[[nodiscard]]
 		static constexpr util::Monad<Scene*> GetScene(const size_t index) noexcept
 		{
@@ -47,6 +54,12 @@ export namespace game
 			{
 				return util::nullopt;
 			}
+		}
+
+		[[nodiscard]]
+		static constexpr Scene* const& GetActiveScene() noexcept
+		{
+			return activeScene;
 		}
 
 		[[nodiscard]]
