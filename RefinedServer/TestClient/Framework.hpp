@@ -4,6 +4,7 @@
 #include <vector>
 
 import Utility;
+import Utility.Singleton;
 import Utility.Constraints;
 import Utility.Monad;
 import Game.Camera;
@@ -12,10 +13,11 @@ import Game.Scene;
 import Game.Scene.Specialized;
 import Game.Scene.Management;
 
-class Framework
+class Framework : public util::Singleton<Framework>
 {
 public:
 	constexpr Framework() noexcept
+		: Singleton<Framework>(this)
 	{}
 
 	constexpr ~Framework() noexcept = default;
