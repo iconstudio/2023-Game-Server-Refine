@@ -15,43 +15,43 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Classifier.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)D3DVector.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)D3DMatrix.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)DataPacker.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)DataUnit.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Deserialization.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Indexer.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Named.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Serialization.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Array.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Atomic.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Classifier.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Constraints.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\D3DMatrix.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\D3DVector.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DataPacker.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DataUnit.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Deserialization.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Error.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Expected.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Identity.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Indexer.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Locks.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\LooseMonad.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Meta.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Monad.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Named.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Option.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Print.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Serialization.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Singleton.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Testbed.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Thread.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Traits.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Transform.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Union.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utility.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\String.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\ThreadUnit.ixx" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Transform.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)Utility.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Deserialization.inl" />
-    <None Include="$(MSBuildThisFileDirectory)Serialization.inl" />
+    <None Include="$(MSBuildThisFileDirectory)src\Deserialization.inl" />
+    <None Include="$(MSBuildThisFileDirectory)src\Serialization.inl" />
   </ItemGroup>
 </Project>
