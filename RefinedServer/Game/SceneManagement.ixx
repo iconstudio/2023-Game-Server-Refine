@@ -86,6 +86,18 @@ export namespace game
 		}
 
 		[[nodiscard]]
+		static constexpr bool IsAvailableNext() noexcept
+		{
+			return activeIndex < everyScene.size() - 1ULL;
+		}
+
+		[[nodiscard]]
+		static constexpr bool IsAvailablePrev() noexcept
+		{
+			return 1ULL <= activeIndex;
+		}
+
+		[[nodiscard]]
 		static inline constexpr size_t NumberOfScenes() noexcept
 		{
 			return everyScene.size();
