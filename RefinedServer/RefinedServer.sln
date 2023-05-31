@@ -12,6 +12,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utility", "Utility\Utility.vcxitems", "{2B6D212A-90B7-4295-AC9D-7ADB96C265D1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestClient", "TestClient\TestClient.vcxproj", "{66BE34FF-EF60-4B87-9FD0-567E6486BC27}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D64513C7-DA16-431A-BA60-51D12683F0D8} = {D64513C7-DA16-431A-BA60-51D12683F0D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game\Game.vcxitems", "{9FF0670C-E50B-4B55-A28C-DBC42287FFA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,9 +51,11 @@ Global
 		Utility\Utility.vcxitems*{2b6d212a-90b7-4295-ac9d-7adb96c265d1}*SharedItemsImports = 9
 		Network\Network.vcxitems*{36e8bd54-1dbb-4fd1-a304-8d22721b85a6}*SharedItemsImports = 9
 		Core\Core.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
+		Game\Game.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Network\Network.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Utility\Utility.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Core\Core.vcxitems*{74c59b3a-a02f-4e4e-9e1e-afce7a7cb14b}*SharedItemsImports = 9
+		Game\Game.vcxitems*{9ff0670c-e50b-4b55-a28c-dbc42287ffa0}*SharedItemsImports = 9
 		Core\Core.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
 		Network\Network.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
 		Utility\Utility.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4

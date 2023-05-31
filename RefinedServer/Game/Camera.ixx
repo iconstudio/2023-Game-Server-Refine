@@ -1,5 +1,5 @@
 module;
-#include "pch.hpp"
+#include <glm/glm.hpp>
 
 export module Game.Camera;
 import <memory>;

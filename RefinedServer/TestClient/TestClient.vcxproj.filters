@@ -41,30 +41,6 @@
     <ClCompile Include="Framework.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineObject.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManagement.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SpecializedScene.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

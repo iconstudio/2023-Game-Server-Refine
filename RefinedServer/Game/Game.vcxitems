@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{9ff0670c-e50b-4b55-a28c-dbc42287ffa0}</ItemsProjectGuid>
+    <ItemsRootNamespace>game</ItemsRootNamespace>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Camera.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Component.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)GameObject.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Object.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PipelineObject.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Scene.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SceneManagement.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SpecializedScene.ixx" />
+  </ItemGroup>
+</Project>
