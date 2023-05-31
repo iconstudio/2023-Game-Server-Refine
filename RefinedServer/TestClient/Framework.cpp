@@ -35,8 +35,16 @@ void Framework::Update()
 {
 	util::Println("프레임워크를 시작합니다.");
 
-	long long start_time = 0;
-	long long current_time = 0;
+	using clock = std::chrono::system_clock;
+	using time_point = clock::time_point;
+	using duration = clock::duration;
+	using period = clock::period;
+	constexpr float num = static_cast<float>(period::num);
+	constexpr float den = static_cast<float>(period::den);
+	constexpr float idv = num / den;
+
+	time_point start_time{};
+	time_point current_time{};
 
 	while (true)
 	{
@@ -48,7 +56,6 @@ void Framework::Update()
 		};
 
 		Scene* const& scene = *scene_ptr;
-
 		if (scene->IsPaused()) UNLIKELY
 		{
 			std::this_thread::yield();
@@ -56,22 +63,23 @@ void Framework::Update()
 			continue;
 		};
 
-		long long between = current_time - start_time;
-		float est = static_cast<float>(between) / 1000.0f;
+		duration between = current_time - start_time;
+		float est = static_cast<float>(between.count()) * idv;
 
 		UpdateOnce(scene, est);
-		util::debug::Println("씬 업데이트 1 (시간: {:.3f}초)", est);
+		util::debug::Println("씬 업데이트 1 (시간: {:.5f}초)", est);
 
 		start_time = current_time;
-		current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		current_time = std::chrono::system_clock::now();
 
 		between = current_time - start_time;
-		est = static_cast<float>(between) / 1000.0f;
+		est = static_cast<float>(between.count()) * idv;
+
 		LateUpdateOnce(scene, est);
-		util::debug::Println("씬 업데이트 2 (시간: {:.3f}초)", est);
+		util::debug::Println("씬 업데이트 2 (시간: {:.5f}초)", est);
 
 		start_time = current_time;
-		current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		current_time = std::chrono::system_clock::now();
 
 		if (scene->IsCompleted()) UNLIKELY
 		{
