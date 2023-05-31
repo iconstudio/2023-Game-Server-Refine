@@ -39,20 +39,20 @@ void Framework::Update()
 	while (true)
 	{
 		const auto& scene_ptr = CurrentScene();
-		if (!scene_ptr.has_value())
+		if (!scene_ptr.has_value()) UNLIKELY
 		{
 			util::Println("현재 가리키는 씬이 없습니다.");
 			break;
-		}
+		};
 
 		Scene* const& scene = *scene_ptr;
 
-		if (scene->IsPaused())
+		if (scene->IsPaused()) UNLIKELY
 		{
 			std::this_thread::yield();
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			continue;
-		}
+		};
 
 		long long between = current_time - start_time;
 		float est = static_cast<float>(between) / 1000.0f;
@@ -71,22 +71,22 @@ void Framework::Update()
 		start_time = current_time;
 		current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-		if (scene->IsCompleted())
+		if (scene->IsCompleted()) UNLIKELY
 		{
 			roomIndex++;
 
-			if (game::SceneManager::NumberOfScenes() <= roomIndex)
+			if (game::SceneManager::NumberOfScenes() <= roomIndex) UNLIKELY
 			{
 				util::Println("다음 씬이 없습니다.");
 				break;
 			}
 			else
 			{
-				auto scene_wrapper = SceneManager::GetScene(roomIndex);
+				const util::Monad<game::Scene*> scene_wrapper = SceneManager::GetScene(roomIndex);
 
 				if (scene_wrapper.has_value())
 				{
-					Scene* next = *scene_wrapper;
+					Scene* const& next = *scene_wrapper;
 
 					util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
 					next->Start();
@@ -96,8 +96,8 @@ void Framework::Update()
 					util::Println("오류! 다음 씬 {}에 문제가 있습니다.", roomIndex);
 					break;
 				}
-			}
-		}
+			};
+		};
 
 #if _DEBUG
 		std::this_thread::sleep_for(std::chrono::milliseconds(3000));

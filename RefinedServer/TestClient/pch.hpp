@@ -12,3 +12,6 @@
 #include <vector>
 #include <algorithm>
 #include <ranges>
+
+#define LIKELY [[likely]]
+#define UNLIKELY [[unlikely]]
