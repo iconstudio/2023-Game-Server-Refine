@@ -71,6 +71,46 @@ export extern "C++" namespace game
 
 		virtual SCENE_CONSTEXPR ~Scene() noexcept = default;
 
+		virtual inline void Awake() override
+		{
+			for (auto& instance : gameObjects)
+			{
+				instance->Awake();
+			}
+		}
+
+		virtual inline void Start() noexcept override
+		{
+			for (auto& instance : gameObjects)
+			{
+				instance->Start();
+			}
+		}
+
+		virtual inline void Update(const float delta_time) override
+		{
+			for (auto& instance : gameObjects)
+			{
+				instance->Update(delta_time);
+			}
+		}
+
+		virtual inline void LateUpdate(const float delta_time) override
+		{
+			for (auto& instance : gameObjects)
+			{
+				instance->LateUpdate(delta_time);
+			}
+		}
+
+		virtual inline void Destroy() override
+		{
+			for (auto& instance : gameObjects)
+			{
+				instance->Destroy();
+			}
+		}
+
 		constexpr void AddInstance(GameObjectHandle&& gameObject) noexcept
 		{
 			gameObjects.emplace_back(static_cast<GameObjectHandle&&>(gameObject));
