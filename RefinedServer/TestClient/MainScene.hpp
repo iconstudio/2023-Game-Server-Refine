@@ -14,11 +14,11 @@ public:
 		, myAddress()
 	{}
 
-	void Awake();
-	void Start() noexcept;
-	void Update(const float& delta_time);
-	void LateUpdate(const float& delta_time);
-	void Destroy();
+	void Awake() override;
+	void Start() noexcept override;
+	void Update(const float delta_time) override;
+	void LateUpdate(const float delta_time) override;
+	void Destroy() override;
 
 	net::Socket mySocket;
 	net::EndPoint myAddress;

@@ -14,13 +14,20 @@ void MainScene::Awake()
 
 void MainScene::Start() noexcept
 {
+
 }
 
-void MainScene::Update(const float& delta_time)
-{}
+void MainScene::Update(const float delta_time)
+{
+	Scene::Update(delta_time);
+}
 
-void MainScene::LateUpdate(const float& delta_time)
-{}
+void MainScene::LateUpdate(const float delta_time)
+{
+	Scene::LateUpdate(delta_time);
+}
 
 void MainScene::Destroy()
-{}
+{
+	Scene::Destroy();
+}
