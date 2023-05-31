@@ -51,8 +51,8 @@ void Framework::Update()
 	constexpr float den = static_cast<float>(period::den);
 	constexpr float idv = num / den;
 
-	time_point start_time{};
-	time_point current_time{};
+	time_point start_time = std::chrono::system_clock::now();
+	time_point current_time = start_time;
 
 	while (true)
 	{
