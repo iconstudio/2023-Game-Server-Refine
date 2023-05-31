@@ -14,8 +14,12 @@ void Framework::Awake()
 	SceneManager::AddScene(SceneManager::CreateScene<MainScene>());
 	SceneManager::AddScene(SceneManager::CreateScene("씬 2"));
 
+	SceneManager::SetActiveScene(0);
+
 	for (SceneHandle& scene : SceneManager::everyScene)
 	{
+		util::debug::Println("장면 '{}'을(를) 초기화하는 중...", scene->GetName());
+
 		scene->Awake();
 	}
 }
@@ -24,11 +28,14 @@ void Framework::Start() noexcept
 {
 	util::Println("프레임워크를 준비합니다.");
 
-	CurrentScene().if_then([](Scene* scene) {
-		scene->Start();
-	}).else_then([]() noexcept {
+	if (Scene* const& intro = SceneManager::GetActiveScene(); intro != nullptr)
+	{
+		intro->Start();
+	}
+	else
+	{
 		util::Println("첫번째 씬이 없습니다.");
-	});
+	}
 }
 
 void Framework::Update()
@@ -48,14 +55,13 @@ void Framework::Update()
 
 	while (true)
 	{
-		const auto& scene_ptr = CurrentScene();
-		if (!scene_ptr.has_value()) UNLIKELY
+		Scene* const& scene = SceneManager::GetActiveScene();
+		if (scene == nullptr) UNLIKELY
 		{
 			util::Println("현재 가리키는 씬이 없습니다.");
 			break;
 		};
 
-		Scene* const& scene = *scene_ptr;
 		if (scene->IsPaused()) UNLIKELY
 		{
 			std::this_thread::yield();
@@ -83,27 +89,25 @@ void Framework::Update()
 
 		if (scene->IsCompleted()) UNLIKELY
 		{
-			roomIndex++;
-
-			if (game::SceneManager::NumberOfScenes() <= roomIndex) UNLIKELY
+			if (!game::SceneManager::IsAvailableNext()) UNLIKELY
 			{
 				util::Println("다음 씬이 없습니다.");
 				break;
 			}
 			else
 			{
-				const util::Monad<game::Scene*> scene_wrapper = SceneManager::GetScene(roomIndex);
+				const util::Monad<game::Scene*> scene_wrapper = SceneManager::GotoNextScene();
 
 				if (scene_wrapper.has_value())
 				{
 					Scene* const& next = *scene_wrapper;
 
-					util::Println("다음 씬 {}을(를) 시작합니다.", roomIndex);
+					util::Println("다음 씬 {}을(를) 시작합니다.", next->GetName());
 					next->Start();
 				}
 				else
 				{
-					util::Println("오류! 다음 씬 {}에 문제가 있습니다.", roomIndex);
+					util::Println("오류! 씬 {}에 문제가 있습니다.", scene->GetName());
 					break;
 				}
 			};

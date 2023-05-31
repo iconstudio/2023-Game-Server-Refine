@@ -28,11 +28,4 @@ public:
 
 	void UpdateOnce(game::Scene* const& scene, const float delta_time);
 	void LateUpdateOnce(game::Scene* const& scene, const float delta_time);
-
-	constexpr util::Monad<game::Scene*> CurrentScene() const noexcept
-	{
-		return game::SceneManager::GetScene(roomIndex);
-	}
-
-	size_t roomIndex = 0;
 };
