@@ -10,11 +10,13 @@ void MainScene::Awake()
 	net::Socket::CreateTCP(net::SocketType::SoFlagOverlapped).if_then([this](net::Socket&& socket) {
 		mySocket = static_cast<net::Socket&&>(socket);
 	});
+
+	Scene::Awake();
 }
 
 void MainScene::Start() noexcept
 {
-
+	Scene::Start();
 }
 
 void MainScene::Update(const float delta_time)
