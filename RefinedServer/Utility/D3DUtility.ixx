@@ -1,0 +1,362 @@
+module;
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+#include <DirectXCollision.h>
+#include <type_traits>
+
+export module Utility.D3D.Tools;
+export import Utility.D3D.Vector;
+export import Utility.D3D.Matrix;
+
+using namespace ::DirectX;
+using namespace ::DirectX::PackedVector;
+
+export namespace d3d
+{
+	using DirectX::XMStoreFloat2;
+	using DirectX::XMStoreFloat3;
+	using DirectX::XMStoreFloat4;
+	using DirectX::XMLoadFloat2;
+	using DirectX::XMLoadFloat3;
+	using DirectX::XMLoadFloat4;
+
+	extern "C++" namespace vec
+	{
+		inline XMFLOAT3 XMVectorToFloat3(const XMVECTOR& xmvVector) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, xmvVector);
+
+			return result;
+		}
+
+		inline XMFLOAT3 XMVectorToFloat3(XMVECTOR&& xmvVector) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, std::move(xmvVector));
+
+			return result;
+		}
+
+		inline XMFLOAT3 ScalarProduct(XMVECTOR&& vector, const float& scalar, const bool& normalize = true) noexcept
+		{
+			XMFLOAT3 result{};
+
+			if (normalize)
+			{
+				XMStoreFloat3(&result, XMVector3Normalize(std::move(vector)) * scalar);
+			}
+			else
+			{
+				XMStoreFloat3(&result, std::move(vector) * scalar);
+			}
+
+			return result;
+		}
+
+		inline XMFLOAT3 ScalarProduct(const XMFLOAT3& vector, const float& scalar, const bool& normalize = true) noexcept
+		{
+			return ScalarProduct(XMLoadFloat3(&vector), scalar, normalize);
+		}
+
+		inline XMFLOAT3 Add(const XMFLOAT3& vector1, const XMFLOAT3& vector2) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMLoadFloat3(&vector1) + XMLoadFloat3(&vector2));
+
+			return result;
+		}
+
+		inline XMFLOAT3 Add(const XMFLOAT3& vector1, const XMFLOAT3& vector2, const float& scalar) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMLoadFloat3(&vector1) + (XMLoadFloat3(&vector2) * scalar));
+
+			return result;
+		}
+
+		inline XMFLOAT3 Subtract(const XMFLOAT3& vector1, const XMFLOAT3& vector2) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMLoadFloat3(&vector1) - XMLoadFloat3(&vector2));
+
+			return result;
+		}
+
+		inline float DotProduct(const XMFLOAT3& vector1, const XMFLOAT3& vector2) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMVector3Dot(XMLoadFloat3(&vector1), XMLoadFloat3(&vector2)));
+
+			return result.x;
+		}
+
+		inline XMFLOAT3 CrossProduct(XMVECTOR&& vector1, XMVECTOR&& vector2, const bool& normalize = true) noexcept
+		{
+			XMFLOAT3 result{};
+
+			if (normalize)
+			{
+				XMStoreFloat3(&result, XMVector3Normalize(XMVector3Cross(std::move(vector1), std::move(vector2))));
+			}
+			else
+			{
+				XMStoreFloat3(&result, XMVector3Cross(std::move(vector1), std::move(vector2)));
+			}
+			return result;
+		}
+
+		inline XMFLOAT3 CrossProduct(const XMFLOAT3& vector1, const XMFLOAT3& vector2, const bool& normalize = true) noexcept
+		{
+			return CrossProduct(XMLoadFloat3(&vector1), XMLoadFloat3(&vector2), normalize);
+		}
+
+		inline XMFLOAT3 Normalize(XMVECTOR&& vector) noexcept
+		{
+			XMFLOAT3 normal{};
+
+			XMStoreFloat3(&normal, XMVector3Normalize(std::move(vector)));
+
+			return normal;
+		}
+
+		inline XMFLOAT3 Normalize(const XMFLOAT3& vector) noexcept
+		{
+			return Normalize(XMLoadFloat3(&vector));
+		}
+
+		inline float Length(XMVECTOR&& vector) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMVector3Length(std::move(vector)));
+
+			return(result.x);
+		}
+
+		inline float Length(const XMFLOAT3& vector) noexcept
+		{
+			return Length(XMLoadFloat3(&vector));
+		}
+
+		inline float Angle(XMVECTOR&& lhs, XMVECTOR&& rhs) noexcept
+		{
+			return XMConvertToDegrees(XMVectorGetX(XMVector3AngleBetweenNormals(std::move(lhs), std::move(rhs))));
+		}
+
+		inline float Angle(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+		{
+			return Angle(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs));
+		}
+
+		inline XMFLOAT3 TransformNormal(const XMFLOAT3& vector, const XMMATRIX& transform) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMVector3TransformNormal(XMLoadFloat3(&vector), transform));
+
+			return result;
+		}
+
+		inline XMFLOAT3 TransformCoord(const XMFLOAT3& vector, const XMMATRIX& transform) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result, XMVector3TransformCoord(XMLoadFloat3(&vector), transform));
+
+			return result;
+		}
+
+		inline XMFLOAT3 TransformCoord(const XMFLOAT3& vector, const XMFLOAT4X4& transform) noexcept
+		{
+			XMFLOAT3 result{};
+
+			XMStoreFloat3(&result
+				, XMVector3TransformCoord(XMLoadFloat3(&vector), XMLoadFloat4x4(&transform)));
+
+			return result;
+		}
+
+		inline XMFLOAT4 Add(const XMFLOAT4& xmf4Vector1, const XMFLOAT4& xmf4Vector2) noexcept
+		{
+			XMFLOAT4 result{};
+
+			XMStoreFloat4(&result, XMLoadFloat4(&xmf4Vector1) + XMLoadFloat4(&xmf4Vector2));
+
+			return result;
+		}
+	}
+
+	extern "C++" namespace mat
+	{
+		inline XMFLOAT4X4 Multiply(XMFLOAT4X4&& lhs, XMFLOAT4X4&& rhs) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMMATRIX mat1 = XMLoadFloat4x4(&lhs);
+			const XMMATRIX mat2 = XMLoadFloat4x4(&rhs);
+
+			XMStoreFloat4x4(&result, mat1 * mat2);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Multiply(const XMFLOAT4X4& lhs, const XMFLOAT4X4& rhs) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			XMStoreFloat4x4(&result, XMLoadFloat4x4(&lhs) * XMLoadFloat4x4(&rhs));
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Multiply(const XMFLOAT4X4& lhs, const XMMATRIX& rhs) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			XMStoreFloat4x4(&result, XMLoadFloat4x4(&lhs) * rhs);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Multiply(XMFLOAT4X4&& lhs, const XMMATRIX& rhs) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			XMStoreFloat4x4(&result, XMLoadFloat4x4(&lhs) * rhs);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Multiply(const XMMATRIX& lhs, const XMFLOAT4X4& rhs) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			XMStoreFloat4x4(&result, lhs * XMLoadFloat4x4(&rhs));
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Multiply(XMMATRIX&& lhs, const XMFLOAT4X4& rhs) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			XMStoreFloat4x4(&result, std::move(lhs) * XMLoadFloat4x4(&rhs));
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Inverse(const XMFLOAT4X4& matrix) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMMATRIX mat = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&matrix));
+			XMStoreFloat4x4(&result, mat);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Inverse(XMFLOAT4X4&& matrix) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMMATRIX mat = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&matrix));
+			XMStoreFloat4x4(&result, mat);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 Transpose(const XMFLOAT4X4& matrix) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMMATRIX mat = DirectX::XMMatrixTranspose(XMLoadFloat4x4(&matrix));
+			XMStoreFloat4x4(&result, mat);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 RotationYawPitchRoll(const float& pitch, const float& yaw, const float& roll) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const float rad_pitch = XMConvertToRadians(pitch);
+			const float rad_yaw = XMConvertToRadians(yaw);
+			const float rad_roll = XMConvertToRadians(roll);
+			const XMMATRIX rot = DirectX::XMMatrixRotationRollPitchYaw(rad_pitch, rad_yaw, rad_roll);
+			XMStoreFloat4x4(&result, rot);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 RotationAxis(const XMFLOAT3& axis, const float& angle) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMMATRIX rot = DirectX::XMMatrixRotationAxis(XMLoadFloat3(&axis), XMConvertToRadians(angle));
+			XMStoreFloat4x4(&result, rot);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 PerspectiveFovLH(const float& fov_y, const float& aspect, const float& znear, const float& zfar) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMMATRIX mat = DirectX::XMMatrixPerspectiveFovLH(fov_y, aspect, znear, zfar);
+			XMStoreFloat4x4(&result, mat);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 LookAtLH(const XMFLOAT3& eye_pos, const XMFLOAT3& lookat, const XMFLOAT3& up) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const auto mat = DirectX::XMMatrixLookAtLH(XMLoadFloat3(&eye_pos), XMLoadFloat3(&lookat), XMLoadFloat3(&up));
+
+			XMStoreFloat4x4(&result, mat);
+
+			return result;
+		}
+
+		inline XMFLOAT4X4 LookToLH(const XMFLOAT3& eye_pos, const XMFLOAT3& look_pos, const XMFLOAT3& up_dir) noexcept
+		{
+			XMFLOAT4X4 result{};
+
+			const XMVECTOR eye = XMLoadFloat3(&eye_pos);
+			const XMVECTOR look = XMLoadFloat3(&look_pos);
+			const XMVECTOR up = XMLoadFloat3(&up_dir);
+			XMStoreFloat4x4(&result, DirectX::XMMatrixLookToLH(eye, look, up));
+
+			return result;
+		}
+	}
+
+	extern "C" namespace trig
+	{
+		inline bool Intersect(const XMFLOAT3& xmf3RayPosition, const XMFLOAT3& xmf3RayDirection, const XMFLOAT3& v0, const XMFLOAT3& v1, const XMFLOAT3& v2, float& dist) noexcept
+		{
+			return TriangleTests::Intersects(XMLoadFloat3(&xmf3RayPosition)
+				, XMLoadFloat3(&xmf3RayDirection)
+				, XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)
+				, dist);
+		}
+	}
+
+	extern "C" namespace rect
+	{
+		inline XMFLOAT4 Normalize(const XMFLOAT4& xmf4Plane) noexcept
+		{
+			XMFLOAT4 result;
+			XMStoreFloat4(&result, XMPlaneNormalize(XMLoadFloat4(&xmf4Plane)));
+			return result;
+		}
+	}
+}
