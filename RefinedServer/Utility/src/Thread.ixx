@@ -87,3 +87,27 @@ export extern "C++" namespace util
 		return jthread{ ::std::forward<Fn>(fn), ::std::forward<Args>(args)... };
 	}
 }
+
+export template<>
+struct std::default_delete<std::jthread>
+{
+	constexpr default_delete() noexcept = default;
+	constexpr ~default_delete() noexcept = default;
+
+	template <std::convertible_to<std::jthread> U>
+	constexpr default_delete(const default_delete<U>&) noexcept
+	{}
+
+	inline void operator()(std::jthread* const handle) const noexcept
+	{
+		try
+		{
+			handle->request_stop();
+			handle->join();
+		}
+		catch (...)
+		{}
+
+		delete handle;
+	}
+};
