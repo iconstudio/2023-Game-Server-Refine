@@ -230,7 +230,7 @@ export namespace util
 		inline void Println(format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
-			return Println(stdout, fmt, std::forward<Args>(args)...);
+			return util::Println(stdout, fmt, std::forward<Args>(args)...);
 #endif
 		}
 
