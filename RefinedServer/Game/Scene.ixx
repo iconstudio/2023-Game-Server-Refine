@@ -73,6 +73,13 @@ export extern "C++" namespace game
 
 		virtual inline void Awake() override
 		{
+			if (IsAwaken())
+			{
+				return;
+			}
+
+			MakeAwake();
+
 			for (auto& instance : gameObjects)
 			{
 				instance->Awake();
