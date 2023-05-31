@@ -58,6 +58,46 @@ export namespace game
 			return std::unique_ptr<GameObject>(DeepCopy(original.get()));
 		}
 
+		inline void Awake()
+		{
+			for (auto& component : myComponents)
+			{
+				component->Awake();
+			}
+		}
+
+		inline void Start() noexcept
+		{
+			for (auto& component : myComponents)
+			{
+				component->Start();
+			}
+		}
+
+		inline void Update(const float& delta_time)
+		{
+			for (auto& component : myComponents)
+			{
+				component->Update(delta_time);
+			}
+		}
+
+		inline void LateUpdate(const float& delta_time)
+		{
+			for (auto& component : myComponents)
+			{
+				component->LateUpdate(delta_time);
+			}
+		}
+
+		inline void Destroy()
+		{
+			for (auto& component : myComponents)
+			{
+				component->Destroy();
+			}
+		}
+
 		constexpr void Reset() noexcept
 		{}
 
