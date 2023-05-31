@@ -26,21 +26,22 @@ void Framework::Awake()
 
 void Framework::Start() noexcept
 {
-	util::Println("프레임워크를 준비합니다.");
+	util::Println("게임을 준비합니다.");
 
 	if (Scene* const& intro = SceneManager::GetActiveScene(); intro != nullptr)
 	{
+		util::debug::Println("첫번째 씬으로 '{}'에서 게임을 시작합니다.", intro->GetName());
 		intro->Start();
 	}
 	else
 	{
-		util::Println("첫번째 씬이 없습니다.");
+		util::Println("첫번째 씬이 없어서 게임을 시작할 수 없습니다.");
 	}
 }
 
 void Framework::Update()
 {
-	util::Println("프레임워크를 시작합니다.");
+	util::Println("프레임워크의 갱신 루프를 시작합니다.");
 
 	using clock = std::chrono::system_clock;
 	using time_point = clock::time_point;
