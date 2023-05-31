@@ -38,7 +38,8 @@ export namespace game
 
 		static constexpr util::Monad<Scene*> SetActiveScene(const size_t index) noexcept
 		{
-			return GetScene(index).if_then([](Scene* scene) noexcept {
+			return GetScene(index).if_then([&index](Scene* scene) noexcept {
+				activeIndex = index;
 				activeScene = scene;
 			});
 		}
@@ -72,5 +73,6 @@ export namespace game
 
 	private:
 		static inline Scene* activeScene = nullptr;
+		static inline size_t activeIndex = 0;
 	};
 }
