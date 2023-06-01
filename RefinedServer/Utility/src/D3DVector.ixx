@@ -30,33 +30,6 @@ export namespace d3d
 
 export namespace d3d::vec
 {
-	[[nodiscard]]
-	constexpr XMVECTOR Zero() noexcept
-	{
-		if (std::is_constant_evaluated())
-		{
-			return { 0.0f, 0.0f, 0.0f, 0.0f };
-		}
-		else
-		{
-			return DirectX::XMVectorZero();
-		}
-	}
-
-	[[nodiscard]]
-	constexpr XMVECTOR One() noexcept
-	{
-		if (std::is_constant_evaluated())
-		{
-			return { 1.0f, 1.0f, 1.0f, 1.0f };
-		}
-		else
-		{
-			return DirectX::XMVectorSplatOne();
-		}
-	}
-
-
 	using DirectX::XMVectorSet;
 	using DirectX::XMVectorReplicate;
 
@@ -95,4 +68,113 @@ export namespace d3d::vec
 	using DirectX::XMVector3IsInfinite;
 	using DirectX::XMVector3IsNaN;
 	using DirectX::XMVector3InBounds;
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV Zero() noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			return { 0.0f, 0.0f, 0.0f, 0.0f };
+		}
+		else
+		{
+			return DirectX::XMVectorZero();
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV One() noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			return { 1.0f, 1.0f, 1.0f, 1.0f };
+		}
+		else
+		{
+			return DirectX::XMVectorSplatOne();
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV MergeXY(const XMVECTOR& lhs, const XMVECTOR& rhs) noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			return
+			{
+				lhs.m128_f32[0],
+				rhs.m128_f32[0],
+				lhs.m128_f32[1],
+				rhs.m128_f32[1],
+			};
+		}
+		else
+		{
+			return DirectX::XMVectorMergeXY(lhs, rhs);
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV MergeZW(const XMVECTOR& lhs, const XMVECTOR& rhs) noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			return
+			{
+				lhs.m128_f32[2],
+				rhs.m128_f32[2],
+				lhs.m128_f32[3],
+				rhs.m128_f32[3],
+			};
+		}
+		else
+		{
+			return DirectX::XMVectorMergeZW(lhs, rhs);
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV SplatX(const XMVECTOR& vector) noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			DirectX::XMVECTORF32 result{};
+			result.f[0] = result.f[1] = result.f[2] = result.f[3] = vector.m128_f32[0];
+			return result.v;
+		}
+		else
+		{
+			return DirectX::XMVectorSplatX(vector);
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV SplatY(const XMVECTOR& vector) noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			DirectX::XMVECTORF32 result{};
+			result.f[0] = result.f[1] = result.f[2] = result.f[3] = vector.m128_f32[1];
+			return result.v;
+		}
+		else
+		{
+			return DirectX::XMVectorSplatY(vector);
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMVECTOR XM_CALLCONV SplatZ(const XMVECTOR& vector) noexcept
+	{
+		if (std::is_constant_evaluated())
+		{
+			DirectX::XMVECTORF32 result{};
+			result.f[0] = result.f[1] = result.f[2] = result.f[3] = vector.m128_f32[2];
+			return result.v;
+		}
+		else
+		{
+			return DirectX::XMVectorSplatZ(vector);
+		}
+	}
 }
