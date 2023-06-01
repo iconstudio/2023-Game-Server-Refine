@@ -352,6 +352,21 @@ export namespace d3d
 	using DirectX::XMFLOAT4X3A;
 	using DirectX::XMFLOAT4X4A;
 
+	using DirectX::XMLoadFloat3x3;
+	using DirectX::XMStoreFloat3x3;
+	using DirectX::XMLoadFloat3x4;
+	using DirectX::XMStoreFloat3x4;
+	using DirectX::XMLoadFloat3x4A;
+	using DirectX::XMStoreFloat3x4A;
+	using DirectX::XMLoadFloat4x3;
+	using DirectX::XMStoreFloat4x3;
+	using DirectX::XMLoadFloat4x3A;
+	using DirectX::XMStoreFloat4x3A;
+	using DirectX::XMLoadFloat4x4;
+	using DirectX::XMStoreFloat4x4;
+	using DirectX::XMLoadFloat4x4A;
+	using DirectX::XMStoreFloat4x4A;
+
 	using DirectX::operator+;
 	using DirectX::operator+=;
 	using DirectX::operator-;
@@ -372,6 +387,91 @@ export namespace d3d::mat
 		result.r[1] = DirectX::g_XMIdentityR1.v;
 		result.r[2] = DirectX::g_XMIdentityR2.v;
 		result.r[3] = DirectX::g_XMIdentityR3.v;
+		return result;
+	}
+
+	inline XMFLOAT4X4 Inverse(const XMFLOAT4X4& matrix) noexcept
+	{
+		XMFLOAT4X4 result{};
+
+		const XMMATRIX mat = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&matrix));
+		XMStoreFloat4x4(&result, mat);
+
+		return result;
+	}
+
+	inline XMFLOAT4X4 Inverse(XMFLOAT4X4&& matrix) noexcept
+	{
+		XMFLOAT4X4 result{};
+
+		const XMMATRIX mat = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&matrix));
+		XMStoreFloat4x4(&result, mat);
+
+		return result;
+	}
+
+	constexpr DirectX::XMVECTOR MergeXY(const DirectX::XMVECTOR& lhs, const DirectX::XMVECTOR& rhs) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			DirectX::XMVECTOR Result =
+			{
+				lhs.m128_f32[0],
+				rhs.m128_f32[0],
+				lhs.m128_f32[1],
+				rhs.m128_f32[1],
+			};
+
+			return Result.v;
+		}
+		else
+		{
+			return DirectX::XMVectorMergeXY(lhs, rhs);
+		}
+	}
+
+	constexpr DirectX::XMVECTOR MergeZW(const DirectX::XMVECTOR& lhs, const DirectX::XMVECTOR& rhs) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			DirectX::XMVECTOR Result =
+			{
+				lhs.m128_f32[2],
+				rhs.m128_f32[2],
+				lhs.m128_f32[3],
+				rhs.m128_f32[3],
+			};
+
+			return Result.v;
+		}
+		else
+		{
+			return DirectX::XMVectorMergeZW(lhs, rhs);
+		}
+	}
+
+	constexpr XMFLOAT4X4 Transpose(const XMFLOAT4X4& matrix) noexcept
+	{
+		XMFLOAT4X4 result{};
+		if (util::is_constant_evaluated())
+		{
+
+		}
+		else
+		{
+			XMStoreFloat4x4(&result, DirectX::XMMatrixTranspose(XMLoadFloat4x4(&matrix)));
+		}
+
+		return result;
+	}
+
+	inline XMFLOAT4X4 RotationAxis(const DirectX::XMFLOAT3& axis, const float& angle) noexcept
+	{
+		XMFLOAT4X4 result{};
+
+		const XMMATRIX rot = DirectX::XMMatrixRotationAxis(XMLoadFloat3(&axis), DirectX::XMConvertToRadians(angle));
+		XMStoreFloat4x4(&result, rot);
+
 		return result;
 	}
 }

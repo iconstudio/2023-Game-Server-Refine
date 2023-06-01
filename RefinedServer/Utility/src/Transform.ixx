@@ -16,12 +16,12 @@ export namespace d3d
 
 		constexpr ~XyzwWrapper() noexcept = default;
 
-		constexpr XyzwWrapper& operator=(const XyzwWrapper& other) noexcept
+		constexpr XyzwWrapper& operator=([[maybe_unused]] const XyzwWrapper&) noexcept
 		{
 			return *this;
 		}
 
-		constexpr XyzwWrapper& operator=(XyzwWrapper&& other) noexcept
+		constexpr XyzwWrapper& operator=([[maybe_unused]] XyzwWrapper&&) noexcept
 		{
 			return *this;
 		}
@@ -230,6 +230,16 @@ export namespace d3d
 		constexpr void Downward(XMFLOAT3&& xyz) noexcept
 		{
 			myPosition.y -= static_cast<float&&>(xyz.y);
+		}
+
+		inline void Rotation(const XMFLOAT3& axis, const float& rot) noexcept
+		{
+			myMatrix = mat::RotationAxis(axis, rot);
+		}
+
+		inline void RotateAxis(const XMFLOAT3& axis, const float& rot) noexcept
+		{
+			myMatrix *= mat::RotationAxis(axis, rot);
 		}
 
 		[[nodiscard]]

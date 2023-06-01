@@ -252,36 +252,6 @@ export namespace d3d
 			return result;
 		}
 
-		inline XMFLOAT4X4 Inverse(const XMFLOAT4X4& matrix) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			const XMMATRIX mat = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&matrix));
-			XMStoreFloat4x4(&result, mat);
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Inverse(XMFLOAT4X4&& matrix) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			const XMMATRIX mat = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&matrix));
-			XMStoreFloat4x4(&result, mat);
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Transpose(const XMFLOAT4X4& matrix) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			const XMMATRIX mat = DirectX::XMMatrixTranspose(XMLoadFloat4x4(&matrix));
-			XMStoreFloat4x4(&result, mat);
-
-			return result;
-		}
-
 		inline XMFLOAT4X4 RotationYawPitchRoll(const float& pitch, const float& yaw, const float& roll) noexcept
 		{
 			XMFLOAT4X4 result{};
@@ -290,16 +260,6 @@ export namespace d3d
 			const float rad_yaw = XMConvertToRadians(yaw);
 			const float rad_roll = XMConvertToRadians(roll);
 			const XMMATRIX rot = DirectX::XMMatrixRotationRollPitchYaw(rad_pitch, rad_yaw, rad_roll);
-			XMStoreFloat4x4(&result, rot);
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 RotationAxis(const XMFLOAT3& axis, const float& angle) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			const XMMATRIX rot = DirectX::XMMatrixRotationAxis(XMLoadFloat3(&axis), XMConvertToRadians(angle));
 			XMStoreFloat4x4(&result, rot);
 
 			return result;
