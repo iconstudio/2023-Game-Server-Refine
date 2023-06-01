@@ -8,13 +8,24 @@ export import Utility.D3D.Vector;
 
 export namespace d3d
 {
-	struct XyzWrapper
-	{
-		float& x, & y, & z;
-	};
-
 	struct XyzwWrapper
 	{
+		constexpr XyzwWrapper(float& dx, float& dy, float& dz, float& dw) noexcept
+			: x(dx), y(dy), z(dz), w(dw)
+		{}
+
+		constexpr ~XyzwWrapper() noexcept = default;
+
+		constexpr XyzwWrapper& operator=(const XyzwWrapper& other) noexcept
+		{
+			return *this;
+		}
+
+		constexpr XyzwWrapper& operator=(XyzwWrapper&& other) noexcept
+		{
+			return *this;
+		}
+
 		float& x, & y, & z, & w;
 	};
 
