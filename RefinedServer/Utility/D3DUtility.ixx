@@ -69,34 +69,6 @@ export namespace d3d
 			return CrossProduct(XMLoadFloat3(&vector1), XMLoadFloat3(&vector2), normalize);
 		}
 
-		inline XMFLOAT3 Normalize(XMVECTOR&& vector) noexcept
-		{
-			XMFLOAT3 normal{};
-
-			XMStoreFloat3(&normal, XMVector3Normalize(std::move(vector)));
-
-			return normal;
-		}
-
-		inline XMFLOAT3 Normalize(const XMFLOAT3& vector) noexcept
-		{
-			return Normalize(XMLoadFloat3(&vector));
-		}
-
-		inline float Length(XMVECTOR&& vector) noexcept
-		{
-			XMFLOAT3 result{};
-
-			XMStoreFloat3(&result, XMVector3Length(std::move(vector)));
-
-			return(result.x);
-		}
-
-		inline float Length(const XMFLOAT3& vector) noexcept
-		{
-			return Length(XMLoadFloat3(&vector));
-		}
-
 		inline float Angle(XMVECTOR&& lhs, XMVECTOR&& rhs) noexcept
 		{
 			return XMConvertToDegrees(XMVectorGetX(XMVector3AngleBetweenNormals(std::move(lhs), std::move(rhs))));
