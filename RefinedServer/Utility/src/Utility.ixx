@@ -1,11 +1,27 @@
 module;
+#include <cmath>
 #include <utility>
 #include <initializer_list>
 #include <optional>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <limits>
 export module Utility;
+
+__forceinline constexpr double sqrtNewtonRaphson(double x, double curr, double prev) noexcept
+{
+	return curr == prev
+		? curr
+		: sqrtNewtonRaphson(x, 0.5 * (curr + x / curr), curr);
+}
+
+__forceinline constexpr float sqrtNewtonRaphson(float x, float curr, float prev) noexcept
+{
+	return curr == prev
+		? curr
+		: sqrtNewtonRaphson(x, 0.5f * (curr + x / curr), curr);
+}
 
 export extern "C++" namespace util
 {
@@ -81,4 +97,44 @@ export extern "C++" namespace util
 	using ::std::cend;
 	using ::std::size;
 	using ::std::ssize;
+
+	/// <summary>
+	/// https://gist.github.com/alexshtf/eb5128b3e3e143187794
+	/// </summary>
+	/// <param name="value"></param>
+	/// <returns> For a finite and non-negative value, returns an approximation for the square root of value. Otherwise, returns NaN.</returns>
+	[[nodiscard]] __forceinline
+		constexpr double sqrt(const double value) noexcept
+	{
+		if (is_constant_evaluated())
+		{
+			return 0 <= value && value < std::numeric_limits<double>::infinity()
+				? ::sqrtNewtonRaphson(value, value, 0)
+				: std::numeric_limits<double>::quiet_NaN();
+		}
+		else
+		{
+			return std::sqrt(value);
+		}
+	}
+
+	/// <summary>
+	/// https://gist.github.com/alexshtf/eb5128b3e3e143187794
+	/// </summary>
+	/// <param name="value"></param>
+	/// <returns> For a finite and non-negative value, returns an approximation for the square root of value. Otherwise, returns NaN.</returns>
+	[[nodiscard]] __forceinline
+		constexpr float sqrt(const float value) noexcept
+	{
+		if (is_constant_evaluated())
+		{
+			return 0 <= value && value < std::numeric_limits<float>::infinity()
+				? ::sqrtNewtonRaphson(value, value, 0)
+				: std::numeric_limits<float>::quiet_NaN();
+		}
+		else
+		{
+			return std::sqrt(value);
+		}
+	}
 }
