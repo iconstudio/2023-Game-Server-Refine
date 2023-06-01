@@ -1,6 +1,169 @@
 module;
 #include <DirectXMath.h>
 export module Utility.D3D.Matrix;
+import Utility;
+
+export constexpr DirectX::XMFLOAT3X3 operator+(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+{
+	DirectX::XMFLOAT3X3 result{};
+	if (util::is_constant_evaluated())
+	{
+		result._11 = lhs._11 + rhs._11;
+		result._21 = lhs._21 + rhs._21;
+		result._31 = lhs._31 + rhs._31;
+		result._12 = lhs._12 + rhs._12;
+		result._22 = lhs._22 + rhs._22;
+		result._32 = lhs._32 + rhs._32;
+		result._13 = lhs._13 + rhs._13;
+		result._23 = lhs._23 + rhs._23;
+		result._33 = lhs._33 + rhs._33;
+	}
+	else
+	{
+		const DirectX::XMMATRIX lmt = XMLoadFloat3x3(&lhs);
+		const DirectX::XMMATRIX rmt = XMLoadFloat3x3(&rhs);
+
+		XMStoreFloat3x3(&result, lmt + rmt);
+	}
+
+	return result;
+}
+
+export constexpr DirectX::XMFLOAT3X3& operator+=(DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+{
+	if (util::is_constant_evaluated())
+	{
+		lhs = lhs + rhs;
+	}
+	else
+	{
+		const DirectX::XMMATRIX lmt = XMLoadFloat3x3(&lhs);
+		const DirectX::XMMATRIX rmt = XMLoadFloat3x3(&rhs);
+
+		XMStoreFloat3x3(&lhs, lmt + rmt);
+	}
+
+	return lhs;
+}
+
+export constexpr DirectX::XMFLOAT3X3 operator-(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+{
+	DirectX::XMFLOAT3X3 result{};
+	if (util::is_constant_evaluated())
+	{
+		result._11 = lhs._11 - rhs._11;
+		result._21 = lhs._21 - rhs._21;
+		result._31 = lhs._31 - rhs._31;
+		result._12 = lhs._12 - rhs._12;
+		result._22 = lhs._22 - rhs._22;
+		result._32 = lhs._32 - rhs._32;
+		result._13 = lhs._13 - rhs._13;
+		result._23 = lhs._23 - rhs._23;
+		result._33 = lhs._33 - rhs._33;
+	}
+	else
+	{
+		const DirectX::XMMATRIX lmt = XMLoadFloat3x3(&lhs);
+		const DirectX::XMMATRIX rmt = XMLoadFloat3x3(&rhs);
+
+		XMStoreFloat3x3(&result, lmt - rmt);
+	}
+
+	return result;
+}
+
+export constexpr DirectX::XMFLOAT3X3& operator-=(DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+{
+	if (util::is_constant_evaluated())
+	{
+		lhs = lhs - rhs;
+	}
+	else
+	{
+		const DirectX::XMMATRIX lmt = XMLoadFloat3x3(&lhs);
+		const DirectX::XMMATRIX rmt = XMLoadFloat3x3(&rhs);
+
+		XMStoreFloat3x3(&lhs, lmt - rmt);
+	}
+
+	return lhs;
+}
+
+export constexpr DirectX::XMFLOAT3X3 operator*(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+{
+	DirectX::XMFLOAT3X3 result{};
+	if (util::is_constant_evaluated())
+	{
+		DirectX::XMMATRIX result{};
+
+		// Cache the invariants in registers
+		float x = lhs.m[0][0];
+		float y = lhs.m[0][1];
+		float z = lhs.m[0][2];
+		float w = lhs.m[0][3];
+
+		// Perform the operation on the first row
+		result.m[0][0] = (rhs.m[0][0] * x) + (rhs.m[1][0] * y) + (rhs.m[2][0] * z) + (rhs.m[3][0] * w);
+		result.m[0][1] = (rhs.m[0][1] * x) + (rhs.m[1][1] * y) + (rhs.m[2][1] * z) + (rhs.m[3][1] * w);
+		result.m[0][2] = (rhs.m[0][2] * x) + (rhs.m[1][2] * y) + (rhs.m[2][2] * z) + (rhs.m[3][2] * w);
+		result.m[0][3] = (rhs.m[0][3] * x) + (rhs.m[1][3] * y) + (rhs.m[2][3] * z) + (rhs.m[3][3] * w);
+
+		// Repeat for all the other rows
+		x = lhs.m[1][0];
+		y = lhs.m[1][1];
+		z = lhs.m[1][2];
+		w = lhs.m[1][3];
+
+		result.m[1][0] = (rhs.m[0][0] * x) + (rhs.m[1][0] * y) + (rhs.m[2][0] * z) + (rhs.m[3][0] * w);
+		result.m[1][1] = (rhs.m[0][1] * x) + (rhs.m[1][1] * y) + (rhs.m[2][1] * z) + (rhs.m[3][1] * w);
+		result.m[1][2] = (rhs.m[0][2] * x) + (rhs.m[1][2] * y) + (rhs.m[2][2] * z) + (rhs.m[3][2] * w);
+		result.m[1][3] = (rhs.m[0][3] * x) + (rhs.m[1][3] * y) + (rhs.m[2][3] * z) + (rhs.m[3][3] * w);
+		x = lhs.m[2][0];
+		y = lhs.m[2][1];
+		z = lhs.m[2][2];
+		w = lhs.m[2][3];
+
+		result.m[2][0] = (rhs.m[0][0] * x) + (rhs.m[1][0] * y) + (rhs.m[2][0] * z) + (rhs.m[3][0] * w);
+		result.m[2][1] = (rhs.m[0][1] * x) + (rhs.m[1][1] * y) + (rhs.m[2][1] * z) + (rhs.m[3][1] * w);
+		result.m[2][2] = (rhs.m[0][2] * x) + (rhs.m[1][2] * y) + (rhs.m[2][2] * z) + (rhs.m[3][2] * w);
+		result.m[2][3] = (rhs.m[0][3] * x) + (rhs.m[1][3] * y) + (rhs.m[2][3] * z) + (rhs.m[3][3] * w);
+		x = lhs.m[3][0];
+		y = lhs.m[3][1];
+		z = lhs.m[3][2];
+		w = lhs.m[3][3];
+
+		result.m[3][0] = (rhs.m[0][0] * x) + (rhs.m[1][0] * y) + (rhs.m[2][0] * z) + (rhs.m[3][0] * w);
+		result.m[3][1] = (rhs.m[0][1] * x) + (rhs.m[1][1] * y) + (rhs.m[2][1] * z) + (rhs.m[3][1] * w);
+		result.m[3][2] = (rhs.m[0][2] * x) + (rhs.m[1][2] * y) + (rhs.m[2][2] * z) + (rhs.m[3][2] * w);
+		result.m[3][3] = (rhs.m[0][3] * x) + (rhs.m[1][3] * y) + (rhs.m[2][3] * z) + (rhs.m[3][3] * w);
+	}
+	else
+	{
+		const DirectX::XMMATRIX lmt = XMLoadFloat3x3(&lhs);
+		const DirectX::XMMATRIX rmt = XMLoadFloat3x3(&rhs);
+
+		XMStoreFloat3x3(&result, lmt * rmt);
+	}
+
+	return result;
+}
+
+export constexpr DirectX::XMFLOAT3X3& operator*=(DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+{
+	if (util::is_constant_evaluated())
+	{
+		lhs = lhs * rhs;
+	}
+	else
+	{
+		const DirectX::XMMATRIX lmt = XMLoadFloat3x3(&lhs);
+		const DirectX::XMMATRIX rmt = XMLoadFloat3x3(&rhs);
+
+		XMStoreFloat3x3(&lhs, lmt * rmt);
+	}
+
+	return lhs;
+}
 
 export namespace d3d::mat
 {
@@ -22,7 +185,6 @@ export namespace d3d::mat
 	using DirectX::operator/;
 	using DirectX::operator/=;
 
-	
 	[[nodiscard]]
 	constexpr XMMATRIX XM_CALLCONV Identity() noexcept
 	{
