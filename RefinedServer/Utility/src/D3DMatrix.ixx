@@ -1,7 +1,9 @@
 module;
 #include <DirectXMath.h>
+
 export module Utility.D3D.Matrix;
 import Utility;
+import Utility.D3D.Vector;
 
 export
 [[nodiscard]]
@@ -390,7 +392,8 @@ export namespace d3d::mat
 		return result;
 	}
 
-	inline XMFLOAT4X4 Inverse(const XMFLOAT4X4& matrix) noexcept
+	[[nodiscard]]
+	inline XMFLOAT4X4 XM_CALLCONV Inverse(const XMFLOAT4X4& matrix) noexcept
 	{
 		XMFLOAT4X4 result{};
 
@@ -400,7 +403,8 @@ export namespace d3d::mat
 		return result;
 	}
 
-	inline XMFLOAT4X4 Inverse(XMFLOAT4X4&& matrix) noexcept
+	[[nodiscard]]
+	inline XMFLOAT4X4 XM_CALLCONV Inverse(XMFLOAT4X4&& matrix) noexcept
 	{
 		XMFLOAT4X4 result{};
 
@@ -410,52 +414,66 @@ export namespace d3d::mat
 		return result;
 	}
 
-	constexpr DirectX::XMVECTOR MergeXY(const DirectX::XMVECTOR& lhs, const DirectX::XMVECTOR& rhs) noexcept
+	[[nodiscard]]
+	constexpr XMFLOAT3X3 XM_CALLCONV Transpose(const XMFLOAT3X3& matrix) noexcept
 	{
+		XMFLOAT3X3 result{};
 		if (util::is_constant_evaluated())
 		{
-			DirectX::XMVECTOR Result =
-			{
-				lhs.m128_f32[0],
-				rhs.m128_f32[0],
-				lhs.m128_f32[1],
-				rhs.m128_f32[1],
-			};
-
-			return Result.v;
+			result._12 = matrix._21;
+			result._21 = matrix._12;
+			result._13 = matrix._31;
+			result._31 = matrix._13;
+			result._23 = matrix._32;
+			result._32 = matrix._23;
 		}
 		else
 		{
-			return DirectX::XMVectorMergeXY(lhs, rhs);
+			XMStoreFloat3x3(&result, DirectX::XMMatrixTranspose(XMLoadFloat3x3(&matrix)));
 		}
+
+		return result;
 	}
 
-	constexpr DirectX::XMVECTOR MergeZW(const DirectX::XMVECTOR& lhs, const DirectX::XMVECTOR& rhs) noexcept
+	[[nodiscard]]
+	constexpr XMFLOAT3X3 XM_CALLCONV Transpose(XMFLOAT3X3&& matrix) noexcept
 	{
+		XMFLOAT3X3 result{};
 		if (util::is_constant_evaluated())
 		{
-			DirectX::XMVECTOR Result =
-			{
-				lhs.m128_f32[2],
-				rhs.m128_f32[2],
-				lhs.m128_f32[3],
-				rhs.m128_f32[3],
-			};
-
-			return Result.v;
+			result._12 = static_cast<float&&>(matrix._21);
+			result._21 = static_cast<float&&>(matrix._12);
+			result._13 = static_cast<float&&>(matrix._31);
+			result._31 = static_cast<float&&>(matrix._13);
+			result._23 = static_cast<float&&>(matrix._32);
+			result._32 = static_cast<float&&>(matrix._23);
 		}
 		else
 		{
-			return DirectX::XMVectorMergeZW(lhs, rhs);
+			XMStoreFloat3x3(&result, DirectX::XMMatrixTranspose(XMLoadFloat3x3(&matrix)));
 		}
+
+		return result;
 	}
 
-	constexpr XMFLOAT4X4 Transpose(const XMFLOAT4X4& matrix) noexcept
+	[[nodiscard]]
+	constexpr XMFLOAT4X4 XM_CALLCONV Transpose(const XMFLOAT4X4& matrix) noexcept
 	{
 		XMFLOAT4X4 result{};
 		if (util::is_constant_evaluated())
 		{
-
+			result._12 = matrix._21;
+			result._21 = matrix._12;
+			result._13 = matrix._31;
+			result._31 = matrix._13;
+			result._14 = matrix._41;
+			result._41 = matrix._14;
+			result._23 = matrix._32;
+			result._32 = matrix._23;
+			result._24 = matrix._42;
+			result._42 = matrix._24;
+			result._34 = matrix._43;
+			result._43 = matrix._34;
 		}
 		else
 		{
@@ -465,13 +483,50 @@ export namespace d3d::mat
 		return result;
 	}
 
-	inline XMFLOAT4X4 RotationAxis(const DirectX::XMFLOAT3& axis, const float& angle) noexcept
+	[[nodiscard]]
+	constexpr XMFLOAT4X4 XM_CALLCONV Transpose(XMFLOAT4X4&& matrix) noexcept
+	{
+		XMFLOAT4X4 result{};
+		if (util::is_constant_evaluated())
+		{
+			result._12 = static_cast<float&&>(matrix._21);
+			result._21 = static_cast<float&&>(matrix._12);
+			result._13 = static_cast<float&&>(matrix._31);
+			result._31 = static_cast<float&&>(matrix._13);
+			result._14 = static_cast<float&&>(matrix._41);
+			result._41 = static_cast<float&&>(matrix._14);
+			result._23 = static_cast<float&&>(matrix._32);
+			result._32 = static_cast<float&&>(matrix._23);
+			result._24 = static_cast<float&&>(matrix._42);
+			result._42 = static_cast<float&&>(matrix._24);
+			result._34 = static_cast<float&&>(matrix._43);
+			result._43 = static_cast<float&&>(matrix._34);
+		}
+		else
+		{
+			XMStoreFloat4x4(&result, DirectX::XMMatrixTranspose(XMLoadFloat4x4(&matrix)));
+		}
+
+		return result;
+	}
+
+	[[nodiscard]]
+	inline XMFLOAT4X4 XM_CALLCONV RotationAxis(const XMFLOAT3& axis, const float& angle) noexcept
 	{
 		XMFLOAT4X4 result{};
 
-		const XMMATRIX rot = DirectX::XMMatrixRotationAxis(XMLoadFloat3(&axis), DirectX::XMConvertToRadians(angle));
+		const float radian = DirectX::XMConvertToRadians(angle);
+		const XMMATRIX rot = DirectX::XMMatrixRotationAxis(XMLoadFloat3(&axis), radian);
 		XMStoreFloat4x4(&result, rot);
+		return result;
+	}
 
+	[[nodiscard]]
+	inline XMFLOAT3X3 XM_CALLCONV RotationAxis(const XMFLOAT2& axis, const float& angle) noexcept
+	{
+		XMFLOAT3X3 result{};
+
+		XMStoreFloat3x3(&result, DirectX::XMMatrixRotationAxis(XMLoadFloat2(&axis), DirectX::XMConvertToRadians(angle)));
 		return result;
 	}
 }
