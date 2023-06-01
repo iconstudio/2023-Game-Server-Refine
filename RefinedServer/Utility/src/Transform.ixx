@@ -70,6 +70,140 @@ export namespace d3d
 			: myMatrix(static_cast<XMFLOAT4X4&&>(matrix))
 		{}
 
+		constexpr void Translate(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.x += xyz.x;
+			myPosition.y += xyz.y;
+			myPosition.z += xyz.z;
+		}
+
+		constexpr void Translate(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.x += static_cast<float&&>(xyz.x);
+			myPosition.y += static_cast<float&&>(xyz.y);
+			myPosition.z += static_cast<float&&>(xyz.z);
+		}
+
+		constexpr void Forward(const float& distance) noexcept
+		{
+			myPosition.z += distance;
+		}
+
+		constexpr void Forward(float&& distance) noexcept
+		{
+			myPosition.z += static_cast<float&&>(distance);
+		}
+
+		constexpr void Forward(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.z += xyz.z;
+		}
+
+		constexpr void Forward(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.z += static_cast<float&&>(xyz.z);
+		}
+
+		constexpr void Backward(const float& distance) noexcept
+		{
+			myPosition.z -= distance;
+		}
+
+		constexpr void Backward(float&& distance) noexcept
+		{
+			myPosition.z -= static_cast<float&&>(distance);
+		}
+
+		constexpr void Backward(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.z -= xyz.z;
+		}
+
+		constexpr void Backward(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.z -= static_cast<float&&>(xyz.z);
+		}
+
+		constexpr void StrafeLeft(const float& distance) noexcept
+		{
+			myPosition.x -= distance;
+		}
+
+		constexpr void StrafeLeft(float&& distance) noexcept
+		{
+			myPosition.x -= static_cast<float&&>(distance);
+		}
+
+		constexpr void StrafeLeft(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.x -= xyz.x;
+		}
+
+		constexpr void StrafeLeft(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.x -= static_cast<float&&>(xyz.x);
+		}
+
+		constexpr void StrafeRight(const float& distance) noexcept
+		{
+			myPosition.x += distance;
+		}
+
+		constexpr void StrafeRight(float&& distance) noexcept
+		{
+			myPosition.x += static_cast<float&&>(distance);
+		}
+
+		constexpr void StrafeRight(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.x += xyz.x;
+		}
+
+		constexpr void StrafeRight(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.x += static_cast<float&&>(xyz.x);
+		}
+
+		constexpr void Upward(const float& distance) noexcept
+		{
+			myPosition.y += distance;
+		}
+
+		constexpr void Upward(float&& distance) noexcept
+		{
+			myPosition.y += static_cast<float&&>(distance);
+		}
+
+		constexpr void Upward(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.y += xyz.y;
+		}
+
+		constexpr void Upward(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.y += static_cast<float&&>(xyz.y);
+		}
+
+		constexpr void Downward(const float& distance) noexcept
+		{
+			myPosition.y -= distance;
+		}
+
+		constexpr void Downward(float&& distance) noexcept
+		{
+			myPosition.y -= static_cast<float&&>(distance);
+		}
+
+		constexpr void Downward(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.y -= xyz.y;
+		}
+
+		constexpr void Downward(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.y -= static_cast<float&&>(xyz.y);
+		}
+
 		[[nodiscard]]
 		inline friend constexpr Transform operator+(const Transform& lhs, const Transform& rhs) noexcept
 		{
