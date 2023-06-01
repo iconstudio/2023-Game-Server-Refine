@@ -339,7 +339,7 @@ export namespace d3d
 		}
 	}
 
-	extern "C" namespace trig
+	extern "C++" namespace trig
 	{
 		inline bool Intersect(const XMFLOAT3& xmf3RayPosition, const XMFLOAT3& xmf3RayDirection, const XMFLOAT3& v0, const XMFLOAT3& v1, const XMFLOAT3& v2, float& dist) noexcept
 		{
@@ -350,7 +350,7 @@ export namespace d3d
 		}
 	}
 
-	extern "C" namespace rect
+	extern "C++" namespace rect
 	{
 		inline XMFLOAT4 Normalize(const XMFLOAT4& xmf4Plane) noexcept
 		{
