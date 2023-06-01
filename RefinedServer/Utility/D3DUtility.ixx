@@ -22,24 +22,6 @@ export namespace d3d
 
 	extern "C++" namespace vec
 	{
-		inline XMFLOAT3 XMVectorToFloat3(const XMVECTOR& xmvVector) noexcept
-		{
-			XMFLOAT3 result{};
-
-			XMStoreFloat3(&result, xmvVector);
-
-			return result;
-		}
-
-		inline XMFLOAT3 XMVectorToFloat3(XMVECTOR&& xmvVector) noexcept
-		{
-			XMFLOAT3 result{};
-
-			XMStoreFloat3(&result, std::move(xmvVector));
-
-			return result;
-		}
-
 		inline float Angle(XMVECTOR&& lhs, XMVECTOR&& rhs) noexcept
 		{
 			return XMConvertToDegrees(XMVectorGetX(XMVector3AngleBetweenNormals(std::move(lhs), std::move(rhs))));
@@ -81,63 +63,6 @@ export namespace d3d
 
 	extern "C++" namespace mat
 	{
-		inline XMFLOAT4X4 Multiply(XMFLOAT4X4&& lhs, XMFLOAT4X4&& rhs) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			const XMMATRIX mat1 = XMLoadFloat4x4(&lhs);
-			const XMMATRIX mat2 = XMLoadFloat4x4(&rhs);
-
-			XMStoreFloat4x4(&result, mat1 * mat2);
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Multiply(const XMFLOAT4X4& lhs, const XMFLOAT4X4& rhs) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			XMStoreFloat4x4(&result, XMLoadFloat4x4(&lhs) * XMLoadFloat4x4(&rhs));
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Multiply(const XMFLOAT4X4& lhs, const XMMATRIX& rhs) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			XMStoreFloat4x4(&result, XMLoadFloat4x4(&lhs) * rhs);
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Multiply(XMFLOAT4X4&& lhs, const XMMATRIX& rhs) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			XMStoreFloat4x4(&result, XMLoadFloat4x4(&lhs) * rhs);
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Multiply(const XMMATRIX& lhs, const XMFLOAT4X4& rhs) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			XMStoreFloat4x4(&result, lhs * XMLoadFloat4x4(&rhs));
-
-			return result;
-		}
-
-		inline XMFLOAT4X4 Multiply(XMMATRIX&& lhs, const XMFLOAT4X4& rhs) noexcept
-		{
-			XMFLOAT4X4 result{};
-
-			XMStoreFloat4x4(&result, std::move(lhs) * XMLoadFloat4x4(&rhs));
-
-			return result;
-		}
-
 		inline XMFLOAT4X4 RotationYawPitchRoll(const float& pitch, const float& yaw, const float& roll) noexcept
 		{
 			XMFLOAT4X4 result{};
