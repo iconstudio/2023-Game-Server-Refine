@@ -333,7 +333,7 @@ export constexpr DirectX::XMFLOAT4X4& operator*=(DirectX::XMFLOAT4X4& lhs, const
 	return lhs;
 }
 
-export namespace d3d::mat
+export namespace d3d
 {
 	using DirectX::XMMATRIX;
 	using DirectX::XMFLOAT3X3;
@@ -352,7 +352,10 @@ export namespace d3d::mat
 	using DirectX::operator*=;
 	using DirectX::operator/;
 	using DirectX::operator/=;
+}
 
+export namespace d3d::mat
+{
 	[[nodiscard]]
 	constexpr XMMATRIX XM_CALLCONV Identity() noexcept
 	{

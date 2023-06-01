@@ -4,7 +4,7 @@ module;
 
 export module Utility.D3D.Vector;
 
-export namespace d3d::vec
+export namespace d3d
 {
 	using DirectX::XMVECTOR;
 	using DirectX::XMMATRIX;
@@ -26,7 +26,10 @@ export namespace d3d::vec
 	using DirectX::operator*=;
 	using DirectX::operator/;
 	using DirectX::operator/=;
+}
 
+export namespace d3d::vec
+{
 	[[nodiscard]]
 	constexpr XMVECTOR Zero() noexcept
 	{
