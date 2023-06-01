@@ -71,6 +71,71 @@ export namespace d3d::vec
 	using DirectX::XMVector3InBounds;
 
 	[[nodiscard]]
+	constexpr float XM_CALLCONV DotProduct(const XMFLOAT2& lhs, const XMFLOAT2& rhs) noexcept
+	{
+		return lhs.x * rhs.x + lhs.y * rhs.y;
+	}
+
+	[[nodiscard]]
+	constexpr float XM_CALLCONV DotProduct(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+		}
+		else
+		{
+			XMFLOAT3 calc{};
+			XMStoreFloat3(&calc, XMVector3Dot(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
+
+			return calc.x;
+		}
+	}
+
+	[[nodiscard]]
+	constexpr float XM_CALLCONV DotProduct(XMFLOAT3&& lhs, XMFLOAT3&& rhs) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			return static_cast<float&&>(lhs.x) * static_cast<float&&>(rhs.x)
+				+ static_cast<float&&>(lhs.y) * static_cast<float&&>(rhs.y)
+				+ static_cast<float&&>(lhs.z) * static_cast<float&&>(rhs.z);
+		}
+		else
+		{
+			XMFLOAT3 calc{};
+			XMStoreFloat3(&calc, XMVector3Dot(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
+
+			return calc.x;
+		}
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV CrossProduct(const XMFLOAT3& vector1, const XMFLOAT3& vector2, const bool& normalize = true) noexcept
+	{
+		XMFLOAT3 result{};
+		if (util::is_constant_evaluated())
+		{
+			result.x = (vector1.y * vector2.z) - (vector1.z * vector2.y);
+			result.y = (vector1.z * vector2.x) - (vector1.x * vector2.z);
+			result.z = (vector1.x * vector2.y) - (vector1.y * vector2.x);
+		}
+		else
+		{
+			XMStoreFloat3(&result, XMVector3Cross(XMLoadFloat3(vector1), XMLoadFloat3(vector2)));
+		}
+
+		if (normalize)
+		{
+			return Normalize(result);
+		}
+		else
+		{
+			return result;
+		}
+	}
+
+	[[nodiscard]]
 	constexpr float XM_CALLCONV Length(const XMFLOAT2& vector) noexcept
 	{
 		if (util::is_constant_evaluated())
