@@ -3,7 +3,9 @@ module;
 export module Utility.D3D.Matrix;
 import Utility;
 
-export constexpr DirectX::XMFLOAT3X3 operator+(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+export
+[[nodiscard]]
+constexpr DirectX::XMFLOAT3X3 operator+(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
 {
 	DirectX::XMFLOAT3X3 result{};
 	if (util::is_constant_evaluated())
@@ -46,7 +48,9 @@ export constexpr DirectX::XMFLOAT3X3& operator+=(DirectX::XMFLOAT3X3& lhs, const
 	return lhs;
 }
 
-export constexpr DirectX::XMFLOAT3X3 operator-(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+export
+[[nodiscard]]
+constexpr DirectX::XMFLOAT3X3 operator-(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
 {
 	DirectX::XMFLOAT3X3 result{};
 	if (util::is_constant_evaluated())
@@ -89,13 +93,13 @@ export constexpr DirectX::XMFLOAT3X3& operator-=(DirectX::XMFLOAT3X3& lhs, const
 	return lhs;
 }
 
-export constexpr DirectX::XMFLOAT3X3 operator*(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
+export
+[[nodiscard]]
+constexpr DirectX::XMFLOAT3X3 operator*(const DirectX::XMFLOAT3X3& lhs, const DirectX::XMFLOAT3X3& rhs) noexcept
 {
 	DirectX::XMFLOAT3X3 result{};
 	if (util::is_constant_evaluated())
 	{
-		DirectX::XMFLOAT3X3 result{};
-
 		// Cache the invariants in registers
 		float x = lhs.m[0][0];
 		float y = lhs.m[0][1];
@@ -151,7 +155,9 @@ export constexpr DirectX::XMFLOAT3X3& operator*=(DirectX::XMFLOAT3X3& lhs, const
 	return lhs;
 }
 
-export constexpr DirectX::XMFLOAT4X4 operator+(const DirectX::XMFLOAT4X4& lhs, const DirectX::XMFLOAT4X4& rhs) noexcept
+export
+[[nodiscard]]
+constexpr DirectX::XMFLOAT4X4 operator+(const DirectX::XMFLOAT4X4& lhs, const DirectX::XMFLOAT4X4& rhs) noexcept
 {
 	DirectX::XMFLOAT4X4 result{};
 	if (util::is_constant_evaluated())
@@ -204,7 +210,9 @@ export constexpr DirectX::XMFLOAT4X4& operator+=(DirectX::XMFLOAT4X4& lhs, const
 	return lhs;
 }
 
-export constexpr DirectX::XMFLOAT4X4 operator-(const DirectX::XMFLOAT4X4& lhs, const DirectX::XMFLOAT4X4& rhs) noexcept
+export
+[[nodiscard]]
+constexpr DirectX::XMFLOAT4X4 operator-(const DirectX::XMFLOAT4X4& lhs, const DirectX::XMFLOAT4X4& rhs) noexcept
 {
 	DirectX::XMFLOAT4X4 result{};
 	if (util::is_constant_evaluated())
@@ -257,13 +265,13 @@ export constexpr DirectX::XMFLOAT4X4& operator-=(DirectX::XMFLOAT4X4& lhs, const
 	return lhs;
 }
 
-export constexpr DirectX::XMFLOAT4X4 operator*(const DirectX::XMFLOAT4X4& lhs, const DirectX::XMFLOAT4X4& rhs) noexcept
+export
+[[nodiscard]]
+constexpr DirectX::XMFLOAT4X4 operator*(const DirectX::XMFLOAT4X4& lhs, const DirectX::XMFLOAT4X4& rhs) noexcept
 {
 	DirectX::XMFLOAT4X4 result{};
 	if (util::is_constant_evaluated())
 	{
-		DirectX::XMFLOAT4X4 result{};
-
 		// Cache the invariants in registers
 		float x = lhs.m[0][0];
 		float y = lhs.m[0][1];

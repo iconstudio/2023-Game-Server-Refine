@@ -65,7 +65,6 @@ export namespace d3d
 			return Transform{ lhs.myMatrix + rhs.myMatrix };
 		}
 
-		[[nodiscard]]
 		inline friend constexpr Transform& operator+=(Transform& lhs, const Transform& rhs) noexcept
 		{
 			lhs.myMatrix += rhs.myMatrix;
@@ -79,7 +78,6 @@ export namespace d3d
 			return Transform{ lhs.myMatrix - rhs.myMatrix };
 		}
 
-		[[nodiscard]]
 		inline friend constexpr Transform& operator-=(Transform& lhs, const Transform& rhs) noexcept
 		{
 			lhs.myMatrix -= rhs.myMatrix;
@@ -87,7 +85,6 @@ export namespace d3d
 			return lhs;
 		}
 
-		[[nodiscard]]
 		inline friend constexpr Transform operator*(const Transform& lhs, const Transform& rhs) noexcept
 		{
 			return Transform{ lhs.myMatrix * rhs.myMatrix };
