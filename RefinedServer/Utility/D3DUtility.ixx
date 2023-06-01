@@ -40,54 +40,6 @@ export namespace d3d
 			return result;
 		}
 
-		inline XMFLOAT3 ScalarProduct(XMVECTOR&& vector, const float& scalar, const bool& normalize = true) noexcept
-		{
-			XMFLOAT3 result{};
-
-			if (normalize)
-			{
-				XMStoreFloat3(&result, XMVector3Normalize(std::move(vector)) * scalar);
-			}
-			else
-			{
-				XMStoreFloat3(&result, std::move(vector) * scalar);
-			}
-
-			return result;
-		}
-
-		inline XMFLOAT3 ScalarProduct(const XMFLOAT3& vector, const float& scalar, const bool& normalize = true) noexcept
-		{
-			return ScalarProduct(XMLoadFloat3(&vector), scalar, normalize);
-		}
-
-		inline XMFLOAT3 Add(const XMFLOAT3& vector1, const XMFLOAT3& vector2) noexcept
-		{
-			XMFLOAT3 result{};
-
-			XMStoreFloat3(&result, XMLoadFloat3(&vector1) + XMLoadFloat3(&vector2));
-
-			return result;
-		}
-
-		inline XMFLOAT3 Add(const XMFLOAT3& vector1, const XMFLOAT3& vector2, const float& scalar) noexcept
-		{
-			XMFLOAT3 result{};
-
-			XMStoreFloat3(&result, XMLoadFloat3(&vector1) + (XMLoadFloat3(&vector2) * scalar));
-
-			return result;
-		}
-
-		inline XMFLOAT3 Subtract(const XMFLOAT3& vector1, const XMFLOAT3& vector2) noexcept
-		{
-			XMFLOAT3 result{};
-
-			XMStoreFloat3(&result, XMLoadFloat3(&vector1) - XMLoadFloat3(&vector2));
-
-			return result;
-		}
-
 		inline float DotProduct(const XMFLOAT3& vector1, const XMFLOAT3& vector2) noexcept
 		{
 			XMFLOAT3 result{};
@@ -179,15 +131,6 @@ export namespace d3d
 
 			XMStoreFloat3(&result
 				, XMVector3TransformCoord(XMLoadFloat3(&vector), XMLoadFloat4x4(&transform)));
-
-			return result;
-		}
-
-		inline XMFLOAT4 Add(const XMFLOAT4& xmf4Vector1, const XMFLOAT4& xmf4Vector2) noexcept
-		{
-			XMFLOAT4 result{};
-
-			XMStoreFloat4(&result, XMLoadFloat4(&xmf4Vector1) + XMLoadFloat4(&xmf4Vector2));
 
 			return result;
 		}
