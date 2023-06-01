@@ -70,14 +70,28 @@ export namespace d3d
 			: myMatrix(static_cast<XMFLOAT4X4&&>(matrix))
 		{}
 
-		constexpr void Translate(const XMFLOAT3& xyz) noexcept
+		constexpr void Jump(const float& x, const float& y, const float& z) noexcept
+		{
+			myPosition.x = x;
+			myPosition.y = y;
+			myPosition.z = z;
+		}
+
+		constexpr void Move(const float& x, const float& y, const float& z) noexcept
+		{
+			myPosition.x += x;
+			myPosition.y += y;
+			myPosition.z += z;
+		}
+
+		constexpr void Move(const XMFLOAT3& xyz) noexcept
 		{
 			myPosition.x += xyz.x;
 			myPosition.y += xyz.y;
 			myPosition.z += xyz.z;
 		}
 
-		constexpr void Translate(XMFLOAT3&& xyz) noexcept
+		constexpr void Move(XMFLOAT3&& xyz) noexcept
 		{
 			myPosition.x += static_cast<float&&>(xyz.x);
 			myPosition.y += static_cast<float&&>(xyz.y);
@@ -205,6 +219,54 @@ export namespace d3d
 		}
 
 		[[nodiscard]]
+		constexpr XyzwWrapper& GetPosition() noexcept
+		{
+			return myPosition;
+		}
+
+		[[nodiscard]]
+		constexpr const XyzwWrapper& GetPosition() const noexcept
+		{
+			return myPosition;
+		}
+
+		[[nodiscard]]
+		constexpr XyzwWrapper& GetRight() noexcept
+		{
+			return myRight;
+		}
+
+		[[nodiscard]]
+		constexpr const XyzwWrapper& GetRight() const noexcept
+		{
+			return myRight;
+		}
+
+		[[nodiscard]]
+		constexpr XyzwWrapper& GetUp() noexcept
+		{
+			return myUp;
+		}
+
+		[[nodiscard]]
+		constexpr const XyzwWrapper& GetUp() const noexcept
+		{
+			return myUp;
+		}
+
+		[[nodiscard]]
+		constexpr XyzwWrapper& GetLook() noexcept
+		{
+			return myLook;
+		}
+
+		[[nodiscard]]
+		constexpr const XyzwWrapper& GetLook() const noexcept
+		{
+			return myLook;
+		}
+
+		[[nodiscard]]
 		inline friend constexpr Transform operator+(const Transform& lhs, const Transform& rhs) noexcept
 		{
 			return Transform{ lhs.myMatrix + rhs.myMatrix };
@@ -243,7 +305,11 @@ export namespace d3d
 			return lhs;
 		}
 
+		/// <summary>
+		/// Local Transform
+		/// </summary>
 		XMFLOAT4X4 myMatrix{};
+
 		XyzwWrapper myPosition = { myMatrix._41, myMatrix._42, myMatrix._43, myMatrix._44 };
 		XyzwWrapper myRight = { myMatrix._11, myMatrix._12, myMatrix._13, myMatrix._14 };
 		XyzwWrapper myUp = { myMatrix._21, myMatrix._22, myMatrix._23, myMatrix._24 };
