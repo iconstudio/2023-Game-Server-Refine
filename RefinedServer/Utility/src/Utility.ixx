@@ -98,13 +98,20 @@ export extern "C++" namespace util
 	using ::std::size;
 	using ::std::ssize;
 
+	template<typename T>
+	[[nodiscard]]
+	__forceinline constexpr auto sqr(T&& value) noexcept(noexcept(value * value))
+	{
+		return value * value;
+	}
+
 	/// <summary>
 	/// https://gist.github.com/alexshtf/eb5128b3e3e143187794
 	/// </summary>
 	/// <param name="value"></param>
 	/// <returns> For a finite and non-negative value, returns an approximation for the square root of value. Otherwise, returns NaN.</returns>
-	[[nodiscard]] __forceinline
-		constexpr double sqrt(const double value) noexcept
+	[[nodiscard]]
+	__forceinline constexpr double sqrt(const double value) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -123,8 +130,8 @@ export extern "C++" namespace util
 	/// </summary>
 	/// <param name="value"></param>
 	/// <returns> For a finite and non-negative value, returns an approximation for the square root of value. Otherwise, returns NaN.</returns>
-	[[nodiscard]] __forceinline
-		constexpr float sqrt(const float value) noexcept
+	[[nodiscard]]
+	__forceinline constexpr float sqrt(const float value) noexcept
 	{
 		if (is_constant_evaluated())
 		{
