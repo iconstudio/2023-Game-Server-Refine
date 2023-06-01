@@ -29,11 +29,27 @@ export namespace d3d
 	{
 	public:
 		constexpr Transform() noexcept = default;
-		constexpr Transform(const Transform& other) noexcept = default;
-		constexpr Transform(Transform&& other) noexcept = default;
-		constexpr Transform& operator=(const Transform& other) noexcept = default;
-		constexpr Transform& operator=(Transform&& other) noexcept = default;
 		constexpr ~Transform() noexcept = default;
+
+		constexpr Transform(const Transform& other) noexcept
+			: myMatrix(other.myMatrix)
+		{}
+
+		constexpr Transform(Transform&& other) noexcept
+			: myMatrix(static_cast<XMFLOAT4X4&&>(other.myMatrix))
+		{}
+
+		constexpr Transform& operator=(const Transform& other) noexcept
+		{
+			myMatrix = other.myMatrix;
+			return *this;
+		}
+
+		constexpr Transform& operator=(Transform&& other) noexcept
+		{
+			myMatrix = static_cast<XMFLOAT4X4&&>(other.myMatrix);
+			return *this;
+		}
 
 		explicit constexpr Transform(const XMFLOAT4X4& matrix) noexcept
 			: myMatrix(matrix)
