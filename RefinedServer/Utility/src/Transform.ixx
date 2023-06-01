@@ -77,6 +77,20 @@ export namespace d3d
 			myPosition.z = z;
 		}
 
+		constexpr void Jump(const XMFLOAT3& xyz) noexcept
+		{
+			myPosition.x = xyz.x;
+			myPosition.y = xyz.y;
+			myPosition.z = xyz.z;
+		}
+
+		constexpr void Jump(XMFLOAT3&& xyz) noexcept
+		{
+			myPosition.x = static_cast<float&&>(xyz.x);
+			myPosition.y = static_cast<float&&>(xyz.y);
+			myPosition.z = static_cast<float&&>(xyz.z);
+		}
+
 		constexpr void Move(const float& x, const float& y, const float& z) noexcept
 		{
 			myPosition.x += x;
