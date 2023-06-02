@@ -1,8 +1,11 @@
 #include "pch.hpp"
 #include "Framework.hpp"
-#include "MainScene.hpp"
 
 import Utility.Print;
+import Client.IntroScene;
+import Client.TitleScene;
+import Client.MainScene;
+import Client.GameScene;
 
 using namespace ::game;
 using namespace ::std::chrono_literals;

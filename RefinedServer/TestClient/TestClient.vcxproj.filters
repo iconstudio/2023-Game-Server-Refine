@@ -18,9 +18,6 @@
     <ClInclude Include="Main.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MainScene.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="pch.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -32,22 +29,22 @@
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MainScene.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Framework.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="TitleScene.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="IntroScene.ixx">
-      <Filter>헤더 파일</Filter>
+      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="MainScene.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="TitleScene.ixx">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
