@@ -54,6 +54,7 @@ void Framework::Update()
 
 	time_point start_time = system_clock::now();
 	time_point current_time = start_time;
+	seconds stacked_time{};
 
 	while (true)
 	{
@@ -71,8 +72,11 @@ void Framework::Update()
 			continue;
 		};
 
-		duration between = duration_cast<alter_duration>(current_time - start_time);
-		float est = static_cast<float>(between.count()) * 0.000001f;
+		duration between = current_time - start_time;
+		float est = static_cast<float>(between.count()) * idv;
+		stacked_time += duration_cast<seconds>(between);
+		//alter_duration between = duration_cast<alter_duration>(current_time - start_time);
+		//float est = static_cast<float>(between.count());
 
 		UpdateOnce(scene, est);
 		util::debug::Println("씬 업데이트 1 (시간: {:.5f}초)", est);
@@ -80,9 +84,11 @@ void Framework::Update()
 		start_time = current_time;
 		current_time = std::chrono::system_clock::now();
 
-		//between = current_time - start_time;
-		between = duration_cast<alter_duration>(current_time - start_time);
-		est = static_cast<float>(between.count()) * 0.000001f;
+		between = current_time - start_time;
+		est = static_cast<float>(between.count()) * idv;
+		stacked_time += duration_cast<seconds>(between);
+		//between = duration_cast<alter_duration>(current_time - start_time);
+		//est = static_cast<float>(between.count());
 
 		LateUpdateOnce(scene, est);
 		util::debug::Println("씬 업데이트 2 (시간: {:.5f}초)", est);
