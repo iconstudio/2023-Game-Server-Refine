@@ -6,7 +6,7 @@ import Net.EndPoint;
 import Net.Promise;
 import Game.Scene.Specialized;
 
-class MainScene final : public game::NamedScene<MainScene>
+export class MainScene final : public game::NamedScene<MainScene>
 {
 public:
 	MainScene() noexcept
