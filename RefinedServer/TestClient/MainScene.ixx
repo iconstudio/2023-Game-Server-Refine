@@ -9,8 +9,10 @@ import Game.Scene.Specialized;
 export class MainScene final : public game::NamedScene<MainScene>
 {
 public:
+	using basis = game::NamedScene<MainScene>;
+
 	MainScene() noexcept
-		: NamedScene<MainScene>(this, "Main Scene")
+		: basis(this, "Main Scene")
 		, mySocket()
 		, myAddress()
 	{}
