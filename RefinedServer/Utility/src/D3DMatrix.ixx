@@ -522,11 +522,13 @@ export namespace d3d::mat
 	}
 
 	[[nodiscard]]
-	inline XMFLOAT3X3 XM_CALLCONV RotationAxis(const XMFLOAT2& axis, const float& angle) noexcept
+	inline XMFLOAT4X4 XM_CALLCONV RotationAxis(const XMFLOAT3& axis, float&& angle) noexcept
 	{
-		XMFLOAT3X3 result{};
+		XMFLOAT4X4 result{};
 
-		XMStoreFloat3x3(&result, DirectX::XMMatrixRotationAxis(XMLoadFloat2(&axis), DirectX::XMConvertToRadians(angle)));
+		const float radian = DirectX::XMConvertToRadians(static_cast<float&&>(angle));
+		const XMMATRIX rot = DirectX::XMMatrixRotationAxis(XMLoadFloat3(&axis), radian);
+		XMStoreFloat4x4(&result, rot);
 		return result;
 	}
 }
