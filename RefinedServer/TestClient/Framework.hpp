@@ -1,6 +1,7 @@
 #pragma once
-import <memory>;
-import <vector>;
+#include <GL/freeglut.h>
+#include <memory>
+#include <vector>
 
 import Utility;
 import Utility.Singleton;
@@ -35,4 +36,6 @@ public:
 	void Render(game::Scene* const& scene, const void* context) noexcept;
 
 	Hetero myWorkUnit = nullptr, myInputUnit = nullptr, myRenderUnit = nullptr;
+
+	::GLint myWindow;
 };
