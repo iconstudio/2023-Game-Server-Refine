@@ -14,6 +14,7 @@ void Framework::Awake()
 {
 	util::Println("시스템을 초기화합니다.");
 
+	SceneManager::AddScene(SceneManager::CreateScene<IntroScene>());
 	SceneManager::AddScene(SceneManager::CreateScene<MainScene>());
 	SceneManager::AddScene(SceneManager::CreateScene("씬 2"));
 
@@ -41,15 +42,17 @@ void Framework::Update()
 {
 	util::Println("프레임워크의 갱신 루프를 시작합니다.");
 
-	using clock = std::chrono::system_clock;
+	using namespace std::chrono;
+	using clock = system_clock;
 	using time_point = clock::time_point;
 	using duration = clock::duration;
 	using period = clock::period;
+	using alter_duration = milliseconds;
 	constexpr float num = static_cast<float>(period::num);
 	constexpr float den = static_cast<float>(period::den);
 	constexpr float idv = num / den;
 
-	time_point start_time = std::chrono::system_clock::now();
+	time_point start_time = system_clock::now();
 	time_point current_time = start_time;
 
 	while (true)
@@ -68,8 +71,8 @@ void Framework::Update()
 			continue;
 		};
 
-		duration between = current_time - start_time;
-		float est = static_cast<float>(between.count()) * idv;
+		duration between = duration_cast<alter_duration>(current_time - start_time);
+		float est = static_cast<float>(between.count()) * 0.000001f;
 
 		UpdateOnce(scene, est);
 		util::debug::Println("씬 업데이트 1 (시간: {:.5f}초)", est);
@@ -77,8 +80,9 @@ void Framework::Update()
 		start_time = current_time;
 		current_time = std::chrono::system_clock::now();
 
-		between = current_time - start_time;
-		est = static_cast<float>(between.count()) * idv;
+		//between = current_time - start_time;
+		between = duration_cast<alter_duration>(current_time - start_time);
+		est = static_cast<float>(between.count()) * 0.000001f;
 
 		LateUpdateOnce(scene, est);
 		util::debug::Println("씬 업데이트 2 (시간: {:.5f}초)", est);
@@ -113,7 +117,7 @@ void Framework::Update()
 		};
 
 #if _DEBUG
-		std::this_thread::sleep_for(3000ms);
+		//std::this_thread::sleep_for(3000ms);
 #endif
 	}
 }
