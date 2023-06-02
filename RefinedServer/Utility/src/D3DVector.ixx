@@ -1,8 +1,9 @@
 module;
 #include <DirectXMath.h>
-#include <utility>
 
 export module Utility.D3D.Vector;
+import <utility>;
+import <algorithm>;
 import Utility;
 
 export namespace d3d
@@ -31,6 +32,13 @@ export namespace d3d
 
 export namespace d3d::vec
 {
+	inline constexpr XMFLOAT2 Zero2 = {};
+	inline constexpr XMFLOAT3 Zero = {};
+	inline constexpr XMFLOAT2 NegativeOne2 = { -1.0f, -1.0f };
+	inline constexpr XMFLOAT2 One2 = { 1.0f, 1.0f };
+	inline constexpr XMFLOAT3 NegativeOne = { -1.0f, -1.0f, -1.0f };
+	inline constexpr XMFLOAT3 One = { 1.0f, 1.0f, 1.0f };
+
 	using DirectX::XMVectorSet;
 	using DirectX::XMVectorReplicate;
 
@@ -71,67 +79,21 @@ export namespace d3d::vec
 	using DirectX::XMVector3InBounds;
 
 	[[nodiscard]]
-	constexpr float XM_CALLCONV DotProduct(const XMFLOAT2& lhs, const XMFLOAT2& rhs) noexcept
-	{
-		return lhs.x * rhs.x + lhs.y * rhs.y;
-	}
-
-	[[nodiscard]]
-	constexpr float XM_CALLCONV DotProduct(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	constexpr float XM_CALLCONV Length(XMVECTOR&& vector) noexcept
 	{
 		if (util::is_constant_evaluated())
 		{
-			return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+			const float lf = util::sqr(static_cast<float&&>(vector.m128_f32[0]))
+				+ util::sqr(static_cast<float&&>(vector.m128_f32[1]))
+				+ util::sqr(static_cast<float&&>(vector.m128_f32[2]))
+				+ util::sqr(static_cast<float&&>(vector.m128_f32[3]));
+			return util::sqrt(lf);
 		}
 		else
 		{
-			XMFLOAT3 calc{};
-			XMStoreFloat3(&calc, XMVector3Dot(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
-
-			return calc.x;
-		}
-	}
-
-	[[nodiscard]]
-	constexpr float XM_CALLCONV DotProduct(XMFLOAT3&& lhs, XMFLOAT3&& rhs) noexcept
-	{
-		if (util::is_constant_evaluated())
-		{
-			return static_cast<float&&>(lhs.x) * static_cast<float&&>(rhs.x)
-				+ static_cast<float&&>(lhs.y) * static_cast<float&&>(rhs.y)
-				+ static_cast<float&&>(lhs.z) * static_cast<float&&>(rhs.z);
-		}
-		else
-		{
-			XMFLOAT3 calc{};
-			XMStoreFloat3(&calc, XMVector3Dot(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
-
-			return calc.x;
-		}
-	}
-
-	[[nodiscard]]
-	constexpr XMFLOAT3 XM_CALLCONV CrossProduct(const XMFLOAT3& vector1, const XMFLOAT3& vector2, const bool& normalize = true) noexcept
-	{
-		XMFLOAT3 result{};
-		if (util::is_constant_evaluated())
-		{
-			result.x = (vector1.y * vector2.z) - (vector1.z * vector2.y);
-			result.y = (vector1.z * vector2.x) - (vector1.x * vector2.z);
-			result.z = (vector1.x * vector2.y) - (vector1.y * vector2.x);
-		}
-		else
-		{
-			XMStoreFloat3(&result, XMVector3Cross(XMLoadFloat3(vector1), XMLoadFloat3(vector2)));
-		}
-
-		if (normalize)
-		{
-			return Normalize(result);
-		}
-		else
-		{
-			return result;
+			XMFLOAT3 result{};
+			XMStoreFloat3(&result, XMVector3Length(vector));
+			return(result.x);
 		}
 	}
 
@@ -197,25 +159,6 @@ export namespace d3d::vec
 		if (util::is_constant_evaluated())
 		{
 			const float lf = util::sqr(vector.m128_f32[0]) + util::sqr(vector.m128_f32[1]) + util::sqr(vector.m128_f32[2]) + util::sqr(vector.m128_f32[3]);
-			return util::sqrt(lf);
-		}
-		else
-		{
-			XMFLOAT3 result{};
-			XMStoreFloat3(&result, XMVector3Length(vector));
-			return(result.x);
-		}
-	}
-
-	[[nodiscard]]
-	constexpr float XM_CALLCONV Length(XMVECTOR&& vector) noexcept
-	{
-		if (util::is_constant_evaluated())
-		{
-			const float lf = util::sqr(static_cast<float&&>(vector.m128_f32[0]))
-				+ util::sqr(static_cast<float&&>(vector.m128_f32[1]))
-				+ util::sqr(static_cast<float&&>(vector.m128_f32[2]))
-				+ util::sqr(static_cast<float&&>(vector.m128_f32[3]));
 			return util::sqrt(lf);
 		}
 		else
@@ -305,29 +248,309 @@ export namespace d3d::vec
 	}
 
 	[[nodiscard]]
-	constexpr XMVECTOR XM_CALLCONV Zero() noexcept
+	constexpr XMFLOAT2 XM_CALLCONV Min(const XMFLOAT2& lhs, const XMFLOAT2& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::min(lhs.x, rhs.x),
+			std::min(lhs.y, rhs.y)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Min(XMFLOAT2&& lhs, const XMFLOAT2& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::min(static_cast<float&&>(lhs.x), rhs.x),
+			std::min(static_cast<float&&>(lhs.y), rhs.y)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Min(const XMFLOAT2& lhs, XMFLOAT2&& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::min(lhs.x, static_cast<float&&>(rhs.x)),
+			std::min(lhs.y, static_cast<float&&>(rhs.y))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Min(XMFLOAT2&& lhs, XMFLOAT2&& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::min(static_cast<float&&>(lhs.x), static_cast<float&&>(rhs.x)),
+			std::min(static_cast<float&&>(lhs.y), static_cast<float&&>(rhs.y))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Max(const XMFLOAT2& lhs, const XMFLOAT2& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::max(lhs.x, rhs.x),
+			std::max(lhs.y, rhs.y)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Max(XMFLOAT2&& lhs, const XMFLOAT2& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::max(static_cast<float&&>(lhs.x), rhs.x),
+			std::max(static_cast<float&&>(lhs.y), rhs.y)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Max(const XMFLOAT2& lhs, XMFLOAT2&& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::max(lhs.x, static_cast<float&&>(rhs.x)),
+			std::max(lhs.y, static_cast<float&&>(rhs.y))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT2 XM_CALLCONV Max(XMFLOAT2&& lhs, XMFLOAT2&& rhs) noexcept
+	{
+		return XMFLOAT2
+		{
+			std::max(static_cast<float&&>(lhs.x), static_cast<float&&>(rhs.x)),
+			std::max(static_cast<float&&>(lhs.y), static_cast<float&&>(rhs.y))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Min(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::min(lhs.x, rhs.x),
+			std::min(lhs.y, rhs.y),
+			std::min(lhs.z, rhs.z)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Min(XMFLOAT3&& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::min(static_cast<float&&>(lhs.x), rhs.x),
+			std::min(static_cast<float&&>(lhs.y), rhs.y),
+			std::min(static_cast<float&&>(lhs.z), rhs.z)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Min(const XMFLOAT3& lhs, XMFLOAT3&& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::min(lhs.x, static_cast<float&&>(rhs.x)),
+			std::min(lhs.y, static_cast<float&&>(rhs.y)),
+			std::min(lhs.z, static_cast<float&&>(rhs.z))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Min(XMFLOAT3&& lhs, XMFLOAT3&& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::min(static_cast<float&&>(lhs.x), static_cast<float&&>(rhs.x)),
+			std::min(static_cast<float&&>(lhs.y), static_cast<float&&>(rhs.y)),
+			std::min(static_cast<float&&>(lhs.z), static_cast<float&&>(rhs.z))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Max(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::max(lhs.x, rhs.x),
+			std::max(lhs.y, rhs.y),
+			std::max(lhs.z, rhs.z)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Max(XMFLOAT3&& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::max(static_cast<float&&>(lhs.x), rhs.x),
+			std::max(static_cast<float&&>(lhs.y), rhs.y),
+			std::max(static_cast<float&&>(lhs.z), rhs.z)
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Max(const XMFLOAT3& lhs, XMFLOAT3&& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::max(lhs.x, static_cast<float&&>(rhs.x)),
+			std::max(lhs.y, static_cast<float&&>(rhs.y)),
+			std::max(lhs.z, static_cast<float&&>(rhs.z))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Max(XMFLOAT3&& lhs, XMFLOAT3&& rhs) noexcept
+	{
+		return XMFLOAT3
+		{
+			std::max(static_cast<float&&>(lhs.x), static_cast<float&&>(rhs.x)),
+			std::max(static_cast<float&&>(lhs.y), static_cast<float&&>(rhs.y)),
+			std::max(static_cast<float&&>(lhs.z), static_cast<float&&>(rhs.z))
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Clamp(const XMFLOAT3& vector, const XMFLOAT3& min, const XMFLOAT3& max) noexcept
 	{
 		if (util::is_constant_evaluated())
 		{
-			return { 0.0f, 0.0f, 0.0f, 0.0f };
+			return XMFLOAT3
+			{
+				std::clamp(vector.x, min.x, max.x),
+				std::clamp(vector.y, min.y, max.y),
+				std::clamp(vector.z, min.z, max.z)
+			};
 		}
 		else
 		{
-			return DirectX::XMVectorZero();
+			XMFLOAT3 calc{};
+			XMStoreFloat3(&calc, DirectX::XMVectorClamp(XMLoadFloat3(&vector), XMLoadFloat3(&min), XMLoadFloat3(&max)));
+
+			return calc;
+		};
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Clamp(XMFLOAT3&& vector, const XMFLOAT3& min, const XMFLOAT3& max) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			return XMFLOAT3
+			{
+				std::clamp(static_cast<float&&>(vector.x), min.x, max.x),
+				std::clamp(static_cast<float&&>(vector.y), min.y, max.y),
+				std::clamp(static_cast<float&&>(vector.z), min.z, max.z)
+			};
+		}
+		else
+		{
+			XMFLOAT3 calc{};
+			XMStoreFloat3(&calc, DirectX::XMVectorClamp(XMLoadFloat3(&vector), XMLoadFloat3(&min), XMLoadFloat3(&max)));
+
+			return calc;
+		};
+	}
+
+	[[nodiscard]]
+	constexpr float XM_CALLCONV Dot(const XMFLOAT2& lhs, const XMFLOAT2& rhs) noexcept
+	{
+		return lhs.x * rhs.x + lhs.y * rhs.y;
+	}
+
+	[[nodiscard]]
+	constexpr float XM_CALLCONV Dot(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+		}
+		else
+		{
+			XMFLOAT3 calc{};
+			XMStoreFloat3(&calc, XMVector3Dot(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
+
+			return calc.x;
 		}
 	}
 
 	[[nodiscard]]
-	constexpr XMVECTOR XM_CALLCONV One() noexcept
+	constexpr float XM_CALLCONV Dot(XMFLOAT3&& lhs, XMFLOAT3&& rhs) noexcept
 	{
 		if (util::is_constant_evaluated())
 		{
-			return { 1.0f, 1.0f, 1.0f, 1.0f };
+			return static_cast<float&&>(lhs.x) * static_cast<float&&>(rhs.x)
+				+ static_cast<float&&>(lhs.y) * static_cast<float&&>(rhs.y)
+				+ static_cast<float&&>(lhs.z) * static_cast<float&&>(rhs.z);
 		}
 		else
 		{
-			return DirectX::XMVectorSplatOne();
+			XMFLOAT3 calc{};
+			XMStoreFloat3(&calc, XMVector3Dot(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
+
+			return calc.x;
 		}
+	}
+
+	[[nodiscard]]
+	constexpr XMFLOAT3 XM_CALLCONV Cross(const XMFLOAT3& lhs, const XMFLOAT3& rhs, const bool& normalize = true) noexcept
+	{
+		XMFLOAT3 result{};
+		if (util::is_constant_evaluated())
+		{
+			result.x = (lhs.y * rhs.z) - (lhs.z * rhs.y);
+			result.y = (lhs.z * rhs.x) - (lhs.x * rhs.z);
+			result.z = (lhs.x * rhs.y) - (lhs.y * rhs.x);
+		}
+		else
+		{
+			XMStoreFloat3(&result, XMVector3Cross(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs)));
+		}
+
+		if (normalize)
+		{
+			return Normalize(result);
+		}
+		else
+		{
+			return result;
+		}
+	}
+
+	[[nodiscard]]
+	inline float XM_CALLCONV NormalAngle(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		if (util::is_constant_evaluated())
+		{
+			const float dot = Dot(lhs, rhs);
+			const XMFLOAT3 splat = { dot, dot, dot };
+			const XMFLOAT3 bound = Clamp(splat, NegativeOne, One);
+
+			XMVECTOR calc{};
+			calc.m128_f32[0] = bound.x;
+			calc.m128_f32[1] = bound.y;
+			calc.m128_f32[2] = bound.z;
+			calc.m128_f32[3] = 0.0f;
+
+			// Now not constexpr
+			XMVECTOR result = DirectX::XMVectorACos(calc);
+			return result.m128_f32[0];
+		}
+		else
+		{
+			return DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenNormals(DirectX::XMLoadFloat3(&lhs), DirectX::XMLoadFloat3(&rhs)));
+		}
+	}
+
+	[[nodiscard]]
+	inline float XM_CALLCONV Angle(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
+	{
+		return NormalAngle(Normalize(lhs), Normalize(rhs));
 	}
 
 	[[nodiscard]]

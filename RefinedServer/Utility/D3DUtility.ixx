@@ -22,16 +22,6 @@ export namespace d3d
 
 	extern "C++" namespace vec
 	{
-		inline float Angle(XMVECTOR&& lhs, XMVECTOR&& rhs) noexcept
-		{
-			return XMConvertToDegrees(XMVectorGetX(XMVector3AngleBetweenNormals(std::move(lhs), std::move(rhs))));
-		}
-
-		inline float Angle(const XMFLOAT3& lhs, const XMFLOAT3& rhs) noexcept
-		{
-			return Angle(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs));
-		}
-
 		inline XMFLOAT3 TransformNormal(const XMFLOAT3& vector, const XMMATRIX& transform) noexcept
 		{
 			XMFLOAT3 result{};
