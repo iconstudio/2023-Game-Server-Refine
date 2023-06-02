@@ -42,19 +42,21 @@ void Framework::Update()
 {
 	util::Println("프레임워크의 갱신 루프를 시작합니다.");
 
-	using namespace std::chrono;
-	using clock = system_clock;
+	using clock = std::chrono::steady_clock;
 	using time_point = clock::time_point;
 	using duration = clock::duration;
 	using period = clock::period;
-	using alter_duration = milliseconds;
+	using alter_duration = std::chrono::milliseconds;
 	constexpr float num = static_cast<float>(period::num);
 	constexpr float den = static_cast<float>(period::den);
 	constexpr float idv = num / den;
 
-	time_point start_time = system_clock::now();
-	time_point current_time = start_time;
-	seconds stacked_time{};
+	time_point start_time{};
+	time_point current_time{};
+	duration between{};
+	float est = 0;
+
+	alter_duration stacked_time{};
 
 	while (true)
 	{
@@ -72,29 +74,15 @@ void Framework::Update()
 			continue;
 		};
 
-		duration between = current_time - start_time;
-		float est = static_cast<float>(between.count()) * idv;
-		stacked_time += duration_cast<seconds>(between);
-		//alter_duration between = duration_cast<alter_duration>(current_time - start_time);
-		//float est = static_cast<float>(between.count());
+		start_time = clock::now();
 
 		UpdateOnce(scene, est);
-		util::debug::Println("씬 업데이트 1 (시간: {:.5f}초)", est);
+		util::debug::Println("씬 업데이트 (시간: {:.5f}초)", est);
 
-		start_time = current_time;
-		current_time = std::chrono::system_clock::now();
-
+		current_time = clock::now();
 		between = current_time - start_time;
 		est = static_cast<float>(between.count()) * idv;
-		stacked_time += duration_cast<seconds>(between);
-		//between = duration_cast<alter_duration>(current_time - start_time);
-		//est = static_cast<float>(between.count());
-
-		LateUpdateOnce(scene, est);
-		util::debug::Println("씬 업데이트 2 (시간: {:.5f}초)", est);
-
-		start_time = current_time;
-		current_time = std::chrono::system_clock::now();
+		stacked_time += std::chrono::duration_cast<alter_duration>(between);
 
 		if (scene->IsCompleted()) UNLIKELY
 		{
