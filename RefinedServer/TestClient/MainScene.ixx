@@ -20,7 +20,7 @@ public:
 	void Awake() override;
 	void Start() noexcept override;
 	void Update(const float delta_time) override;
-	void LateUpdate(const float delta_time) override;
+	void Render(const void* context) noexcept override;
 	void Destroy() override;
 
 	net::Socket mySocket;
@@ -49,9 +49,9 @@ void MainScene::Update(const float delta_time)
 	Scene::Update(delta_time);
 }
 
-void MainScene::LateUpdate(const float delta_time)
+void MainScene::Render(const void* context) noexcept
 {
-	Scene::LateUpdate(delta_time);
+	Scene::Render(context);
 }
 
 void MainScene::Destroy()

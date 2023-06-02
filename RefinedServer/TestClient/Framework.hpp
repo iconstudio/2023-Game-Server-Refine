@@ -31,9 +31,8 @@ public:
 	void Awake();
 	void Start() noexcept;
 	void Update();
-
 	void UpdateOnce(game::Scene* const& scene, const float delta_time);
-	void LateUpdateOnce(game::Scene* const& scene, const float delta_time);
+	void Render(game::Scene* const& scene, const void* context) noexcept;
 
 	Hetero myWorkUnit = nullptr, myInputUnit = nullptr, myRenderUnit = nullptr;
 };

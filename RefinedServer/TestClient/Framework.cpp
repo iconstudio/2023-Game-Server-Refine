@@ -122,7 +122,7 @@ void Framework::UpdateOnce(Scene* const& scene, const float delta_time)
 	scene->Update(delta_time);
 }
 
-void Framework::LateUpdateOnce(Scene* const& scene, const float delta_time)
+void Framework::Render(Scene* const& scene, const void* context) noexcept
 {
-	scene->LateUpdate(delta_time);
+	scene->Render(context);
 }

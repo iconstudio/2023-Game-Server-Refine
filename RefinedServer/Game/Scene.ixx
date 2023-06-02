@@ -105,11 +105,11 @@ export extern "C++" namespace game
 			}
 		}
 
-		virtual inline void LateUpdate(const float delta_time) override
+		virtual inline void Render(const void* context) noexcept override
 		{
 			for (auto& instance : gameObjects)
 			{
-				instance->LateUpdate(delta_time);
+				instance->Render(context);
 			}
 		}
 

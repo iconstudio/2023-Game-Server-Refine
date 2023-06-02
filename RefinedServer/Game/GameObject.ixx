@@ -82,11 +82,11 @@ export namespace game
 			}
 		}
 
-		inline void LateUpdate(const float& delta_time)
+		inline void Render(const void* context) noexcept
 		{
 			for (auto& component : myComponents)
 			{
-				component->LateUpdate(delta_time);
+				component->Render(context);
 			}
 		}
 

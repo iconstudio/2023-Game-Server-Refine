@@ -12,7 +12,7 @@ export extern "C++" namespace sys
 		virtual void Awake() {}
 		virtual void Start() noexcept {}
 		virtual void Update(const float delta_time) {}
-		virtual void LateUpdate(const float delta_time) {}
+		virtual void Render(const void* context) noexcept {}
 		virtual void Destroy() {}
 	};
 
