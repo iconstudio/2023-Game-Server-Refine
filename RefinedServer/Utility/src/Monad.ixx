@@ -31,11 +31,13 @@ export namespace util
 		constexpr Monad(const Monad& other)
 			noexcept(nothrow_copy_constructibles<T>) requires(copy_constructibles<T>)
 			: myStorage(other.myStorage)
+			, hasValue(other.hasValue)
 		{}
 
 		constexpr Monad(Monad&& other)
 			noexcept(nothrow_move_constructibles<T>) requires(move_constructibles<T>)
-			: myStorage(static_cast<rebind_base<T>&&>(other.myStorage))
+			: myStorage(static_cast<rebind_base<T>&&>(other.myStorage))\
+			, hasValue(static_cast<bool&&>(other.hasValue))
 		{}
 
 		constexpr Monad(nullopt_t)
@@ -59,6 +61,7 @@ export namespace util
 			noexcept(nothrow_copy_assignables<T>) requires(copy_assignables<T>)
 		{
 			myStorage = other.myStorage;
+			hasValue = other.hasValue;
 			return *this;
 		}
 
@@ -66,6 +69,7 @@ export namespace util
 			noexcept(nothrow_move_assignables<T>) requires(move_assignables<T>)
 		{
 			myStorage = static_cast<rebind_base<T>&&>(other.myStorage);
+			hasValue = static_cast<bool&&>(other.hasValue);
 			return *this;
 		}
 
