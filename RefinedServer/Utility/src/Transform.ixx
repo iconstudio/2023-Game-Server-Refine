@@ -234,7 +234,16 @@ export namespace d3d
 
 		inline void Rotation(const XMFLOAT3& axis, const float& rot) noexcept
 		{
+			XMFLOAT3 position = GetPosition();
 			myMatrix = mat::RotationAxis(axis, rot);
+			Jump(position);
+		}
+
+		inline void Rotation(XMFLOAT3&& axis, const float& rot) noexcept
+		{
+			XMFLOAT3 position = GetPosition();
+			myMatrix = mat::RotationAxis(static_cast<XMFLOAT3&&>(axis), rot);
+			Jump(position);
 		}
 
 		inline void RotateAxis(const XMFLOAT3& axis, const float& rot) noexcept
@@ -242,16 +251,27 @@ export namespace d3d
 			myMatrix *= mat::RotationAxis(axis, rot);
 		}
 
-		[[nodiscard]]
-		constexpr XyzwWrapper& GetPosition() noexcept
+		inline void RotateAxis(XMFLOAT3&& axis, const float& rot) noexcept
 		{
-			return myPosition;
+			myMatrix *= mat::RotationAxis(static_cast<XMFLOAT3&&>(axis), rot);
 		}
 
 		[[nodiscard]]
-		constexpr const XyzwWrapper& GetPosition() const noexcept
+		constexpr XMFLOAT3 GetPosition() const noexcept
 		{
-			return myPosition;
+			return XMFLOAT3{ myMatrix._41, myMatrix._42, myMatrix._43 };
+		}
+
+		[[nodiscard]]
+		constexpr XMFLOAT4X4 GetRotation() const noexcept
+		{
+			XMFLOAT4X4 result{ myMatrix };
+			result._41 = 0;
+			result._42 = 0;
+			result._43 = 0;
+			//result._44 = 1;
+
+			return result;
 		}
 
 		[[nodiscard]]
@@ -334,7 +354,6 @@ export namespace d3d
 		/// </summary>
 		XMFLOAT4X4 myMatrix{};
 
-		XyzwWrapper myPosition = { myMatrix._41, myMatrix._42, myMatrix._43, myMatrix._44 };
 		XyzwWrapper myRight = { myMatrix._11, myMatrix._12, myMatrix._13, myMatrix._14 };
 		XyzwWrapper myUp = { myMatrix._21, myMatrix._22, myMatrix._23, myMatrix._24 };
 		XyzwWrapper myLook = { myMatrix._31, myMatrix._32, myMatrix._33, myMatrix._34 };
