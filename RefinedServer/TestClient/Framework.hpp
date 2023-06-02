@@ -1,7 +1,6 @@
 #pragma once
-#include <memory>
-#include <chrono>
-#include <vector>
+import <memory>;
+import <vector>;
 
 import Utility;
 import Utility.Singleton;
