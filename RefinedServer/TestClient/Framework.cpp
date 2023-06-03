@@ -1,15 +1,14 @@
 module;
 #include "pch.hpp"
+#include <chrono>
 
 module Client.Framework;
-import Utility;
 import Utility.Print;
 import Game.Scene.Management;
 import Client.IntroScene;
 import Client.TitleScene;
 import Client.MainScene;
 import Client.GameScene;
-import <chrono>;
 
 using namespace ::game;
 using namespace ::std::chrono_literals;

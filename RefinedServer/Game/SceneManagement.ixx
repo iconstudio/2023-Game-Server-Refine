@@ -1,6 +1,8 @@
+module;
+#include <vector>
+#include <memory>
+
 export module Game.Scene.Management;
-import <vector>;
-import <memory>;
 import Utility;
 import Utility.Constraints;
 import Utility.Monad;
