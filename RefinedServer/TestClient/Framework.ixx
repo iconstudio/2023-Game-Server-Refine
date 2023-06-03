@@ -1,8 +1,4 @@
-#pragma once
-#include <GL/freeglut.h>
-#include <memory>
-#include <vector>
-
+export module Client.Framework;
 import Utility;
 import Utility.Singleton;
 import Utility.Constraints;
@@ -13,16 +9,18 @@ import Game.GameObject;
 import Game.Scene;
 import Game.Scene.Specialized;
 import Game.Scene.Management;
+import <memory>;
+import <vector>;
 
-class Framework;
-using Hetero = std::unique_ptr<util::jthread>;
-void GameUpdater(Framework& system);
-void GameInputs(Framework& system);
-void GameRenderer(Framework& system);
-
-class Framework : public util::Singleton<Framework>
+export class Framework : public util::Singleton<Framework>
 {
 public:
+	using Hetero = std::unique_ptr<util::jthread>;
+
+	friend void GameUpdater(Framework& system);
+	friend void GameInputs(Framework& system);
+	friend void GameRenderer(Framework& system);
+
 	constexpr Framework() noexcept
 		: Singleton<Framework>(this)
 	{}
@@ -37,5 +35,5 @@ public:
 
 	Hetero myWorkUnit = nullptr, myInputUnit = nullptr, myRenderUnit = nullptr;
 
-	::GLint myWindow;
+	int myWindow;
 };

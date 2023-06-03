@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "Main.hpp"
+import Client.Framework;
 
 Framework* framework = nullptr;
 

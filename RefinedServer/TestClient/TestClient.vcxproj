@@ -155,7 +155,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Framework.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="pch.hpp" />
   </ItemGroup>
@@ -166,6 +165,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Framework.ixx" />
     <ClCompile Include="GameScene.ixx" />
     <ClCompile Include="IntroScene.ixx" />
     <ClCompile Include="Main.cpp">
