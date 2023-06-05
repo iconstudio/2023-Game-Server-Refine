@@ -7,6 +7,7 @@ import <vector>;
 import Utility.Constraints;
 import Utility.Named;
 import Utility.String;
+import Utility.Memory.Watcher;
 import System.PipelineObject;
 import Game.Object;
 import Game.Component;
@@ -266,60 +267,42 @@ export namespace game
 		static inline GameObject* DeepCopy(const GameObject* const& obj)
 		{
 			GameObject* copied_child = nullptr;
-			try
+			util::Watcher watch_child{ copied_child };
+
+			if (obj->HasChild())
 			{
-				if (obj->HasChild())
-				{
-					copied_child = DeepCopy(obj->GetChild());
-				}
-			}
-			catch (...)
-			{
-				delete copied_child;
-				throw;
+				copied_child = DeepCopy(obj->GetChild());
 			}
 
 			GameObject* copied_sibling = nullptr;
-			try
+			util::Watcher watch_sib{ copied_sibling };
+
+			if (obj->HasSibling())
 			{
-				if (obj->HasSibling())
-				{
-					copied_sibling = DeepCopy(obj->GetSibling());
-				}
-			}
-			catch (...)
-			{
-				if (copied_child) delete copied_child;
-				delete copied_sibling;
-				throw;
+				copied_sibling = DeepCopy(obj->GetSibling());
 			}
 
 			GameObject* result = new GameObject{};
-			try
+			util::Watcher watch_obj{ result };
+
+			const std::vector<std::unique_ptr<Component>>& components = obj->myComponents;
+
+			std::vector<std::unique_ptr<Component>> temp_list{};
+			temp_list.reserve(components.size());
+
+			for (const std::unique_ptr<Component>& component : components)
 			{
-				const std::vector<std::unique_ptr<Component>>& components = obj->myComponents;
-
-				std::vector<std::unique_ptr<Component>> temp_list{};
-				temp_list.reserve(components.size());
-
-				for (const std::unique_ptr<Component>& component : components)
-				{
-					temp_list.emplace_back(component->Clone());
-				}
-
-				result->myChild = std::unique_ptr<GameObject>{ copied_child };
-				result->mySibling = std::unique_ptr<GameObject>{ copied_sibling };
-				result->myComponents = std::move(temp_list);
-
-			}
-			catch (...)
-			{
-				if (copied_child) delete copied_child;
-				if (copied_sibling) delete copied_sibling;
-				delete result;
-				throw;
+				temp_list.emplace_back(component->Clone());
 			}
 
+			result->myChild = std::unique_ptr<GameObject>{ copied_child };
+			result->mySibling = std::unique_ptr<GameObject>{ copied_sibling };
+			result->myComponents = std::move(temp_list);
+
+			// Guarded by exception
+			watch_child.Ok();
+			watch_sib.Ok();
+			watch_obj.Ok();
 			return result;
 		}
 
