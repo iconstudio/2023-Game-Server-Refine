@@ -9,7 +9,7 @@ import Net;
 import Net.IoState;
 import Net.Promise;
 
-export namespace net
+export extern "C++" namespace net
 {
 	using ioError = Promise<void, int>;
 
