@@ -162,7 +162,7 @@ export namespace net
 			);
 		}
 
-		inline int BeginRecv(WSABUF& buffer, Context* const& context, CompletionRoutine routine, unsigned long flags = 0) noexcept
+		inline int BeginRecv(WSABUF& buffer, Context* const& context, LPWSAOVERLAPPED_COMPLETION_ROUTINE routine, unsigned long flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{
@@ -177,7 +177,7 @@ export namespace net
 			);
 		}
 
-		inline int BeginSend(WSABUF buffer, Context* const& context, CompletionRoutine routine, const unsigned long& flags = 0) noexcept
+		inline int BeginSend(WSABUF buffer, Context* const& context, LPWSAOVERLAPPED_COMPLETION_ROUTINE routine, const unsigned long& flags = 0) noexcept
 		{
 			if (buffer.len <= 0)
 			{

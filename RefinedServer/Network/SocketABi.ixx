@@ -1,13 +1,13 @@
 module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
-
 export module Net.Socket.ABI;
 
 export namespace net
 {
 	using ::UINT_PTR;
 	using ::SOCKET;
+	using ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
 	using SoLinger = ::linger;
 	using CompletionRoutine = ::LPWSAOVERLAPPED_COMPLETION_ROUTINE;
 
