@@ -1,3 +1,6 @@
+module;
+#include <WS2tcpip.h>
+
 export module Net.Intrinsics;
 import Utility;
 import Utility.Constraints;
