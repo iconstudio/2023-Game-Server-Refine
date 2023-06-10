@@ -11,58 +11,6 @@ import Net.Promise;
 
 export extern "C++" namespace net
 {
-	using ioError = Promise<void, int>;
-
-	inline ioError CheckPending() noexcept
-	{
-		int error = debug::WSAGetLastError();
-		if (debug::CheckPending(error))
-		{
-			return io::defered;
-		}
-		else
-		{
-			return static_cast<int&&>(error);
-		}
-	}
-
-	inline ioError CheckIncomplete() noexcept
-	{
-		int error = debug::WSAGetLastError();
-		if (debug::CheckIncomplete(error))
-		{
-			return io::defered;
-		}
-		else
-		{
-			return static_cast<int&&>(error);
-		}
-	}
-
-	inline ioError CheckIO(const int& socket_fn_result) noexcept
-	{
-		if (debug::CheckError(socket_fn_result))
-		{
-			return CheckPending();
-		}
-		else
-		{
-			return io::success;
-		}
-	}
-
-	inline ioError CheckBool(const int& bool_fn_result) noexcept
-	{
-		if (0 == bool_fn_result)
-		{
-			return CheckPending();
-		}
-		else
-		{
-			return io::success;
-		}
-	}
-
 #if true
 	export namespace io
 	{
@@ -72,7 +20,7 @@ export extern "C++" namespace net
 		template<typename Gateway, typename Fn, typename... Args>
 			//requires util::r_invocables<Gateway, ioError, int>
 		inline
-			ioError
+			auto
 			ExecuteVia(Gateway&& gateway, Fn&& fn, Args&&... args)
 			noexcept(noexcept(util::forward<Gateway>(gateway)(util::forward<Fn>(fn)(util::declval<Args>()...))))
 		{
@@ -84,41 +32,37 @@ export extern "C++" namespace net
 
 			return util::forward<Gateway>(gateway)(static_cast<int&&>(result));
 #else // _DEBUG
-			return CheckIO(util::forward<Fn>(fn)(util::forward<Args>(args)...));
+			return util::forward<Fn>(fn)(util::forward<Args>(args)...);
 #endif
 		}
 
 		template<typename Fn, typename... Args>
 		inline
-			ioError
+			int
 			Execute(Fn&& fn, Args&&... args)
 			noexcept(noexcept(util::forward<Fn>(fn)(util::declval<Args>()...)))
 		{
-			return ExecuteVia(CheckIO, util::forward<Fn>(fn), util::forward<Args>(args)...);
+			return util::forward<Fn>(fn)(util::forward<Args>(args)...);
 		}
 
 		template<typename Class, typename Method, typename... Args>
 			requires so_invocables<Method, Args...>
 		inline
-			ioError
+			int
 			Delegate(Method Class::* (&& action), Class& obj, SOCKET socket, Args&&... args)
 			noexcept(noexcept((obj.*util::forward<Method Class::*>(action))(util::declval<SOCKET>(), util::declval<Args>()...)))
 		{
-			int&& result = (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
-
-			return CheckIO(static_cast<int&&>(result));
+			return (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
 		}
 
 		template<typename Class, typename Method, typename... Args>
 			requires so_invocables<Method, Args...>
 		inline
-			ioError
+			int
 			Delegate(Method Class::* (&& action), const Class& obj, SOCKET socket, Args&&... args)
 			noexcept(noexcept((obj.*util::forward<Method Class::*>(action))(util::declval<SOCKET>(), util::declval<Args>()...)))
 		{
-			int&& result = (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
-
-			return CheckIO(static_cast<int&&>(result));
+			return (obj.*util::forward<Method Class::*>(action))(socket, util::forward<Args>(args)...);
 		}
 	}
 #endif // false
