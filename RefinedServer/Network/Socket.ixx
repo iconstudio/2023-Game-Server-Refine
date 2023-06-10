@@ -16,6 +16,56 @@ export import Net.Socket.Basic;
 
 namespace net
 {
+	inline ioError CheckPending() noexcept
+	{
+		int error = debug::WSAGetLastError();
+		if (debug::CheckPending(error))
+		{
+			return io::defered;
+		}
+		else
+		{
+			return static_cast<int&&>(error);
+		}
+	}
+
+	inline ioError CheckIncomplete() noexcept
+	{
+		int error = debug::WSAGetLastError();
+		if (debug::CheckIncomplete(error))
+		{
+			return io::defered;
+		}
+		else
+		{
+			return static_cast<int&&>(error);
+		}
+	}
+
+	inline ioError CheckIO(const int& socket_fn_result) noexcept
+	{
+		if (debug::CheckError(socket_fn_result))
+		{
+			return CheckPending();
+		}
+		else
+		{
+			return io::success;
+		}
+	}
+
+	inline ioError CheckBool(const int& bool_fn_result) noexcept
+	{
+		if (0 == bool_fn_result)
+		{
+			return CheckPending();
+		}
+		else
+		{
+			return io::success;
+		}
+	}
+
 	export class [[nodiscard]] Socket : public BasicSocket
 	{
 	public:
