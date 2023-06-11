@@ -36,6 +36,12 @@ export namespace util
 	using ::std::const_pointer_cast;
 	using ::std::reinterpret_pointer_cast;
 
+	using ::std::allocate_shared;
+	using ::std::construct_at;
+	using ::std::destroy_at;
+	using ::std::destroy;
+	using ::std::destroy_n;
+
 	using ::std::pointer_traits;
 	using ::std::uninitialized_default_construct;
 	using ::std::uninitialized_default_construct_n;
@@ -48,8 +54,4 @@ export namespace util
 	using ::std::uninitialized_move_n;
 	using ::std::uninitialized_fill;
 	using ::std::uninitialized_fill_n;
-	using ::std::allocate_shared;
-	using ::std::destroy_at;
-	using ::std::destroy;
-	using ::std::destroy_n;
 }
