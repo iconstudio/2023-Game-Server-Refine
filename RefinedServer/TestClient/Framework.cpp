@@ -1,9 +1,9 @@
 module;
 #include "pch.hpp"
-#include <chrono>
 
 module Client.Framework;
 import Utility.Print;
+import Utility.Time;
 import Client.IntroScene;
 import Client.TitleScene;
 import Client.MainScene;
@@ -26,7 +26,7 @@ void Framework::Awake()
 
 void Framework::UpdateOnce(Scene* const& scene)
 {
-	auto start_time = std::chrono::high_resolution_clock::now();
+	//auto start_time = std::chrono::high_resolution_clock::now();
 	/*
 	start_time = clock::now();
 
