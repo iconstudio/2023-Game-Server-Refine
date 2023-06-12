@@ -21,7 +21,7 @@ namespace util
 		constexpr Object& operator=(Object&& other) noexcept = default;
 
 	protected:
-		constexpr Object() noexcept
+		inline Object() noexcept
 			: Named()
 			, Classifier<Object>()
 			, Indexer<Object>()
