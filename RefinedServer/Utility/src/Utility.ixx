@@ -1,12 +1,11 @@
 module;
 #include <cmath>
-#include <utility>
+#include <limits>
 #include <initializer_list>
+#include <utility>
 #include <optional>
-#include <memory>
 #include <string>
 #include <string_view>
-#include <limits>
 export module Utility;
 
 __forceinline constexpr double sqrtNewtonRaphson(double x, double curr, double prev) noexcept
@@ -61,10 +60,6 @@ export extern "C++" namespace util
 
 	using ::std::initializer_list;
 
-	using ::std::default_delete;
-	using ::std::destroying_delete_t;
-	using ::std::destroying_delete;
-
 	using ::std::move;
 	using ::std::forward;
 	using ::std::move_if_noexcept;
@@ -81,15 +76,6 @@ export extern "C++" namespace util
 
 	using ::std::is_constant_evaluated;
 	using ::std::unreachable;
-
-	using ::std::copy;
-	using ::std::copy_n;
-	using ::std::uninitialized_copy;
-	using ::std::uninitialized_copy_n;
-	using ::std::memcpy;
-	using ::std::memmove;
-	using ::memcpy_s;
-	using ::memmove_s;
 
 	using ::std::begin;
 	using ::std::end;

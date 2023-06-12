@@ -1,10 +1,8 @@
-module;
-#include <cstdio>
-#include <string>
-#include <string_view>
-#include <format>
-
 export module Utility.Print;
+import <cstdio>;
+export import <string>;
+export import <string_view>;
+export import <format>;
 import Utility;
 import Utility.String;
 import Utility.Concurrency.Locks;

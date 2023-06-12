@@ -1,7 +1,5 @@
-module;
-#include <optional>
-
 export module Utility.Expected;
+import <optional>;
 import Utility.Constraints;
 
 export namespace util

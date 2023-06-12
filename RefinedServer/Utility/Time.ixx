@@ -1,5 +1,7 @@
+module;
+#include <ctime>
+#include <chrono>
 export module Utility.Time;
-export import <chrono>;
 
 export namespace util
 {
@@ -9,5 +11,5 @@ export namespace util
 	using ::std::operator==;
 	using ::std::operator<=>;
 
-	using std::chrono::system_clock;
+	using namespace ::std::chrono;
 }

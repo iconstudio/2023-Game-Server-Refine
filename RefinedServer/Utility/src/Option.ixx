@@ -1,8 +1,6 @@
-module;
-#include <vector>
-#include <functional>
-
 export module Utility.Option;
+import <vector>;
+import <functional>;
 import Utility;
 import Utility.Constraints;
 

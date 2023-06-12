@@ -1,6 +1,5 @@
-module;
-#include <utility>
 export module Utility.Traits;
+export import <utility>;
 
 export namespace util
 {

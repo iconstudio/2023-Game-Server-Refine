@@ -1,7 +1,5 @@
-module;
-#include <variant>
-
 export module Utility.Union;
+import <variant>;
 import Utility;
 import Utility.Constraints;
 import Utility.Meta;

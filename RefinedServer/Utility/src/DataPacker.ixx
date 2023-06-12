@@ -1,8 +1,6 @@
-module;
-#include <utility>
-#include <tuple>
-
 export module Utility.Datagram.Packer;
+import <utility>;
+import <tuple>;
 import Utility;
 import Utility.Meta;
 import Utility.Constraints;

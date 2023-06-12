@@ -1,29 +1,29 @@
 module;
-#include <utility>
 #include <mutex>
 #include <shared_mutex>
+#include <latch>
 #include <semaphore>
 #include <barrier>
-#include <latch>
 #include <condition_variable>
 export module Utility.Concurrency.Locks;
+import Utility.Constraints;
 
 export namespace util
 {
 	template<typename T>
-	concept lockables = std::movable<T> && requires(T t)
+	concept lockables = movable<T> && requires(T t)
 	{
 		t.lock();
 		t.unlock();
-		{ t.try_lock() } -> std::same_as<bool>;
+		{ t.try_lock() } -> same_as<bool>;
 	};
 
 	template<typename T>
-	concept shared_lockables = std::movable<T> && lockables<T> && requires(T t)
+	concept shared_lockables = movable<T> && lockables<T> && requires(T t)
 	{
 		t.lock_shared();
 		t.unlock_shared();
-		{ t.try_lock_shared() } -> std::convertible_to<bool>;
+		{ t.try_lock_shared() } -> convertible_to<bool>;
 	};
 
 	using ::std::operator<=>;

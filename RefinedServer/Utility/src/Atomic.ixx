@@ -1,7 +1,6 @@
-module;
-#include <utility>
-#include <atomic>
 export module Utility.Atomic;
+import <utility>;
+export import <atomic>;
 
 export namespace util
 {

@@ -1,11 +1,9 @@
-module;
-#include <system_error>
-#include <utility>
-#include <array>
-#include <algorithm>
-#include <ranges>
-
 export module Utility.Array;
+import <system_error>;
+import <utility>;
+export import <array>;
+import <algorithm>;
+import <ranges>;
 import Utility;
 import Utility.Constraints;
 

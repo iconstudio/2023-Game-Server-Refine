@@ -1,7 +1,5 @@
-module;
-#include <variant>
-
 export module Utility.Monad.Loosen;
+import <variant>;
 import Utility;
 import Utility.Constraints;
 import Utility.Meta;

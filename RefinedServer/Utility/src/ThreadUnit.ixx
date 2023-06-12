@@ -1,7 +1,5 @@
-module;
-#include <exception>
-
 export module Utility.Concurrency.Thread.Unit;
+import <exception>;
 import Utility;
 import Utility.Constraints;
 import Utility.Concurrency.Thread;
