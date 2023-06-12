@@ -13,11 +13,16 @@ export namespace util
 			: myIndex(_index++)
 		{}
 
-
 		[[nodiscard]]
-		constexpr size_t GetIndex() const noexcept
+		constexpr const size_t& GetIndex() const& noexcept
 		{
 			return myIndex;
+		}
+
+		[[nodiscard]]
+		constexpr size_t&& GetIndex() && noexcept
+		{
+			return static_cast<size_t&&>(myIndex);
 		}
 
 		constexpr Indexer(Indexer&& other) noexcept = default;
