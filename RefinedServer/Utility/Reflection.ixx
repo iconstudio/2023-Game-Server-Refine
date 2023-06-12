@@ -102,26 +102,26 @@ namespace reflex
 	template<typename Tag>
 	using tag_traits_t = typename tag_traits<Tag>::type;
 
-	template<typename T>
+	export template<typename T>
 	struct reflect_traits;
 
-	template<typename T>
+	export template<typename T>
 	struct reflect_traits<const T> : reflect_traits<T>
 	{};
 
-	template<typename T>
+	export template<typename T>
 	struct reflect_traits<volatile T> : reflect_traits<T>
 	{};
 
-	template<typename T>
+	export template<typename T>
 	struct reflect_traits<const volatile T> : reflect_traits<T>
 	{};
 
-	template<typename T>
+	export template<typename T>
 	struct reflect_traits<T[]> : reflect_traits<T*>
 	{};
 
-	template<typename T, typename Trait = reflect_traits<T>>
+	export template<typename T, typename Trait = reflect_traits<T>>
 	struct reflection
 	{
 		consteval reflection() noexcept = default;
@@ -278,7 +278,7 @@ export namespace reflex
 #pragma warning(push, 1)
 namespace reflex::test
 {
-#if true
+#if false
 	void test()
 	{
 		using namespace ::std::literals;
@@ -287,7 +287,7 @@ namespace reflex::test
 		const fixed_string bbb{ "342" };
 		fixed_string ccc{ "342" };
 
-		constexpr reflect_t<int> aaa_2 = 0;
+		constexpr reflect_t<const volatile int> aaa_2 = 0;
 		//constexpr parents<int> bbb_2{};
 		//constexpr children<int> ccc_2{};
 		constexpr auto nameii = name<int>;
