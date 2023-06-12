@@ -1,4 +1,3 @@
-
 module;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
@@ -9,7 +8,7 @@ export namespace net
 {
 	void ss()
 	{
-		Socket sk = Socket::CreateTCP();
+		//Socket sk = Socket::CreateTCP();
 
 
 		LPFN_RIODEREGISTERBUFFER;
