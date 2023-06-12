@@ -61,4 +61,7 @@
     <None Include="$(MSBuildThisFileDirectory)src\Deserialization.inl" />
     <None Include="$(MSBuildThisFileDirectory)src\Serialization.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Reflection.cc" />
+  </ItemGroup>
 </Project>
