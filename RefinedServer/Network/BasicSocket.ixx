@@ -219,6 +219,29 @@ export namespace net
 			);
 		}
 
+		template<typename Control>
+		[[nodiscard]]
+		inline int AcquireIoControl(Control& ptr, const DWORD& code, GUID uid, PDWORD bytes, Context* overlap = nullptr) const
+		{
+			return ::WSAIoctl(myHandle
+				, code
+				, &uid, sizeof(uid)
+				, &ptr, sizeof(ptr)
+				, bytes
+				, overlap, nullptr);
+		}
+
+		template<typename Fn>
+		[[nodiscard]]
+		inline int AcquireIoMethod(Fn& method_ptr, GUID uid, PDWORD bytes, Context* overlap = nullptr) const
+		{
+			return
+				this->AcquireIoControl<Fn>(method_ptr
+				, SocketIos::SocketIoForGettingFunction
+				, uid
+				, bytes, overlap);
+		}
+
 		[[nodiscard]]
 		constexpr SOCKET Handle() const& noexcept
 		{
