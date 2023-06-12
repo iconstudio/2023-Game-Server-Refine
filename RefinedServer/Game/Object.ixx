@@ -1,3 +1,6 @@
+module;
+#include "Object.cc"
+
 export module Game.Object;
 import Utility.Indexer;
 export import Utility.Classifier;
@@ -7,6 +10,7 @@ export namespace game
 	class alignas(32) Object
 		: private util::Indexer<Object>
 		, public util::Classifier<Object>
+		//, public util::Object
 	{
 	public:
 		constexpr Object() noexcept = default;
@@ -24,9 +28,15 @@ export namespace game
 		}
 
 		[[nodiscard]]
-		constexpr size_t GetID() const noexcept
+		constexpr const size_t& GetID() const& noexcept
 		{
-			return GetIndex();
+			return Indexer<Object>::GetIndex();
+		}
+
+		[[nodiscard]]
+		constexpr size_t&& GetID() && noexcept
+		{
+			return static_cast<Object&&>(*this).Indexer<Object>::GetIndex();
 		}
 
 		[[nodiscard]]
