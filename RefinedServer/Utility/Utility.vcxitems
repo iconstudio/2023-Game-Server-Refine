@@ -18,6 +18,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)D3DUtility.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MemoryWatcher.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Object.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Reflection.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Spinlock.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Array.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Atomic.ixx" />
