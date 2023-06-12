@@ -31,6 +31,15 @@ export namespace util
 		constexpr Indexer& operator=(const Indexer& other) noexcept = default;
 		constexpr ~Indexer() noexcept = default;
 
+	protected:
+		explicit constexpr Indexer(const size_t& index) noexcept
+			: myIndex(index)
+		{}
+
+		explicit constexpr Indexer(size_t&& index) noexcept
+			: myIndex(static_cast<size_t&&>(index))
+		{}
+
 	private:
 		size_t myIndex;
 		inline constinit static size_t _index = 0;
