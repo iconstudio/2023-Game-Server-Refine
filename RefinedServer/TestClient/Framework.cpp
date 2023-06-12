@@ -1,6 +1,3 @@
-module;
-#include "pch.hpp"
-
 module Client.Framework;
 import Utility.Print;
 import Utility.Time;
@@ -10,6 +7,22 @@ import Client.MainScene;
 import Client.GameScene;
 
 using namespace ::game;
+
+using dt_clock = std::chrono::steady_clock;
+using time_point = dt_clock::time_point;
+using duration = dt_clock::duration;
+using period = dt_clock::period;
+using alter_duration = std::chrono::milliseconds;
+constexpr float num = static_cast<float>(period::num);
+constexpr float den = static_cast<float>(period::den);
+constexpr float idv = num / den;
+
+time_point start_time{};
+time_point current_time{};
+duration between{};
+float est = 0;
+
+alter_duration stacked_time{};
 
 void Framework::Awake()
 {
@@ -26,14 +39,12 @@ void Framework::Awake()
 
 void Framework::UpdateOnce(Scene* const& scene)
 {
-	//auto start_time = std::chrono::high_resolution_clock::now();
-	/*
-	start_time = clock::now();
+	start_time = dt_clock::now();
 
 	scene->Update(est);
 	util::debug::Println("씬 업데이트 (시간: {:.5f}초)", est);
 
-	current_time = clock::now();
+	current_time = dt_clock::now();
 	between = current_time - start_time;
 	est = static_cast<float>(between.count()) * idv;
 	stacked_time += std::chrono::duration_cast<alter_duration>(between);
@@ -43,15 +54,15 @@ void Framework::UpdateOnce(Scene* const& scene)
 		if (!game::SceneManager::IsAvailableNext())
 		{
 			util::Println("다음 씬이 없습니다.");
-			break;
+			return;
 		}
 		else
 		{
-			const util::Monad<game::Scene*> scene_wrapper = game::SceneManager::GotoNextScene();
+			const util::Monad<game::Scene*> scene_wrapper = SceneManager::GotoNextScene();
 
 			if (scene_wrapper.has_value())
 			{
-				game::Scene* const& next = *scene_wrapper;
+				Scene* const& next = *scene_wrapper;
 
 				util::Println("다음 씬 {}을(를) 시작합니다.", *next);
 				next->Start();
@@ -59,8 +70,8 @@ void Framework::UpdateOnce(Scene* const& scene)
 			else
 			{
 				util::Println("오류! 씬 {}에 문제가 있습니다.", *scene);
-				break;
+				return;
 			}
 		}
-	}*/
+	}
 }
