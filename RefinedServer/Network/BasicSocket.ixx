@@ -223,6 +223,21 @@ export namespace net
 		[[nodiscard]]
 		inline int AcquireIoControl(Control& ptr, const DWORD& code, GUID uid, PDWORD bytes, Context* overlap = nullptr) const
 		{
+			if constexpr (0 == sizeof(Control))
+			{
+				return -1;
+			}
+
+			if (nullptr == bytes)
+			{
+				return -1;
+			}
+
+			if (0 == code)
+			{
+				return -1;
+			}
+
 			return ::WSAIoctl(myHandle
 				, code
 				, &uid, sizeof(uid)
