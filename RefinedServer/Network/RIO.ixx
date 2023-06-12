@@ -9,7 +9,7 @@ export namespace net
 	void init_rio()
 	{
 		RIO_EXTENSION_FUNCTION_TABLE rio; // 함수 테이블
-		constexpr GUID functionTableId = WSAID_MULTIPLE_RIO; // 테이블 아이디
+		GUID functionTableId = WSAID_MULTIPLE_RIO; // 테이블 아이디
 
 		DWORD dwBytes = 0; // 더미 변수
 		SOCKET mListenSocket{};
