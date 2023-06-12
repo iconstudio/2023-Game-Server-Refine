@@ -176,6 +176,20 @@ namespace net
 			return CheckIO(BasicSocket::BeginSend(buffer, context, routine, flags));
 		}
 
+		template<typename Control>
+		[[nodiscard]]
+		inline ioError AcquireIoControl(Control& ptr, const DWORD& code, GUID uid, PDWORD bytes, Context* overlap = nullptr) const
+		{
+			return CheckIO(BasicSocket::AcquireIoControl(ptr, code, uid, bytes, overlap));
+		}
+
+		template<typename Fn>
+		[[nodiscard]]
+		inline ioError AcquireIoMethod(Fn& method_ptr, GUID uid, PDWORD bytes, Context* overlap = nullptr) const
+		{
+			return AcquireIoControl<Fn>(method_ptr, SocketIos::SocketIoForGettingFunction, uid, bytes, overlap);
+		}
+
 		[[nodiscard]]
 		static inline
 			Promise<Socket, int>
