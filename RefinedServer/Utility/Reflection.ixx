@@ -153,6 +153,12 @@ namespace reflex
 	struct reflect_traits<const volatile T> : reflect_traits<T>
 	{};
 
+	template<typename T>
+	struct reflect_traits<T[]> : reflect_traits<T*>
+	{};
+
+	export constexpr size_t LastTypeIndex = 27;
+
 #define MAKE_PARENTS(...) \
 	::reflex::tag_types<__VA_ARGS__>
 
@@ -202,7 +208,7 @@ export MAKE_REFLECTION_NO_HIERACHY(std::wstring, 23, "wide string");
 export MAKE_REFLECTION_NO_HIERACHY(std::u8string, 24, "utf-8 string");
 export MAKE_REFLECTION_NO_HIERACHY(std::u16string, 25, "utf-16 string");
 export MAKE_REFLECTION_NO_HIERACHY(std::u32string, 26, "utf-32 string");
-export MAKE_REFLECTION_NO_HIERACHY(std::string_view, 27, "string_view");
+export MAKE_REFLECTION_NO_HIERACHY(std::string_view, ::reflex::LastTypeIndex, "string_view");
 
 export namespace reflex
 {
@@ -210,16 +216,16 @@ export namespace reflex
 	using reflect_t = typename reflect_traits<T>::template type;
 
 	template<typename T>
-	using parents_t = typename reflect_traits<T>::template parents;
+	using parents = typename reflect_traits<T>::template parents;
 
 	template<typename T>
-	using children_t = typename reflect_traits<T>::template children;
+	using children = typename reflect_traits<T>::template children;
 
 	template<typename T, size_t I>
-	using parent_t = meta::at<parents_t<T>, I>;
+	using parent = meta::at<parents<T>, I>;
 
 	template<typename T, size_t I>
-	using child_t = meta::at<children_t<T>, I>;
+	using child = meta::at<children<T>, I>;
 
 	template<typename T>
 	inline constexpr size_t type_id = reflect_traits<T>::template type_id;
@@ -232,7 +238,13 @@ export namespace reflex
 	{
 		return type_id<T> == type_id<U>;
 	}
+}
 
+#pragma warning(push, 1)
+namespace reflex::test
+{
+#if false
+{
 	void test()
 	{
 		using namespace ::std::literals;
@@ -260,13 +272,12 @@ export namespace reflex
 		constexpr auto id = test_refl_int::type_id;
 
 		constexpr reflect_t<int> aaa_2 = 0;
-		constexpr parents_t<int> bbb_2{};
-		constexpr children_t<int> ccc_2{};
+		constexpr parents<int> bbb_2{};
+		constexpr children<int> ccc_2{};
 		constexpr auto nameii = name<int>;
 		constexpr char name_2 = nameii[0];
 		constexpr auto id_2 = type_id<int>;
-
-
-		//constexpr make_reflection<int, 0, "int"> aa{};
 	}
+#endif
 }
+#pragma warning(pop)
