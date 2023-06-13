@@ -23,5 +23,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Scene.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SceneManagement.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SpecializedScene.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Window.ixx" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,5 @@
+module;
+#include <GL/freeglut.h>
 export module Client.GameScene;
 import Game.Scene.Specialized;
 
