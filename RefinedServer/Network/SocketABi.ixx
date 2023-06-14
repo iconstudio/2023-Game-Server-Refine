@@ -41,6 +41,7 @@ export namespace net
 	enum SocketIos : unsigned long
 	{
 		SocketIoForGettingFunction = SIO_GET_EXTENSION_FUNCTION_POINTER,
+		SocketIoForGettingMutipleFunctions = SIO_GET_MULTIPLE_EXTENSION_FUNCTION_POINTER
 	};
 
 	enum class SocketTasks : unsigned long
