@@ -4,7 +4,6 @@ import Utility.Memory;
 import Utility.Print;
 import Utility.Concurrency.Thread;
 import Game.Scene;
-import Game.Scene.Specialized;
 import Game.Scene.Management;
 
 export class Framework : public util::Singleton<Framework>
