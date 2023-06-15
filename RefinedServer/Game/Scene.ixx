@@ -47,7 +47,6 @@ export extern "C++" namespace game
 		constexpr Scene(util::string_view name) noexcept
 			: Named(name), Indexer<Scene>()
 		{
-			std::formatter<std::string> a;
 			gameObjects.reserve(10ULL);
 		}
 
