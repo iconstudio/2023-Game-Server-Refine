@@ -1,10 +1,17 @@
+module;
 #include <GL/freeglut.h>
 module Client.IntroScene;
 
 void IntroScene::Awake()
 {
 	basis::Awake();
-	myLoadTime = 0;
+
+	int argc = 0;
+	glutInit(&argc, nullptr); // glut √ ±‚»≠
+
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowSize(800, 600);
+	glutCreateWindow("Practice");
 }
 
 void IntroScene::Update(const float dt)
