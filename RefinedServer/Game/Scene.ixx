@@ -1,10 +1,10 @@
 module;
 #define SCENE_ATOMIC_FLAGS false
-export module Game.Scene;
 
+export module Game.Scene;
+#if SCENE_ATOMIC_FLAGS
 import Utility.Atomic;
 
-#if SCENE_ATOMIC_FLAGS
 #define SCENE_CONSTEXPR inline
 #define GET_FLAG(flag) flag.load(util::memory_order_relaxed)
 using FLAG_T = util::atomic_bool;
@@ -17,6 +17,7 @@ using FLAG_T = bool;
 #endif // !SCENE_ATOMIC_FLAGS
 
 import <string>;
+import <memory>;
 import <format>;
 import <vector>;
 import <algorithm>;
