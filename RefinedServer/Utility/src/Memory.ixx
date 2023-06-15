@@ -4,6 +4,10 @@ export module Utility.Memory;
 
 export namespace util
 {
+	using ::std::operator==;
+	using ::std::operator!=;
+	using ::std::operator<=>;
+
 	using ::std::memcpy;
 	using ::std::memmove;
 	using ::std::memcmp;
@@ -42,6 +46,9 @@ export namespace util
 	using ::std::destroy;
 	using ::std::destroy_n;
 
+	using ::std::reference_wrapper;
+	using ::std::ref;
+	using ::std::cref;
 	using ::std::pointer_traits;
 	using ::std::uninitialized_default_construct;
 	using ::std::uninitialized_default_construct_n;
