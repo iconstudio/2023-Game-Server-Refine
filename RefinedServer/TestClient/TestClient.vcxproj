@@ -172,6 +172,7 @@
     </ClCompile>
     <ClCompile Include="Framework.ixx" />
     <ClCompile Include="GameScene.ixx" />
+    <ClCompile Include="IntroScene.cpp" />
     <ClCompile Include="IntroScene.ixx" />
     <ClCompile Include="Main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>

@@ -10,34 +10,16 @@ public:
 		: basis(this, "Intro Scene")
 	{}
 
-	void Awake() override
-	{
-		basis::Awake();
-		myLoadTime = 0;
-	}
+	void Awake() override;
 
 	void Start() noexcept override
 	{
 		basis::Start();
 	}
 
-	void Update(const float dt) override
-	{
-		basis::Update(dt);
+	void Update(const float dt) override;
 
-		myLoadTime += dt;
-
-		if (maxPeriod <= myLoadTime)
-		{
-			MakeCompletion();
-		}
-	}
-
-	void Destroy() override
-	{
-		basis::Destroy();
-		myLoadTime = 0;
-	}
+	void Destroy() override;
 
 	const float maxPeriod = 6.0f;
 	float myLoadTime = 0;
