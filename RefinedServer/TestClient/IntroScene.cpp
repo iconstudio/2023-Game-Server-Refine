@@ -1,6 +1,8 @@
 module;
 #include <GL/freeglut.h>
+
 module Client.IntroScene;
+import Client.Framework;
 
 void IntroScene::Awake()
 {
@@ -11,7 +13,9 @@ void IntroScene::Awake()
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("Practice");
+
+	const int handle = glutCreateWindow("Practice");
+	Framework::Instance->SetWindowID(handle);
 }
 
 void IntroScene::Update(const float dt)

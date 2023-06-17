@@ -68,7 +68,24 @@ public:
 		scene->Render(context);
 	}
 
-	Hetero myWorkUnit = nullptr, myInputUnit = nullptr, myRenderUnit = nullptr;
+	void SetWindowID(const int& id) noexcept
+	{
+		myWindow = id;
+	}
 
+	[[nodiscard]]
+	const int& GetWindowID() const& noexcept
+	{
+		return myWindow;
+	}
+
+	[[nodiscard]]
+	int&& GetWindowID() && noexcept
+	{
+		return static_cast<int&&>(myWindow);
+	}
+
+private:
+	Hetero myWorkUnit = nullptr, myInputUnit = nullptr, myRenderUnit = nullptr;
 	int myWindow;
 };
