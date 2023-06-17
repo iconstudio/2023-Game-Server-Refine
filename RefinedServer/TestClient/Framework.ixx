@@ -1,4 +1,6 @@
 export module Client.Framework;
+import <vector>;
+import Utility.Constraints;
 import Utility.Singleton;
 import Utility.Memory;
 import Utility.Print;
@@ -6,18 +8,28 @@ import Utility.Concurrency.Thread;
 import Game.Scene;
 import Game.Scene.Management;
 
+export class Framework;
+
+export template <typename T>
+concept game_updaters = util::invocable<T, Framework&>;
+
+export template <typename T>
+concept game_renderers = util::invocable<T, Framework&>;
+
+export template <typename T>
+concept game_inputs = util::invocable<T, Framework&>;
+
 export class Framework : public util::Singleton<Framework>
 {
 public:
 	using Hetero = util::unique_ptr<util::jthread>;
 
-	friend void GameUpdater(Framework& system);
-	friend void GameInputs(Framework& system);
-	friend void GameRenderer(Framework& system);
-
 	constexpr Framework() noexcept
 		: Singleton<Framework>(this)
-	{}
+		, myWorkers()
+	{
+		myWorkers.reserve(3);
+	}
 
 	constexpr ~Framework() noexcept = default;
 
@@ -68,6 +80,11 @@ public:
 		scene->Render(context);
 	}
 
+	constexpr void AddWorker(Hetero&& worker) noexcept
+	{
+		myWorkers.emplace_back(static_cast<Hetero&&>(worker));
+	}
+
 	void SetWindowID(const int& id) noexcept
 	{
 		myWindow = id;
@@ -86,6 +103,6 @@ public:
 	}
 
 private:
-	Hetero myWorkUnit = nullptr, myInputUnit = nullptr, myRenderUnit = nullptr;
+	std::vector<Hetero> myWorkers;
 	int myWindow;
 };

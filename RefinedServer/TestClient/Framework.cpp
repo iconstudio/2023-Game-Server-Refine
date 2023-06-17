@@ -34,7 +34,7 @@ void Framework::Awake()
 
 	SceneManager::AwakeScenes();
 
-	SceneManager::SetActiveScene(0);
+	[[maybe_unused]] SceneManager::SetActiveScene(0);
 }
 
 void Framework::UpdateOnce(Scene* const& scene)
