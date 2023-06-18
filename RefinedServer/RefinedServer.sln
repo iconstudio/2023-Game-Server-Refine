@@ -53,11 +53,9 @@ Global
 		Core\Core.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Game\Game.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Network\Network.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
-		Utility\Utility.vcxitems*{66be34ff-ef60-4b87-9fd0-567e6486bc27}*SharedItemsImports = 4
 		Core\Core.vcxitems*{74c59b3a-a02f-4e4e-9e1e-afce7a7cb14b}*SharedItemsImports = 9
 		Game\Game.vcxitems*{9ff0670c-e50b-4b55-a28c-dbc42287ffa0}*SharedItemsImports = 9
 		Core\Core.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
 		Network\Network.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
-		Utility\Utility.vcxitems*{d64513c7-da16-431a-ba60-51d12683f0d8}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal
