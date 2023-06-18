@@ -17,12 +17,15 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Camera.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Component.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)D3DMatrix.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)D3DVector.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameObject.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Object.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PipelineObject.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Scene.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SceneManagement.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SpecializedScene.ixx" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Transform.ixx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Window.ixx" />
   </ItemGroup>
 </Project>
